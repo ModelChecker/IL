@@ -1,6 +1,6 @@
 ### General Design Philosophy
 
-
+<!--
 Extension the SMT-LIB language with new commands to define and verify systems.
 
 
@@ -28,25 +28,29 @@ where
 
 * _T_ is the system's _transition relation_ expressed as an SMT-LIB formula over the input variables **i**, output variables **o**,  state variables **s**, and _next_ state variables **o**.
 
-
 ### Supported SMT-LIB commands
 
-`(declare-sort` _s n_ `)`
-`(declare-enum-sort` _s_ `(`_c<sub>1</sub> ⋅⋅⋅ c<sub>n</sub>_`))`
-`(define-sort` _s_ `(`_u<sub>1</sub> ⋅⋅⋅ u<sub>n</sub>_`)` _τ_ `)`
-`(declare-const` _c σ_ `)`
-`(define-fun` _f_ `((`_x<sub>1</sub> σ<sub>1</sub>_`)` ··· `(`_x<sub>n</sub> σ<sub>n</sub>_`))` _σ  t_ `)`
+<tt>(declare-sort _s n_)</tt>
+
+<tt>(declare-enum-sort _s_ (_c<sub>1</sub> ⋅⋅⋅ c<sub>n</sub>_))</tt>
+
+<tt>(define-sort _s_ (_u<sub>1</sub> ⋅⋅⋅ u<sub>n</sub>_) _τ_)</tt>
+  
+<tt>(declare-const _c σ_)</tt>
+
+<tt>(define-fun _f_ ((_x<sub>1</sub> σ<sub>1</sub>_) ··· (_x<sub>n</sub> σ<sub>n</sub>_)) _σ  t_)</tt>
+-->
 
 
 ### System definition command
 
-<tt>(define-system</tt> _S_ 
-&nbsp; <tt>((</tt>_i<sub>1</sub> δ<sub>1</sub>_<tt>)</tt>  ⋅⋅⋅ <tt>(</tt>_i<sub>m</sub> δ<sub>m</sub>_<tt>)) ; input vars</tt>  
-&nbsp; <tt>((</tt>_o<sub>1</sub> τ<sub>1</sub>_<tt>)</tt>  ⋅⋅⋅ <tt>(</tt>_o<sub>n</sub> τ<sub>n</sub>_<tt>)) ; output vars</tt>
-&nbsp; <tt>((</tt>_s<sub>1</sub> σ<sub>1</sub>_<tt>)</tt>  ⋅⋅⋅ <tt>(</tt>_s<sub>p</sub> σ<sub>p</sub>_<tt>)) ; current state vars</tt>  
-&nbsp; <tt>(</tt>_sub<sub>1</sub> ⋅⋅⋅ sub<sub>k</sub>_<tt>) ; subsystems</tt>
-&nbsp;&nbsp; _I_ <tt>&nbsp;&nbsp; ; initial state condition</tt>
-&nbsp;&nbsp; _T_ <tt>&nbsp;&nbsp; ; transition relation</tt>
+<tt>(define-system _S_</tt><br>
+<tt>&nbsp; ((_i<sub>1</sub> δ<sub>1</sub>_)  ⋅⋅⋅ (_i<sub>m</sub> δ<sub>m</sub>_)) ; input vars </tt><br>
+<tt>&nbsp; ((_o<sub>1</sub> τ<sub>1</sub>_) ⋅⋅⋅ (_o<sub>n</sub> τ<sub>n</sub>_)) ; output vars</tt><br>
+<tt>&nbsp; ((_s<sub>1</sub> σ<sub>1</sub>_) ⋅⋅⋅ (_s<sub>p</sub> σ<sub>p</sub>_)) ; current state vars</tt><br>
+<tt>&nbsp; (_sub<sub>1</sub> ⋅⋅⋅ sub<sub>k</sub>_) ; subsystems</tt><br>
+<tt>&nbsp;&nbsp; _I_ &nbsp;&nbsp; ; initial state condition</tt><br>
+<tt>&nbsp;&nbsp; _T_ &nbsp;&nbsp; ; transition relation</tt><br>
 <tt>)</tt>
 
 where
