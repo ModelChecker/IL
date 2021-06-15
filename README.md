@@ -1,6 +1,5 @@
 ### General Design Philosophy
 
-<!--
 Extension the SMT-LIB language with new commands to define and verify systems.
 
 
@@ -39,8 +38,6 @@ where
 <tt>(declare-const _c σ_)</tt>
 
 <tt>(define-fun _f_ ((_x<sub>1</sub> σ<sub>1</sub>_) ··· (_x<sub>n</sub> σ<sub>n</sub>_)) _σ  t_)</tt>
--->
-
 
 ### System definition command
 
