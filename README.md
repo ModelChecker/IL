@@ -13,15 +13,15 @@ Each system definition
 
 Formally, a transition system is a predicate _S_ of the form
 
-_S = λ **i**:**δ**, **o**:**τ**, **s**:**σ** (I[**s**],T[**i**,**o**,**s**,**s'**])_
+_S = λ **i**:**δ**, **o**:**τ**, **s**:**σ**, **s'**:**σ** (I[**s**],T[**i**,**o**,**s**,**s'**])_
 
 where
 
 * _**i** = (i<sub>1</sub>, ..., i<sub>m</sub>)_ is a tuple of _input variables_ of respective type _**δ** = (δ<sub>1</sub>, ..., δ<sub>m</sub>,)_
 
-* _**s** = (s<sub>1</sub>, ..., s<sub>n</sub>)_ and _**s** = (s<sub>1</sub>, ..., s<sub>n</sub>)_ are two tuples of _state variables_ of respective type _**σ** = (σ<sub>1</sub>, ..., σ<sub>n</sub>)_
+* _**o** = (o<sub>1</sub>, ..., o<sub>n</sub>)_ is a tuple of _output variables_ of respective type _**τ** = (τ<sub>1</sub>, ..., τ<sub>n</sub>,)_
 
-* _**i** = (i<sub>1</sub>, ..., i<sub>k</sub>)_ is a tuple of _output variables_ of respective type _**τ** = (τ<sub>1</sub>, ..., τ<sub>k</sub>,)_
+* _**s** = (s<sub>1</sub>, ..., s<sub>p</sub>)_ and _**s'** = (s<sub>1</sub>', ..., s<sub>p</sub>')_ are two tuples of _state variables_ of respective type _**σ** = (σ<sub>1</sub>, ..., σ<sub>p</sub>)_
 
 * _I_ is the system's _initial state condition_ expressed as an SMT-LIB formula over the state variables **s**.
 
@@ -56,9 +56,8 @@ where
 * each _i<sub>i</sub>_ is an input variable of sort _δ<sub>i</sub>_;
 * each _o<sub>i</sub>_ is an output variables of sort _τ<sub>i</sub>_;
 * each _s<sub>i</sub>_ is a current state variables of sort _σ<sub>i</sub>_;
-* the system's next state variables are not provided explicitly but are denoted by convention as primed version of the current state variables (_s<sub>i</sub>'_ for each _s<sub>i</sub>);
-* each _sub<sub>i</sub>_ has the form <tt>(_S<sub>i</sub>_ (_x<sub>1</sub> ⋅⋅⋅ x<sub>m<sub>i</sub></sub>_)) (_y<sub>1</sub> ⋅⋅⋅ y<sub>n<sub>i</sub></sub>_))</tt> where each _x_ is a variable of _S_ and each _y_ is a next state or an output variable of _S_ [to double check].
-
+* the system's next state variables are not provided explicitly but are denoted by convention as primed version of the current state variables (_s<sub>i</sub>'_ for each _i_);
+* each _sub<sub>i</sub>_ has the form <tt>(_S<sub>i</sub>_ (_x<sub>1</sub> ⋅⋅⋅ x<sub>m<sub>i</sub></sub>_)) (_y<sub>1</sub> ⋅⋅⋅ y<sub>n<sub>i</sub></sub>_))</tt> where each _x_ is a variable of _S_ and each _y_ is a next state or an output variable of _S_ [to be checked].
 * _I_ is an SMT-LIB formula over the current state variables;
 * _T_ is an SMT-LIB formula over all of the system's variables.
 
@@ -68,6 +67,8 @@ where
 1. _I_ should denote a non-empty set of states.
 
 2. _T_ should denote a right-total relation over states that also imposes no constraints on the value of the input variables.
+
+The totality restriction ensures that there are no _stuck_ states: from any state and for any possible input there is a possible output and next state. (As usual, this is with no loss of generality as a system's with a final state can be modeled as one with a self-loop.)
 
 A necessary and sufficient condition for (1) is that _I_ is satisfiable (in the relevant background theory).
 A sufficient condition for (2) is that _T_ is the the following formula is valid (in the relevant theory): 
