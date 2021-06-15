@@ -60,24 +60,22 @@ where
 * each _o<sub>i</sub>_ is an output variables of sort _τ<sub>i</sub>_;
 * each _s<sub>i</sub>_ is a current state variables of sort _σ<sub>i</sub>_;
 * the system's next state variables are not provided explicitly but are denoted by convention as primed version of the current state variables (_s<sub>i</sub>'_ for each _s<sub>i</sub>);
-* each _sub<sub>i</sub>_ has the form <tt>(</tt>_S<sub>i</sub>_ <tt>(</tt>_x<sub>1</sub> ⋅⋅⋅ x<sub>m<sub>i</sub></sub>_<tt>)) (</tt>_y<sub>1</sub> ⋅⋅⋅ y<sub>n<sub>i</sub></sub>_<tt>))</tt> where each _x_ is a variable of _S_ and each _y_ is a next state or an output variable of _S_ [to double check].
+* each _sub<sub>i</sub>_ has the form <tt>(_S<sub>i</sub>_ (_x<sub>1</sub> ⋅⋅⋅ x<sub>m<sub>i</sub></sub>_)) (_y<sub>1</sub> ⋅⋅⋅ y<sub>n<sub>i</sub></sub>_))</tt> where each _x_ is a variable of _S_ and each _y_ is a next state or an output variable of _S_ [to double check].
 
 * _I_ is an SMT-LIB formula over the current state variables;
 * _T_ is an SMT-LIB formula over all of the system's variables.
 
 
-#### Requirements on $I$ and $T$
+#### Requirements on _I_ and _T_
 
 1. _I_ should denote a non-empty set of states.
 
 2. _T_ should denote a right-total relation over states that also imposes no constraints on the value of the input variables.
 
 A necessary and sufficient condition for (1) is that _I_ is satisfiable (in the relevant background theory).
-
 A sufficient condition for (2) is that _T_ is the the following formula is valid (in the relevant theory): 
-<center><i>
-∀ i<sub>1</sub> ⋅⋅⋅ ∀ i<sub>m</sub> ∀ s<sub>1</sub> ⋅⋅⋅ ∀ s<sub>q</sub> ∃ o<sub>1</sub> ⋅⋅⋅ ∃ o<sub>n</sub> ∃ s<sub>1</sub>' ⋅⋅⋅ ∃ s<sub>q</sub>' T
-</i></center>
+
+_∀ i<sub>1</sub> ⋅⋅⋅ ∀ i<sub>m</sub> ∀ s<sub>1</sub> ⋅⋅⋅ ∀ s<sub>q</sub> ∃ o<sub>1</sub> ⋅⋅⋅ ∃ o<sub>n</sub> ∃ s<sub>1</sub>' ⋅⋅⋅ ∃ s<sub>q</sub>' T_
 
 
 
