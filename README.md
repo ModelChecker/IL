@@ -57,7 +57,7 @@ where
 * each _o<sub>i</sub>_ is an output variables of sort _τ<sub>i</sub>_;
 * each _s<sub>i</sub>_ is a current state variables of sort _σ<sub>i</sub>_;
 * the system's next state variables are not provided explicitly but are denoted by convention as primed version of the current state variables (_s<sub>i</sub>'_ for each _i_);
-* each _sub<sub>i</sub>_ has the form <tt>(_S<sub>i</sub>_ (_x<sub>1</sub> ⋅⋅⋅ x<sub>m<sub>i</sub></sub>_)) (_y<sub>1</sub> ⋅⋅⋅ y<sub>n<sub>i</sub></sub>_))</tt> where each _x_ is a variable of _S_ and each _y_ is a next state or an output variable of _S_ [to be checked].
+* each _sub<sub>i</sub>_ has the form <tt>(_S<sub>i</sub>_ (_x<sub>1</sub> ⋅⋅⋅ x<sub>m<sub>i</sub></sub>_) (_y<sub>1</sub> ⋅⋅⋅ y<sub>n<sub>i</sub></sub>_))</tt> where each _x_ is a variable of _S_ and each _y_ is a next state or an output variable of _S_ [to be checked].
 * _I_ is an SMT-LIB formula over the current state variables;
 * _T_ is an SMT-LIB formula over all of the system's variables.
 
@@ -68,7 +68,7 @@ where
 
 2. _T_ should denote a right-total relation over states that also imposes no constraints on the value of the input variables.
 
-The totality restriction ensures that there are no _stuck_ states: from any state and for any possible input there is a possible output and next state. (As usual, this is with no loss of generality as a system's with a final state can be modeled as one with a self-loop.)
+The totality restriction ensures that there are no _stuck_ states: from any state and for any possible input there is a possible output and next state. (As usual, this is with no loss of generality as a system with a final state can be modeled as one with a self-loop.)
 
 A necessary and sufficient condition for (1) is that _I_ is satisfiable (in the relevant background theory).
 A sufficient condition for (2) is that _T_ is the the following formula is valid (in the relevant theory): 
