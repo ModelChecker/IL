@@ -41,14 +41,16 @@ Each system definition:
 <!-- * may be associated to (proved) state invariants (one-state properties) and transition invariants (two-properties); -->
 <!-- * may be abstracted by its associated properties. -->
 
-**Notation:** If an FOL $F$ is a formula and $\boldsymbol x$ a tuple of distinct variables, let $F[\boldsymbol x]$ express the fact that every variable in $\boldsymbol x$ is free in $F$.
+**Notation:** If an FOL $F$ is a formula and 
+$\boldsymbol{x}$ a tuple of distinct variables, let $F[\boldsymbol{x}]$ express the fact that every variable 
+in $\boldsymbol{x}$ is free in $F$.
 
 Formally, a transition system $S$ is a pair of predicates of the form
 
 $$S = ( 
   \lambda \boldsymbol i{:}\boldsymbol{\sigma} \lambda \boldsymbol o{:}\boldsymbol\tau~
    I_S [\boldsymbol i, \boldsymbol o,  \boldsymbol s],~
-  \lambda \boldsymbol i{:}\boldsymbol\sigma \lambda \boldsymbol{i'}{:}\sigma \lambda \boldsymbol o{:}\boldsymbol\tau \lambda \boldsymbol{o'}{:}\boldsymbol\tau~
+  \lambda \boldsymbol i{:}\boldsymbol\sigma \lambda \boldsymbol{i'}{:}\boldsymbol\sigma \lambda \boldsymbol o{:}\boldsymbol\tau \lambda \boldsymbol{o'}{:}\boldsymbol\tau~
    T_S [\boldsymbol i, \boldsymbol o, \boldsymbol s, \boldsymbol{i'}, \boldsymbol{o'}, \boldsymbol{s'}] 
 )$$
 
