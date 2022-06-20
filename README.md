@@ -41,15 +41,21 @@ Each system definition:
 <!-- * may be associated to (proved) state invariants (one-state properties) and transition invariants (two-properties); -->
 <!-- * may be abstracted by its associated properties. -->
 
-**Notation:** If an FOL $F$ is a formula and $\bm x$ a tuple of distinct variables, let $F[\bm x]$ express the fact that every variable in $\bm x$ is free in $F$.
+**Notation:** If an FOL $F$ is a formula and $\boldsymbol x$ a tuple of distinct variables, let $F[\boldsymbol x]$ express the fact that every variable in $\boldsymbol x$ is free in $F$.
 
 Formally, a transition system $S$ is a pair of predicates of the form
 
-$$S = ( \lambda \bm i{:}\bm{\sigma} \, \lambda \bm o{:}\bm\tau\, I_S [\bm i, \bm o,  \bm s],\: \lambda \bm i{:}\bm\sigma\, \lambda \bm{i'}{:}\sigma\, \lambda \bm o{:}\bm\tau\, \lambda \bm{o'}{:}\bm\tau\, T_S [\bm i,\, \bm o,\, \bm s,\, \bm{i'},\, \bm{o'},\, \bm{s'}] )$$
+$$S = ( 
+  \lambda \boldsymbol i{:}\boldsymbol{\sigma} \lambda \boldsymbol o{:}\boldsymbol\tau~
+   I_S [\boldsymbol i, \boldsymbol o,  \boldsymbol s],~
+  \lambda \boldsymbol i{:}\boldsymbol\sigma \lambda \boldsymbol{i'}{:}\sigma \lambda \boldsymbol o{:}\boldsymbol\tau \lambda \boldsymbol{o'}{:}\boldsymbol\tau~
+   T_S [\boldsymbol i, \boldsymbol o, \boldsymbol s, \boldsymbol{i'}, \boldsymbol{o'}, \boldsymbol{s'}] 
+)$$
 
 where
 
-* _**i** = (i<sub>1</sub>, ..., i<sub>m</sub>)_ and _**i'** = (i<sub>1</sub>', ..., i<sub>m</sub>')_ are two tuples of _input variables_, both of type _**δ** = (δ<sub>1</sub>, ..., δ<sub>m</sub>)_
+* $\boldsymbol i = (i_1, ..., i_m)$ and 
+  $\boldsymbol{i} = (i_1', ..., i_m')$ are two tuples of _input variables_, both of type $\boldsymbol\delta = (\delta_1, ..., \delta_m)$
 
 * _**s** = (s<sub>1</sub>, ..., s<sub>p</sub>)_ and _**s'** = (s<sub>1</sub>', ..., s<sub>p</sub>')_ are two tuples of _local (or, internal state) variables_, both of type _**σ** = (σ<sub>1</sub>, ..., σ<sub>p</sub>)_
 
