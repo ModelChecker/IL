@@ -1,11 +1,3 @@
-
-$\def\RR{{\bf R}}
- \def\bs#1{{\boldsymbol{#1}}}
-$
-
-$\RR$
-
-$
 ### Model Checking Intermediate Language
 
 # Model Checking Intermediate Language (Draft)
@@ -35,6 +27,10 @@ IL is an extension the SMT-LIB language with new commands to define and verify s
 It allows the definition of multi-component synchronous reactive systems.
 It also allows the specification and checking of state invariants, transition invariants and deadlocks, possibly under fairness conditions on input values. 
 
+
+
+
+
 IL assumes a linear notion of time and hence has a standard trace-based semantics.
 
 Each system definition:
@@ -52,9 +48,10 @@ Formally, a transition system $S$ is a pair of predicates of the form
 $$S = ( 
   \lambda \boldsymbol i{:}\boldsymbol{\sigma} \lambda \boldsymbol o{:}\boldsymbol\tau~
    I_S [\boldsymbol i, \boldsymbol o,  \boldsymbol s],~
-  \lambda \boldsymbol i{:}\boldsymbol\sigma \lambda \boldsymbol{i'}{:}\boldsymbol\sigma \lambda \boldsymbol o{:}\boldsymbol\tau \lambda \boldsymbol{o'}{:}\boldsymbol\tau~
+  \lambda \boldsymbol i{:}\boldsymbol\sigma \lambda \boldsymbol{i'}{:}\sigma \lambda \boldsymbol o{:}\boldsymbol\tau \lambda \boldsymbol{o'}{:}\boldsymbol\tau~
    T_S [\boldsymbol i, \boldsymbol o, \boldsymbol s, \boldsymbol{i'}, \boldsymbol{o'}, \boldsymbol{s'}] 
 )$$
+
 where
 
 * $\boldsymbol i = (i_1, ..., i_m)$ and 
