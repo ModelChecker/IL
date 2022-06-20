@@ -1,0 +1,53 @@
+%---------------------------------------------------------
+%% Beamer customization
+
+%\setbeamercolor{math text}{fg=tuftsblue}
+%\setbeamercolor{math text}{fg=copperrose}
+\setbeamercolor{math text}{fg=gray}
+\setbeamercolor{alerted text}{fg=mordantred19}
+\setbeamercolor{frametitle}{fg=black}
+\setbeamercolor{title}{fg=black}
+\setbeamercolor{enumerate item}{fg=black}
+\setbeamercolor{itemize item}{fg=black}
+\setbeamercolor{itemize subitem}{fg=black}
+\setbeamercolor{subtitle}{fg=mordantred19}
+\setbeamercolor{theorem text}{fg=mordantred19} 
+
+
+\setbeamerfont{frametitle}{series=\bfseries}
+
+\setbeamertemplate{itemize item}[circle]
+\setbeamertemplate{itemize subitem}[circle]
+
+\setbeamercovered{transparent=4}
+
+\setbeamertemplate{navigation symbols}{}
+
+\setbeamertemplate{frametitle}
+{
+ \vspace{1ex}
+ \insertframetitle\par
+}
+
+\setbeamertemplate{footline}[frame number]
+
+\makeatletter
+\newcommand*{\overlaynumber}{\number\beamer@slideinframe}
+\makeatother
+
+
+\setbeamertemplate{theorems}[numbered]
+
+\AtBeginEnvironment{theorem}{%
+  \setbeamercolor{block title}{fg=egyptianblue}
+}
+\AtBeginEnvironment{lemma}{%
+  \setbeamercolor{block title}{fg=egyptianblue}
+}
+\AtBeginEnvironment{Proof}{%
+  \setbeamercolor{block title}{fg=egyptianblue}
+}
+
+
+%---------------------------------------------------------
+
