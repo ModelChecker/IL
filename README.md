@@ -1,77 +1,121 @@
-### Model Checking Intermediate Language
 
 # Model Checking Intermediate Language (Draft)
 
-The Model Checking Intermediate Language (IL, for short) is an intermediate language meant to be a common input and output standard for model checker for finite- and infinite-state systems, with an initial focus is on finite-state ones.
-
+The Model Checking Intermediate Language (IL, for short) is an intermediate language 
+meant to be a common input and output standard for model checker 
+for finite- and infinite-state systems, 
+with an initial focus is on finite-state ones.
 
 ## General Design Philosophy
 
+IL has been designed to be general enough to be an intermediate target language 
+for a variety of user-facing specification languages for model checking.
+At the same time, IL is meant to be simple enough to be easily compilable 
+to lower level languages or be directly supported by model checking tools based 
+on SAT/SMT technology. 
 
-IL has been designed to be general enough to be a target language for a variety of user-facing model specification languages.
+For being an intermediate language, models expressed in IL are meant 
+to be produced and processed by tools, hence it was designed to have
 
-For being an intermediate language, its models are meant to be produced and processed by tools, hence it was designed to have
-
-* simple, easily parsable syntax
-* minimal syntactic sugar, at least initially
-* simple semantics
-* a small but comprehensive set of commands
+* simple, easily parsable syntax;
+* a rich set of data types;
+* minimal syntactic sugar, at least initially;
+* well-understood formal semantics;
+* a small but comprehensive set of commands;
 * simple translations to lower level modeling languages such as Btor2 and Aiger.
 
-Based on these principles, IL provides no direct support for many of the features offered by current hardware modeling languages such as VHDL and Verilog or more general purpose system modeling languages such as SMV, TLA+, PROMELA, Simulink, SCADE, Lustre. 
-However, it strives to offer enough capability so that problems expressed in those languages can be reduced to problems in IL.
+Based on these principles, IL provides no direct support for many of the features 
+offered by current hardware modeling languages such as VHDL and Verilog 
+or more general purpose system modeling languages 
+such as SMV, TLA+, PROMELA, Simulink, SCADE, Lustre. 
+However, it strives to offer enough capability so that problems expressed 
+in those languages can be reduced to problems in IL.
 
+IL is an extension the [SMT-LIB language](https://smtlib.cs.uiowa.edu/language.shtml) 
+with new commands to define and verify systems.
+It allows the definition of multi-component synchronous or asynchronous reactive systems.
+It also allows the specification and checking of reachability conditions 
+(or, indirectly state and transition invariants) and deadlocks, 
+possibly under fairness conditions on input values. 
 
-
-IL is an extension the SMT-LIB language with new commands to define and verify systems.
-It allows the definition of multi-component synchronous reactive systems.
-It also allows the specification and checking of state invariants, transition invariants and deadlocks, possibly under fairness conditions on input values. 
-
-
-
-
-
-IL assumes a linear notion of time and hence has a standard trace-based semantics.
+IL assumes a discrete and linear notion of time and hence has a standard trace-based semantics.
 
 Each system definition:
-* is parametrized by a state signature, a sequence of sorted variables;
-* divides state variables into input, output and local variables;
-* it defines a _transition systems_ via the formalization of an initial state predicate and a transition predicate from (many-sorted) FOL;
+* defines a _transition system_ via the use of SMT formulas, 
+  imposing minimal syntactic restrictions on those formulas;
+* is parametrized by a _state signature_, a sequence of typed variables;
+* partitions state variables into input, output and local variables;
 * can be expressed as the synchronous or asynchronous composition of other systems 
-<!-- * may be associated to (proved) state invariants (one-state properties) and transition invariants (two-properties); -->
-<!-- * may be abstracted by its associated properties. -->
+* is _hierarchical_ ,i.e., may include (instances of) previously defined systems as subsystems;
+* can encode both synchronous and asynchronous system composition.
 
-**Notation:** If an FOL $F$ is a formula and 
-$\boldsymbol{x}$ a tuple of distinct variables, let $F[\boldsymbol{x}]$ express the fact that every variable 
-in $\boldsymbol{x}$ is free in $F$.
+The current focus on _finite-state_ systems. 
+However, the language has been designed to support the specification 
+of infinite-state system as well.
+
+## Technical Preliminaries
+
+The base logic of IL is the same as that of SMT-LIB: 
+many-sorted first-order logic with equality and let binders.
+When we say _formula_, with no further qualifications, we refer to an arbitrary formula 
+of this logic (possibly with quantifiers and let binders).
+
+We say that a formula is _quantifier-free_ if it contains no occurrences of 
+the quantifiers $\forall$ and $\exists$.
+We say that it is _binder-free_ if it is quantifier-free and also contains no occurrences
+of the let binder.
+
+The _scope_ of binders and the notion of _free_ and _bound_ (occurrences of) variables in a formula are defined as usual.
+
+#### Notation
+If $F$ is a formula and $\boldsymbol{x} = (x_1, \ldots, x_n)$ a tuple of distinct variables, 
+we write $F[\boldsymbol{x}]$ or $F[x_1, \ldots, x_n]$ to express the fact that every variable 
+in $\boldsymbol{x}$ is free in $F$ (although $F$ may have additional free variables).
+We write $\boldsymbol{x},\boldsymbol{y}$ to denote the concatenation of tuple $\boldsymbol{x}$ with tuple $\boldsymbol{y}$.
+When its clear from the context, given a formula $F[\boldsymbol{x}]$ and 
+a tuple $\boldsymbol{t} = (t_1, \ldots, t_n)$ of terms of the same type as $\boldsymbol{x} = (x_1, \ldots, x_n)$, 
+we write $F[\boldsymbol{t}]$ or $F[t_1, \ldots, t_n]$ to denote the formula obtained from $F$ 
+by simultaneously replacing each occurrence of $x_i$ by $t_i$ for all $i=1,\ldots,n$.
+
+A formula may contain _uninterpreted_ constant and function symbols, 
+that is, symbols with no constraints on their interpretation. 
+For all purposes, we treat uninterpreted constants as free variables and 
+treat uninterpreted function symbols as _second-order_ free variables.
+
+### Transition systems
 
 Formally, a transition system $S$ is a pair of predicates of the form
 
 $$S = ( 
-  \lambda \boldsymbol i{:}\boldsymbol{\sigma} \lambda \boldsymbol o{:}\boldsymbol\tau~
    I_S [\boldsymbol i, \boldsymbol o,  \boldsymbol s],~
-  \lambda \boldsymbol i{:}\boldsymbol\sigma \lambda \boldsymbol{i'}{:}\boldsymbol\sigma \lambda \boldsymbol o{:}\boldsymbol\tau \lambda \boldsymbol{o'}{:}\boldsymbol\tau~
    T_S [\boldsymbol i, \boldsymbol o, \boldsymbol s, \boldsymbol{i'}, \boldsymbol{o'}, \boldsymbol{s'}] 
 )$$
 
 where
 
-* $\boldsymbol i = (i_1, ..., i_m)$ and 
-  $\boldsymbol{i} = (i_1', ..., i_m')$ are two tuples of _input variables_, both of type $\boldsymbol\delta = (\delta_1, ..., \delta_m)$
+* $\boldsymbol i$ and $\boldsymbol{i'}$ are two tuples of _input variables_ 
+  with the same length and type;
+* $\boldsymbol o$ and $\boldsymbol{o'}$ are two tuples of _output variables_ 
+  with the same length and type;
+* $\boldsymbol s$ and $\boldsymbol{s'}$ are two tuples of _local variables_ 
+  with the same length and type;
+* $I_S$ is the system's _initial state condition_, expressed as a formula 
+  with no (free) variables from $\boldsymbol{i'},\boldsymbol{o'},\boldsymbol{s'}$;
+* $T_S$ is the system's _transition condition_, expressed as a formula 
+  over the variables 
+  $\boldsymbol{i},\boldsymbol{o},\boldsymbol{s},\boldsymbol{i'},\boldsymbol{o'},\boldsymbol{s'}$.
 
-* _**s** = (s<sub>1</sub>, ..., s<sub>p</sub>)_ and _**s'** = (s<sub>1</sub>', ..., s<sub>p</sub>')_ are two tuples of _local (or, internal state) variables_, both of type _**σ** = (σ<sub>1</sub>, ..., σ<sub>p</sub>)_
-
-* _**o** = (o<sub>1</sub>, ..., o<sub>n</sub>)_ and _**o'** = (o<sub>1</sub>', ..., o<sub>n</sub>')_  are two tuples of _output variables_, both of type _**τ** = (τ<sub>1</sub>, ..., τ<sub>n</sub>)_
-
-* _I<sub>S</sub> [**i**, **o**, **s**]_ is the system's _initial state condition_, expressed as an SMT-LIB formula over the input variables **i**, output variables **o** and local variables **s**.
-
-* _T<sub>S</sub> [**i**, **o**, **s**, **i'**, **o'**, **s'**]_ is the system's _transition relation_, expressed as an SMT-LIB formula over the _current-state_ input (**i**), output (**o**), and local (**s**) variables, and next-state _next-state_ input (**i'**), output (**o'**), and local (**s'**) variables.
+**Note:** 
+For convenience, but differently from other formalizations, a (full) state of system $S$
+is expressed by a valuation of the variables $\boldsymbol{i},\boldsymbol{o},\boldsymbol{s}$.
+<font color=red>[More]</font>
 
 **Note:** Similarly to Mealy machines, the initial state condition is also meant to specify the initial system's output based on the initial state and input. Correspondingly, the transition relation is also meant to specify the system's output in every later state of the computation.
 
-**Note:** The input and output values corresponding to the transition to the new state are those in the variables **i'** and **o'**. The values of **i**, **o** are the _old_ input and output values.
+**Note:** The input and output values corresponding to the transition to the new state are those in the variables $\boldsymbol{i'}$ and $\boldsymbol{o'}$. 
+The values of $\boldsymbol{i}$, $\boldsymbol{o}$ are the _old_ input and output values.
 
-**Note:** In this formulation, for uniformity, input and output variables are automatically _stateful_ since the transition relation formula can access old values of inputs and outputs in addition to the old values of the local state. This means that, technically, _S_ is a closed system. The designation of some state variables as input or output is, however, important when combining systems together, to capture which of the state values are shared between two systems being combined, and how.
+**Note:** In this formulation, for uniformity, input and output variables are automatically _stateful_ since the transition relation formula can access old values of inputs and outputs in addition to the old values of the local state. This means that, technically, $S$ is a closed system. The designation of some state variables as input or output is, however, important when combining systems together, to capture which of the state values are shared between two systems being combined, and how.
 
 
 ## Supported SMT-LIB commands
