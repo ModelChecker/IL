@@ -60,20 +60,25 @@ many-sorted first-order logic with equality and let binders.
 When we say _formula_, with no further qualifications, we refer to an arbitrary formula 
 of this logic (possibly with quantifiers and let binders).
 
-We say that a formula is _quantifier-free_ if it contains no occurrences of 
-the quantifiers $\forall$ and $\exists$.
+We say that a formula is _quantifier-free_ if it contains no occurrences 
+of the quantifiers $\forall$ and 
+$\exists$.
 We say that it is _binder-free_ if it is quantifier-free and also contains no occurrences
 of the let binder.
 
-The _scope_ of binders and the notion of _free_ and _bound_ (occurrences of) variables in a formula are defined as usual.
+The _scope_ of binders and the notion of _free_ and _bound_ (occurrences of) variables 
+in a formula are defined as usual.
 
 #### Notation
-If $F$ is a formula and $\boldsymbol{x} = (x_1, \ldots, x_n)$ a tuple of distinct variables, 
+If $F$ is a formula and 
+$\boldsymbol{x} = (x_1, \ldots, x_n)$ a tuple of distinct variables, 
 we write $F[\boldsymbol{x}]$ or $F[x_1, \ldots, x_n]$ to express the fact that every variable 
 in $\boldsymbol{x}$ is free in $F$ (although $F$ may have additional free variables).
-We write $\boldsymbol{x},\boldsymbol{y}$ to denote the concatenation of tuple $\boldsymbol{x}$ with tuple $\boldsymbol{y}$.
+We write $\boldsymbol{x},\boldsymbol{y}$ to denote the concatenation of tuple 
+$\boldsymbol{x}$ with tuple $\boldsymbol{y}$.
 When its clear from the context, given a formula $F[\boldsymbol{x}]$ and 
-a tuple $\boldsymbol{t} = (t_1, \ldots, t_n)$ of terms of the same type as $\boldsymbol{x} = (x_1, \ldots, x_n)$, 
+a tuple $\boldsymbol{t} = (t_1, \ldots, t_n)$ of terms of the same type 
+as $\boldsymbol{x} = (x_1, \ldots, x_n)$, 
 we write $F[\boldsymbol{t}]$ or $F[t_1, \ldots, t_n]$ to denote the formula obtained from $F$ 
 by simultaneously replacing each occurrence of $x_i$ by $t_i$ for all $i=1,\ldots,n$.
 
@@ -110,10 +115,15 @@ For convenience, but differently from other formalizations, a (full) state of sy
 is expressed by a valuation of the variables $\boldsymbol{i},\boldsymbol{o},\boldsymbol{s}$.
 <font color=red>[More]</font>
 
-**Note:** Similarly to Mealy machines, the initial state condition is also meant to specify the initial system's output based on the initial state and input. Correspondingly, the transition relation is also meant to specify the system's output in every later state of the computation.
+**Note:** Similarly to Mealy machines, the initial state condition is also meant to specify 
+the initial system's output based on the initial state and input. 
+Correspondingly, the transition relation is also meant to specify the system's output 
+in every later state of the computation.
 
-**Note:** The input and output values corresponding to the transition to the new state are those in the variables $\boldsymbol{i'}$ and $\boldsymbol{o'}$. 
-The values of $\boldsymbol{i}$, $\boldsymbol{o}$ are the _old_ input and output values.
+**Note:** The input and output values corresponding to the transition to the new state are 
+those in the variables $\boldsymbol{i'}$ and 
+$\boldsymbol{o'}$. 
+The values of $\boldsymbol{i}, \boldsymbol{o}$ are the _old_ input and output values.
 
 **Note:** In this formulation, for uniformity, input and output variables are automatically _stateful_ since the transition relation formula can access old values of inputs and outputs in addition to the old values of the local state. This means that, technically, $S$ is a closed system. The designation of some state variables as input or output is, however, important when combining systems together, to capture which of the state values are shared between two systems being combined, and how.
 
