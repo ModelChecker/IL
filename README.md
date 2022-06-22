@@ -185,19 +185,21 @@ and denote by $\pi^i$ the subsequence $s_i, s_{i+1}, \ldots$ for all $i \geq 0$.
 ### Trace semantics
 
 Let $F[\boldsymbol f, \boldsymbol x, \boldsymbol x']$ be a formula as above.
-If $\mathcal I$ is an interpretation of $\boldsymbol f$ and $\pi$ is and infinite trace,
+If $\mathcal I$ is an interpretation 
+of $\boldsymbol f$ 
+and $\pi$ is and infinite trace,
 $(\mathcal I, \pi)$ _satisfies_ $F$, 
 written $(\mathcal I, \pi) \models F$, iff
 
-* $\mathcal I[\boldsymbol x \mapsto s_0(\boldsymbol x), 
-              \boldsymbol{x'} \mapsto s_1(\boldsymbol x)]$ satisfies $F$ as in FOL
+* $\mathcal I[\boldsymbol x \mapsto s_0(\boldsymbol x), \boldsymbol{x'} \mapsto s_1(\boldsymbol x)]$ 
+   satisfies $F$ as in FOL
    when $F$ is an atomic formula;
 * $(\mathcal I, \pi) \not\models G$ 
    when $F = \lnot G$;
 * $(\mathcal I, \pi) \models G_i$ for $i=1,2$ 
    when $F = G_1 \land G_2$;
 * $(\mathcal I[z \mapsto v], \pi) \models G$ for some value $v$ for $x$ 
-   when $F = \exists x\, G$;
+   when $F = \exists x\\, G$;
 * $(\mathcal I, \pi^i) \models G$ for some $i \geq 0$ 
    when $F = \mathbf{eventually}~G$;
 * $(\mathcal I, \pi^i) \models G$ for all $i \geq 0$ 
@@ -207,8 +209,10 @@ written $(\mathcal I, \pi) \models F$, iff
 The semantics of the propositional connectives $\lor, \rightarrow, \leftrightarrow$
 and the quantifier $\forall$
 can be defined by reduction to the connectives above 
-(e.g., by defining $G_1 \lor G_2$ as $\lnot(\lnot G_1 ∧ \lnot G_2)$ and so on).
-Note that both $\exists$ is a _static_, or _rigid_, quantifier:
+(e.g., by defining $G_1 \lor G_2$ as 
+$\lnot(\lnot G_1 \land \lnot G_2)$ and so on).
+
+**Note:**  $\exists$ is a _static_, or _rigid_, quantifier:
 the meaning of the variable it quantifies does not change over time,
 that is, over the trace $\pi$.
 The same is true for uninterpreted symbols. 
