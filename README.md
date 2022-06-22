@@ -1,3 +1,8 @@
+---
+title: Model Checking Intermediate Language
+author: Cesare Tinelli 
+date: 2022-06-21
+---
 
 # Model Checking Intermediate Language (Draft)
 
@@ -57,8 +62,9 @@ of infinite-state system as well.
 
 The base logic of IL is the same as that of SMT-LIB: 
 many-sorted first-order logic with equality and let binders.
+We refer to this logic simply as FOL.
 When we say _formula_, with no further qualifications, we refer to an arbitrary formula 
-of this logic (possibly with quantifiers and let binders).
+of FOL (possibly with quantifiers and let binders).
 
 We say that a formula is _quantifier-free_ if it contains no occurrences 
 of the quantifiers $\forall$ and 
@@ -84,7 +90,7 @@ by simultaneously replacing each occurrence of $x_i$ by $t_i$ for all $i=1,\ldot
 
 A formula may contain _uninterpreted_ constant and function symbols, 
 that is, symbols with no constraints on their interpretation. 
-For all purposes, we treat uninterpreted constants as free variables and 
+For most purposes, we treat uninterpreted constants as free variables and 
 treat uninterpreted function symbols as _second-order_ free variables.
 
 ### Transition systems
@@ -113,7 +119,12 @@ where
 **Note:** 
 For convenience, but differently from other formalizations, a (full) state of system $S$
 is expressed by a valuation of the variables $\boldsymbol{i},\boldsymbol{o},\boldsymbol{s}$.
-<font color=red>[More]</font>
+In other words, input and output variables are automatically _stateful_ since the transition relation formula can access old values of inputs and outputs in addition to the old values 
+of the local state. 
+This means that, technically, $S$ is a closed system. 
+The designation of some state variables as input or output is, however, important 
+when combining systems together, to capture which of the state values are shared 
+between two systems being combined, and how.
 
 **Note:** Similarly to Mealy machines, the initial state condition is also meant to specify 
 the initial system's output based on the initial state and input. 
@@ -125,18 +136,99 @@ those in the variables $\boldsymbol{i'}$ and
 $\boldsymbol{o'}$. 
 The values of $\boldsymbol{i}, \boldsymbol{o}$ are the _old_ input and output values.
 
-**Note:** In this formulation, for uniformity, input and output variables are automatically _stateful_ since the transition relation formula can access old values of inputs and outputs in addition to the old values of the local state. This means that, technically, $S$ is a closed system. The designation of some state variables as input or output is, however, important when combining systems together, to capture which of the state values are shared between two systems being combined, and how.
+### Trace Semantics
+
+A transition system in the sense above implicitly defines a model
+(i.e., a Kripke structure) of First-Order Linear Temporal Logic (FO-LTL).
+
+The language of FO-LTL extends that of FOL with the same modal operators of time
+as in standard (propositional) LTL: 
+$\mathbf{always},$
+$\mathbf{eventually},$
+$\mathbf{next},$
+$\mathbf{until},$
+$\mathbf{release}$.
+For our purposes of defining the semantics of transition systems
+it is enough to consider just the $\mathbf{always}$ and
+$\mathbf{eventually}$ operators.
+
+The non-temporal operators depend on the particular theory, in the sense of SMT, 
+considered (linear integer/real arithmetic, bit vectors, strings, and so on, and 
+their combinations).
+The meaning of theory symbols (such as arithmetic operators) and theory sorts
+(such as $\mathsf{Int}$,
+$\mathsf{Real},$
+$\mathsf{Array(Int, Real)},$ 
+$\mathsf{BitVec(3)}$, $\ldots$) 
+is fixed by the theory $\mathcal T$ in question. 
+Once a theory $\mathcal T$ has been fixed then, the meaning of a FO-LTL formula $F$ 
+is provided by an interpretation of the uninterpreted (constant and function) symbols 
+of $F$, if any,
+as well as an infinite sequence of valuations for the free variables of $F$.
+
+More precisely, we will fix a tuple $\boldsymbol x = (x_1,\ldots,x_n)$ 
+of distinct _state_ variables, meant to represent the state of a computation system. 
+We will denote by $\boldsymbol{x'}$ 
+the tuple $(x_1',\ldots,x_n')$ 
+and write formulas of the form $F[\boldsymbol f, \boldsymbol x, \boldsymbol x']$ 
+where $\boldsymbol f$ is a tuple of uninterpreted symbols.
+If $F$ has free occurrences of variables 
+of $\boldsymbol x$ 
+but not of $\boldsymbol{x'}$ we call it a _one-state_ formula; 
+otherwise, we call it a _two-state_ formula.
+
+For all $k \geq 0$, let $s_k$ be a _valuation of_ $\boldsymbol x$, mapping each $x_j$ 
+in $\boldsymbol x$ to a value of $x_j$'s type.
+We call the infinite sequence $\pi = s_0, s_1, \ldots$ a _trace_
+and denote by $\pi^i$ the subsequence $s_i, s_{i+1}, \ldots$ for all $i \geq 0$.
+
+### Trace semantics
+
+Let $F[\boldsymbol f, \boldsymbol x, \boldsymbol x']$ be a formula as above.
+If $\mathcal I$ is an interpretation of $\boldsymbol f$ and $\pi$ is and infinite trace,
+$(\mathcal I, \pi)$ _satisfies_ $F$, 
+written $(\mathcal I, \pi) \models F$, iff
+
+* $\mathcal I[\boldsymbol x \mapsto s_0(\boldsymbol x), 
+              \boldsymbol{x'} \mapsto s_1(\boldsymbol x)]$ satisfies $F$ as in FOL
+   when $F$ is an atomic formula;
+* $(\mathcal I, \pi) \not\models G$ 
+   when $F = \lnot G$;
+* $(\mathcal I, \pi) \models G_i$ for $i=1,2$ 
+   when $F = G_1 \land G_2$;
+* $(\mathcal I[z \mapsto v], \pi) \models G$ for some value $v$ for $x$ 
+   when $F = \exists x\, G$;
+* $(\mathcal I, \pi^i) \models G$ for some $i \geq 0$ 
+   when $F = \mathbf{eventually}~G$;
+* $(\mathcal I, \pi^i) \models G$ for all $i \geq 0$ 
+   when $F = \mathbf{always}~G$;
+<!-- * $(\mathcal I, \pi^1) \models G$ when $F = \mathbf{next}~G$; -->
+
+The semantics of the propositional connectives $\lor, \rightarrow, \leftrightarrow$
+and the quantifier $\forall$
+can be defined by reduction to the connectives above 
+(e.g., by defining $G_1 \lor G_2$ as $\lnot(\lnot G_1 ∧ \lnot G_2)$ and so on).
+Note that both $\exists$ is a _static_, or _rigid_, quantifier:
+the meaning of the variable it quantifies does not change over time,
+that is, over the trace $\pi$.
+The same is true for uninterpreted symbols. 
+They are _rigid_ in the same sense that their meaning does not change over time.
+
+Another way to understand the difference between rigid and non-rigid symbols is that 
+state variables are mutable over time 
+whereas quantified variables, theory symbols and uninterpreted symbols are all immutable.
 
 
 ## Supported SMT-LIB commands
 
-SMT-LIB is a command-based language with LISP-like syntax designed to be a common input/output language for SMT solvers.
+SMT-LIB is a command-based language with LISP-like syntax designed to be 
+a common input/output language for SMT solvers.
 
 IL adopts the following SMT-LIB commands:
 
-* <tt>(declare-sort _s n_)</tt>
+* <tt>(declare-sort $s$ $n$)</tt>
 
-  Declares _s_ to be a sort symbol (i.e., type constructor) of arity _n_.
+  Declares $s$ to be a sort symbol (i.e., type constructor) of arity $n$.
   Examples:
   ```scheme
   (declare-sort A 0)
@@ -144,7 +236,7 @@ IL adopts the following SMT-LIB commands:
   ; possible sorts: A, (Set A), (Set (Set A)), ...
   ```
 
-* <tt>(define-sort _s_ (_u<sub>1</sub> ⋅⋅⋅ u<sub>n</sub>_) _τ_)</tt>
+* <tt>(define-sort $s$ ($u_1 \cdots u_n$) $\tau$)</tt>
 
   Defines _s_ as synonym of a parametric type _τ_ with parameters _u<sub>1</sub> ⋅⋅⋅ u<sub>n</sub>_.
   Examples:
