@@ -177,50 +177,112 @@ of $\boldsymbol x$
 but not of $\boldsymbol{x'}$ we call it a _one-state_ formula; 
 otherwise, we call it a _two-state_ formula.
 
-For all $k \geq 0$, let $s_k$ be a _valuation of_ $\boldsymbol x$, mapping each $x_j$ 
-in $\boldsymbol x$ to a value of $x_j$'s type.
-We call the infinite sequence $\pi = s_0, s_1, \ldots$ a _trace_
-and denote by $\pi^i$ the subsequence $s_i, s_{i+1}, \ldots$ for all $i \geq 0$.
+A _valuation of_ $\boldsymbol x$, or a _state (over $\boldsymbol x$)_, is function mapping 
+each variable $x$ in $\boldsymbol x$ to a value of $x$'s type.
+Let $\kappa$ be a positive ordinal smaller than $\omega$, the cardinality of the natural numbers.
+A _trace (of length $\kappa$)_ is any state sequence $\pi = (s_j)_{0 \leq j < \kappa}$.
+Note that $\pi$ is the finite sequence $s_0, \ldots, s_{\kappa-1}$ when $\kappa < \omega$ and 
+is the infinite sequence $s_0, s_1, \ldots$ otherwise.
+For all $i$ with $ 0 \leq i < \kappa$ , we denote by $\pi[i]$ the state $s_i$ and
+by $\pi^i$ the subsequence $(s_j)_{i \leq j < \kappa}$.
 
-### Trace semantics
+### Infinite-Trace Semantics
 
-Let $F[\boldsymbol f, \boldsymbol x, \boldsymbol x']$ be a formula as above.
-If $\mathcal I$ is an interpretation 
-of $\boldsymbol f$ 
-and $\pi$ is and infinite trace,
-$(\mathcal I, \pi)$ _satisfies_ $F$, 
+Let $F[\boldsymbol f, \boldsymbol x, \boldsymbol{x'}]$ be a formula as above.
+If $\mathcal I$ is an interpretation of $\boldsymbol f$ in the theory $\mathcal T$ and 
+$\pi$ is an infinite trace,
+then $(\mathcal I, \pi)$ _satisfies_ $F$, 
 written $(\mathcal I, \pi) \models F$, iff
 
-* $\mathcal I[\boldsymbol x \mapsto s_0(\boldsymbol x), \boldsymbol{x'} \mapsto s_1(\boldsymbol x)]$ 
-   satisfies $F$ as in FOL
-   when $F$ is an atomic formula;
-* $(\mathcal I, \pi) \not\models G$ 
-   when $F = \lnot G$;
-* $(\mathcal I, \pi) \models G_i$ for $i=1,2$ 
-   when $F = G_1 \land G_2$;
-* $(\mathcal I[z \mapsto v], \pi) \models G$ for some value $v$ for $x$ 
-   when $F = \exists x\\, G$;
-* $(\mathcal I, \pi^i) \models G$ for some $i \geq 0$ 
-   when $F = \mathbf{eventually}~G$;
-* $(\mathcal I, \pi^i) \models G$ for all $i \geq 0$ 
-   when $F = \mathbf{always}~G$;
+* $F$ is atomic and
+  $\mathcal I[\boldsymbol x \mapsto \pi[0](\boldsymbol x), 
+              \boldsymbol{x'} \mapsto \pi[1](\boldsymbol x)]$ satisfies $F$ as in FOL;
+* $F = \lnot G~$ and 
+  $~(\mathcal I, \pi) \not\models G$;
+* $F = G_1 \land G_2~$ and 
+  $~(\mathcal I, \pi) \models G_i$ for $i=1,2$;
+* $F = \exists x\, G~$ and
+  $~(\mathcal I[z \mapsto v], \pi) \models G$ for some value $v$ for $x$;
+* $F = \mathbf{eventually}~G~$ and 
+  $~(\mathcal I, \pi^i) \models G$ for some $i \geq 0$;
+* $F = \mathbf{always}~G~$ and
+  $~(\mathcal I, \pi^i) \models G$ for all $i \geq 0$;
 <!-- * $(\mathcal I, \pi^1) \models G$ when $F = \mathbf{next}~G$; -->
 
 The semantics of the propositional connectives $\lor, \rightarrow, \leftrightarrow$
 and the quantifier $\forall$
 can be defined by reduction to the connectives above 
-(e.g., by defining $G_1 \lor G_2$ as 
-$\lnot(\lnot G_1 \land \lnot G_2)$ and so on).
-
-**Note:**  $\exists$ is a _static_, or _rigid_, quantifier:
+(e.g., by defining $G_1 \lor G_2$ as $\lnot(\lnot G_1 ∧ \lnot G_2)$ and so on).
+Note that $\exists$ is a _static_, or _rigid_, quantifier:
 the meaning of the variable it quantifies does not change over time,
-that is, over the trace $\pi$.
+that is, from state to state in $\pi$.
 The same is true for uninterpreted symbols. 
-They are _rigid_ in the same sense that their meaning does not change over time.
+They are _rigid_ in the same sense: their meaning does not change over time.
 
 Another way to understand the difference between rigid and non-rigid symbols is that 
 state variables are mutable over time 
 whereas quantified variables, theory symbols and uninterpreted symbols are all immutable.
+
+Now let
+$S = ( 
+   I_S [\boldsymbol i, \boldsymbol o,  \boldsymbol s],~
+   T_S [\boldsymbol i, \boldsymbol o, \boldsymbol s, \boldsymbol{i'}, \boldsymbol{o'}, \boldsymbol{s'}] 
+)$
+be a transition system with state variables $\boldsymbol i, \boldsymbol o,  \boldsymbol s$.
+
+The _infinite trace semantics_ of $S$ is the set of all pairs $(\mathcal I, \pi)$ 
+of interpretations $\mathcal I$ in $\mathcal T$ and infinite traces $\pi$ such that
+
+$$(\mathcal I, \pi) \models
+  I_S \land\ \mathbf{always}~T_S
+$$
+
+We call any such pair an _execution_ of $S$.
+
+**Note:**
+[We focus on reactive systems]
+
+
+### Finite-Trace Semantics
+
+Let $F[\boldsymbol f, \boldsymbol x, \boldsymbol{x'}]$, $\mathcal I$, $\mathcal T$ and $\pi$ 
+be defined is in the subsection above.
+For every $n \geq 0$, $(\mathcal I, \pi)$ _$n$-satisfies_ $F$, 
+written $(\mathcal I, \pi) \models_n F$, iff
+
+* $F$ is atomic and
+  $\mathcal I[\boldsymbol x \mapsto \pi[0](\boldsymbol x), 
+              \boldsymbol{x'} \mapsto \pi[1](\boldsymbol x)]$ satisfies $F$ as in FOL;
+
+* $F = \lnot G$ and $(\mathcal I, \pi) \not\models_n G$ 
+
+* $F = G_1 \land G_2$ and $(\mathcal I, \pi) \models_n G_i$ for $i=1,2$;
+
+* $F = \exists x\, G$ and $(\mathcal I[z \mapsto v], \pi) \models_n G$ for some value $v$ for $x$;
+
+* $F = \mathbf{eventually}~G$ and $(\mathcal I, \pi^i) \models_{n-i} G$ for some $i = 0, \ldots, n$;
+
+* $F = \mathbf{always}~G$ and $(\mathcal I, \pi^i) \models_{n-i} G$ for all $i = 0, \ldots, n$;
+
+
+The semantics of the propositional connectives $\lor, \rightarrow, \leftrightarrow$
+and the quantifier $\forall$
+is again defined by reduction to the connectives above. 
+
+Intuitively, $n$-satisfiability specifies when a formula is true over
+the first $n$ states of a trace.
+Note that this notion is well defined even when $n=0$ regardless of whether $F$ 
+has free occurrences of variables from $\boldsymbol{x'}$ or not.
+In the atomic case, this is true because $\pi$, for being an _infinite_ trace,
+does contain the state $\pi[1]$.
+In the general case, the claim can be shown by a simple inductive argument.
+
+The notion of $n$-satisfiability is useful when one is interested, as we are,
+in state reachability.
+The reason is that a state satisfying a (non-temporal) property $P$ is reachable 
+in a system $S$ 
+if and only if the temporal formula $\mathbf{eventually}~P$ is $n$-satisfied 
+by an execution of $S$ for some $n$.
 
 
 ## Supported SMT-LIB commands
