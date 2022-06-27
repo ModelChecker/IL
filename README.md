@@ -1,7 +1,7 @@
 ---
 title: Model Checking Intermediate Language
 author: Cesare Tinelli 
-date: 2022-06-21
+date: 2022-06-27
 ---
 
 # Model Checking Intermediate Language (Draft)
@@ -177,42 +177,53 @@ of $\boldsymbol x$
 but not of $\boldsymbol{x'}$ we call it a _one-state_ formula; 
 otherwise, we call it a _two-state_ formula.
 
-A _valuation of_ $\boldsymbol x$, or a _state (over $\boldsymbol x$)_, is function mapping 
-each variable $x$ in $\boldsymbol x$ to a value of $x$'s type.
-Let $\kappa$ be a positive ordinal smaller than $\omega$, the cardinality of the natural numbers.
-A _trace (of length $\kappa$)_ is any state sequence $\pi = (s_j)_{0 \leq j < \kappa}$.
-Note that $\pi$ is the finite sequence $s_0, \ldots, s_{\kappa-1}$ when $\kappa < \omega$ and 
+A _valuation of_ $\boldsymbol x$, 
+or a _state over_ $\boldsymbol x$, is function mapping 
+each variable $x$ in $\boldsymbol x$ 
+to a value of $x$'s type.
+Let $\kappa$ be a positive ordinal smaller than 
+$\omega$, the cardinality of the natural numbers.
+A _trace (of length_ $\kappa$_)_ is 
+any state sequence $\pi = (s_j  \mid 0 \leq j < \kappa)$.
+Note that $\pi$ is the finite sequence $s_0, \ldots, s_{\kappa-1}$
+when $\kappa < \omega$ and 
 is the infinite sequence $s_0, s_1, \ldots$ otherwise.
-For all $i$ with $ 0 \leq i < \kappa$ , we denote by $\pi[i]$ the state $s_i$ and
-by $\pi^i$ the subsequence $(s_j)_{i \leq j < \kappa}$.
+For all $i$ with $0 \leq i < \kappa$ , 
+we denote by $\pi[i]$ the state $s_i$ and
+by $\pi^i$ the subsequence 
+$(s_j \mid i \leq j < \kappa)$.
+
 
 ### Infinite-Trace Semantics
 
 Let $F[\boldsymbol f, \boldsymbol x, \boldsymbol{x'}]$ be a formula as above.
-If $\mathcal I$ is an interpretation of $\boldsymbol f$ in the theory $\mathcal T$ and 
+If $\mathcal I$ is an interpretation
+of $\boldsymbol{f}$ 
+in the theory $\mathcal T$ and 
 $\pi$ is an infinite trace,
 then $(\mathcal I, \pi)$ _satisfies_ $F$, 
 written $(\mathcal I, \pi) \models F$, iff
 
 * $F$ is atomic and
-  $\mathcal I[\boldsymbol x \mapsto \pi[0](\boldsymbol x), 
-              \boldsymbol{x'} \mapsto \pi[1](\boldsymbol x)]$ satisfies $F$ as in FOL;
+  $\mathcal{I}[\boldsymbol x \mapsto \pi[0](\boldsymbol x),\boldsymbol{x'} \mapsto \pi[1](\boldsymbol x)]$
+  satisfies $F$ as in FOL;
 * $F = \lnot G~$ and 
   $~(\mathcal I, \pi) \not\models G$;
 * $F = G_1 \land G_2~$ and 
   $~(\mathcal I, \pi) \models G_i$ for $i=1,2$;
-* $F = \exists x\, G~$ and
-  $~(\mathcal I[z \mapsto v], \pi) \models G$ for some value $v$ for $x$;
-* $F = \mathbf{eventually}~G~$ and 
-  $~(\mathcal I, \pi^i) \models G$ for some $i \geq 0$;
-* $F = \mathbf{always}~G~$ and
-  $~(\mathcal I, \pi^i) \models G$ for all $i \geq 0$;
+* $F = \exists x\, G$ and
+  $(\mathcal I[z \mapsto v], \pi) \models G$ for some value $v$ for $x$;
+* $F = \mathbf{eventually}~G$ and 
+  $(\mathcal I, \pi^i) \models G$ for some $i \geq 0$;
+* $F = \mathbf{always}~G$ and
+  $(\mathcal I, \pi^i) \models G$ for all $i \geq 0$.
 <!-- * $(\mathcal I, \pi^1) \models G$ when $F = \mathbf{next}~G$; -->
 
 The semantics of the propositional connectives $\lor, \rightarrow, \leftrightarrow$
 and the quantifier $\forall$
 can be defined by reduction to the connectives above 
-(e.g., by defining $G_1 \lor G_2$ as $\lnot(\lnot G_1 ∧ \lnot G_2)$ and so on).
+(e.g., by defining $G_1 \lor G_2$ as 
+$\lnot(\lnot G_1 \land \lnot G_2)$ and so on).
 Note that $\exists$ is a _static_, or _rigid_, quantifier:
 the meaning of the variable it quantifies does not change over time,
 that is, from state to state in $\pi$.
