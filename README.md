@@ -315,14 +315,14 @@ IL adopts the following SMT-LIB commands:
 
 * <tt>(define-sort $s$ ($u_1 \cdots u_n$) $\tau$)</tt>
 
-  Defines _s_ as synonym of a parametric type _τ_ with parameters _u<sub>1</sub> ⋅⋅⋅ u<sub>n</sub>_.
+  Defines $S$ as synonym of a parametric type _τ_ with parameters _u<sub>1</sub> ⋅⋅⋅ u<sub>n</sub>_.
   Examples:
   ```scheme
   (declare-sort NestedSet (X) (Set (Set X)))
   ; possible sorts: (NestedSet A), ...
   ```
 
-* <tt>(declare-const _c σ_)</tt>
+* <tt>(declare-const $c$ $\sigma$)</tt>
 
   Declares a constant _c_ of sort _σ_.
   Examples:
@@ -331,12 +331,12 @@ IL adopts the following SMT-LIB commands:
   (declare-const n Int)
   ```
 
-* <tt>(define-fun _f_ ((_x<sub>1</sub> σ<sub>1</sub>_) ··· (_x<sub>n</sub> σ<sub>n</sub>_)) _σ  t_)</tt>
+* <tt>(define-fun $f$ (($x_1$ $\sigma_1$) $\cdots$ ($x_1$ $\sigma_1$)) $\sigma$ $t$)</tt>
 
-  Defines a (non-recursive) function _f_ with inputs _x<sub>1</sub>_, ..., _x<sub>n_ 
-  (of respective sort _σ<sub>1</sub>_, ..., _σ<sub>n</sub>_), output sort _σ_, and body _t_.
+  Defines a (non-recursive) function $f$ with inputs $x_1, \ldots, x_n$ 
+  (of respective sort $\sigma_1, \ldots, \sigma_n$), output sort $\sigma$, and body $t$.
 
-* <tt>(set-logic _L_)</tt>
+* <tt>(set-logic $L$)</tt>
 
   Defines the model's _data logic_, that is, the background theories of relevant datatypes
   (e.g., integers, reals, bit vectors, and so on) as well as the language of allowed logical constraints 
@@ -349,50 +349,53 @@ For each term `s` and `t` of the same sort, `(!= s t)` has the same meaning as `
 
 ### Enumeration declaration
 
-<tt>(declare-enum-sort _s_ (_c<sub>1</sub> ⋅⋅⋅ c<sub>n</sub>_))</tt>
+<tt>(declare-enum-sort $s$ ($c_1$ $\cdots$ $c_n$))</tt>
 
-Declares _s_ to be an enumerative type with (distinct) values _c<sub>1</sub>_, ..., _c<sub>n</sub>_.
+Declares $s$ to be an enumerative type with (distinct) values $c_1, \ldots, c_n$.
 
 ### System definition command
 
-<tt>(define-system _S_</tt><br>
-<tt>&nbsp; :input ((_i<sub>1</sub> δ<sub>1</sub>_)  ⋅⋅⋅ (_i<sub>m</sub> δ<sub>m</sub>_))</tt><br>
-<tt>&nbsp; :output ((_o<sub>1</sub> τ<sub>1</sub>_) ⋅⋅⋅ (_o<sub>n</sub> τ<sub>n</sub>_))</tt><br>
-<tt>&nbsp; :local ((_s<sub>1</sub> σ<sub>1</sub>_) ⋅⋅⋅ (_s<sub>p</sub> σ<sub>p</sub>_))</tt><br>
-<!-- <tt>&nbsp; :sub (_sub<sub>1</sub> ⋅⋅⋅ sub<sub>k</sub>_) ; subsystems</tt><br> -->
-<tt>&nbsp; :init (_I<sub>1</sub> ⋅⋅⋅ I<sub>q</sub>_)</tt><br>
-<tt>&nbsp; :trans (_T<sub>1</sub> ⋅⋅⋅ T<sub>r</sub>_)</tt><br>
-<tt>&nbsp; :inv (_P<sub>1</sub> ⋅⋅⋅ P<sub>s</sub>_)</tt><br>
+<tt>(define-system $S$</tt><br>
+<tt>&nbsp; :input (($i_1$ $\sigma_1$) $\cdots$ ($i_m$ $\sigma_m$))</tt><br>
+<tt>&nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$))</tt><br>
+<tt>&nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$))</tt><br>
+<!-- <tt>&nbsp; :sub (_sub_1$ $\cdots$ sub_k$_) ; subsystems</tt><br> -->
+<tt>&nbsp; :init ($I_1$ $\cdots$ $I_q$)</tt><br>
+<tt>&nbsp; :trans ($T_1$ $\cdots$ $T_r$)</tt><br>
+<tt>&nbsp; :inv ($P_1$ $\cdots$ $P_s$)</tt><br>
 <tt>)</tt>
 
 
 where
 
-* _S_ is the system's identifier;
-* each _i<sub>j</sub>_ is an _input_ variable of sort _δ<sub>j</sub>_;
-* each _o<sub>j</sub>_ is an _output_ variable of sort _τ<sub>j</sub>_;
-* each _s<sub>j</sub>_ is a _local_ variable of sort _σ<sub>j</sub>_;
-* each _i<sub>j</sub>_, _o<sub>j</sub>_, _s<sub>j</sub>_ denote _current-state_ values
-* _next-state variables_ are not provided explicitly but are denoted by convention appending ' to the names of the current-state variables _i<sub>j</sub>_, _o<sub>j</sub>_, and _s<sub>j</sub>_;
-* each _I<sub>j</sub>_ is an SMT-LIB formula over the input, output and current-state variables or a _system application_ that expresses a constraint on the initial states of _S_; 
-* each _T<sub>j</sub>_ is an SMT-LIB formula over all of the system's variables or a _system application_ that expresses a constraint on the state transitions of _S_;
-* each _P<sub>j</sub>_ is an SMT-LIB formula over all of the _unprimed_ system's variables that expresses a constraint on all reachable states of _S_;
-* a system application has the form (_S<sub>i</sub>_ _x<sub>i<sub>1</sub></sub> ⋅⋅⋅ x<sub>i<sub>m</sub></sub> y<sub>i<sub>1</sub></sub> ⋅⋅⋅ y<sub>i<sub>n</sub></sub>_) where _S<sub>i<sub>_ is a system other than _S_ with <sub>i<sub>m</sub></sub> inputs and <sub>i<sub>n</sub></sub> outputs, and each _x_ is a variable of _S_ and each _y_ is a local or output variable of _S_.
+* $S$ is the system's identifier;
+* each $i_j$ is an _input_ variable of sort $\delta_j$;
+* each $o_j$ is an _output_ variable of sort $\tau_j$;
+* each $s_j$ is a _local_ variable of sort $\sigma_j$;
+* each $i_j$, $o_j$, $s_j$ denote _current-state_ values
+* _next-state variables_ are not provided explicitly but are denoted by convention appending $'$ to the names of the current-state variables $i_j$, $o_j$, and $s_j$;
+* each $I_j$ is an SMT-LIB formula over the input, output and current-state variables or a _system application_ that expresses a constraint on the initial states of $S$; 
+* each $T_j$ is an SMT-LIB formula over all of the system's variables or a _system application_ that expresses a constraint on the state transitions of $S$;
+* each $P_j$ is an SMT-LIB formula over all of the _unprimed_ system's variables that expresses a constraint on all reachable states of $S$;
+* a system application has the form ($S_i$ $x_{i_1}$ $\cdots$ $x_{i_m}$ $y_{i_1}$ $\cdots$ $y_{i_n}$) 
+  where $S_i$ is a system other than $S$ with $i_m$ inputs and $i_n$ outputs, 
+  each $x_i$ is a variable of $S$, and 
+  each $y_i$ is a local or output variable of $S$.
 
 
 The various aspects of the system are provided as SMT-LIB attribute-value pairs. The order of the attributes can be arbitrary but each attribute can occur at most once.  A missing attribute stands for a default value: the empty list <tt>()</tt>. The sequence of formulas in the <tt>:init</tt> (resp., <tt>:trans</tt> and <tt>:inv</tt>) attribute is to be understood conjunctively. 
 
 #### Semantics
 
-Formally, the system _S_ specified with a `define-system` is the pair
+Formally, the system $S$ specified with a `define-system` is the pair
 
 _S = ( λ**i**:**δ** λ**o**:**τ** I<sub>S</sub>[**i**,**o**,**s**], λ**i**:**δ** λ**i'**:**δ** λ**o**:**τ** λ**o'**:**τ** T<sub>S</sub>[**i**,**o**,**s**,**i'**,**o'**,**s'**] )_
 
 defining a transitions system with initial state condition _I<sub>S</sub>_ and transition relation _T<sub>S</sub>_ where
 
-* _I<sub>S</sub> = I<sub>1</sub> ∧ ⋅⋅⋅ ∧ I<sub>q</sub> ∧ P<sub>1</sub> ∧ ⋅⋅⋅ ∧ P<sub>s</sub>_;
+* _I<sub>S</sub> = I<sub>1</sub> ∧ $\cdots$ ∧ I<sub>q</sub> ∧ P<sub>1</sub> ∧ $\cdots$ ∧ P<sub>s</sub>_;
 
-* _T<sub>S</sub> = T<sub>1</sub> ∧ ⋅⋅⋅ ∧ T<sub>r</sub> ∧ (P<sub>1</sub> ∧ ⋅⋅⋅ ∧ P<sub>s</sub> )[**i** ↦ **i'**, **o** ↦ **o'**, **s** ↦ **s'**]_;
+* _T<sub>S</sub> = T<sub>1</sub> ∧ $\cdots$ ∧ T<sub>r</sub> ∧ (P<sub>1</sub> \land \cdots \land P<sub>s</sub> )[**i** ↦ **i'**, **o** ↦ **o'**, **s** ↦ **s'**]_;
 
 * If _I<sub>i</sub>_ is the application (S<sub>i</sub> **x**<sub>i</sub> **y**<sub>i</sub>), it is syntactic sugar for the formula _fresh(fst(S<sub>i</sub>) **x**<sub>i</sub> **y**<sub>i</sub>)_;
 
@@ -403,7 +406,7 @@ defining a transitions system with initial state condition _I<sub>S</sub>_ and t
 * for any formula _F_,  the expression _fresh(F)_ denotes the formula obtained from _F_ by replacing each free variable of _F_ by a fresh variable.
 
 **Notes:** 
-* The full set _**s**_ of local variables of _S_ is (recursively) the disjoint union of the variables declared in the <tt>:local</tt> attribute together with the local variables of all the systems applied in <tt>:init</tt> or <tt>:trans</tt>.
+* The full set _**s**_ of local variables of $S$ is (recursively) the disjoint union of the variables declared in the <tt>:local</tt> attribute together with the local variables of all the systems applied in <tt>:init</tt> or <tt>:trans</tt>.
 
 * The order of the formulas in <tt>:init</tt>, <tt>:trans</tt> and   <tt>:inv</tt> attributes does not matter.
 
@@ -434,7 +437,7 @@ Intuitively, for a system definition to define a system with no deadlocks:
 
 1. Any assignment of values to the input variables can be extended to a total assignment (to all the unprimed variables) that satisfies _I<sub>S</sub>_.
 
-2. For any reachable state _s_, any assignment to the primed input variables can be extended to a total assignment _s'_ so that _s,s'_ satisfies _T<sub>S</sub>_.
+2. For any reachable state $S$, any assignment to the primed input variables can be extended to a total assignment _s'_ so that _s,s'_ satisfies _T<sub>S</sub>_.
 
 
 The first restriction above guarantees that the system can start at all. The second ensures that from any reachable state and for any new input the system can move to another state (_and so_ also produce output).
@@ -443,7 +446,7 @@ The first restriction above guarantees that the system can start at all. The sec
 
 * A sufficient condition for (2) is that the following formula is valid in the background theory: _∀ **i** ∀ **o** ∀ **s** ∀ **i'** ∃ **o'** ∃ **s'** T<sub>S</sub>_
  
-  This condition is not necessary, however, since it need not apply to unreachable states. Let _Reachable[**i**, **o**, **s**]_ denote the (possibly higher-order) formula satisfied exactly by the reachable states of _S_. Then, a more accurate sufficient condition for (2) above would be the validity of the formula:
+  This condition is not necessary, however, since it need not apply to unreachable states. Let _Reachable[**i**, **o**, **s**]_ denote the (possibly higher-order) formula satisfied exactly by the reachable states of $S$. Then, a more accurate sufficient condition for (2) above would be the validity of the formula:
 
   _∀ **i** ∀ **o** ∀ **s** ∀ **i'** ∃ **o'** ∃ **s'** (Reachable[**i**,**o**,**s**] ⇒ T<sub>S</sub>)_
 
@@ -869,25 +872,25 @@ define-system ThreeBitCounter
 
 ### System verification command
 
-<tt>(check-system _S_</tt>
-<tt>&nbsp; :input ((_i<sub>1</sub> δ<sub>1</sub>_)  ⋅⋅⋅ (_i<sub>m</sub> δ<sub>m</sub>_))</tt>
-<tt>&nbsp; :output ((_o<sub>1</sub> τ<sub>1</sub>_) ⋅⋅⋅ (_o<sub>n</sub> τ<sub>n</sub>_))</tt>
-<tt>&nbsp; :local ((_s<sub>1</sub> σ<sub>1</sub>_) ⋅⋅⋅ (_s<sub>p</sub> σ<sub>p</sub>_))</tt>
-<tt>&nbsp; :assumptions (_a<sub>1</sub> ⋅⋅⋅ a<sub>q</sub>_)</tt>
-<tt>&nbsp; :fairness (_f<sub>1</sub> ⋅⋅⋅ f<sub>h</sub>_)</tt>
-<tt>&nbsp; :reachable (_r<sub>1</sub> ⋅⋅⋅ r<sub>i</sub>_)</tt>
-<tt>&nbsp; :invariants (_p<sub>1</sub> ⋅⋅⋅ p<sub>k</sub>_)</tt>
+<tt>(check-system $S$</tt>
+<tt>&nbsp; :input ((_i<sub>1</sub> δ<sub>1</sub>_)  $\cdots$ (_i<sub>m</sub> δ<sub>m</sub>_))</tt>
+<tt>&nbsp; :output ((_o<sub>1</sub> τ<sub>1</sub>_) $\cdots$ (_o<sub>n</sub> τ<sub>n</sub>_))</tt>
+<tt>&nbsp; :local ((_s<sub>1</sub> σ<sub>1</sub>_) $\cdots$ (_s<sub>p</sub> σ<sub>p</sub>_))</tt>
+<tt>&nbsp; :assumptions (_a<sub>1</sub> $\cdots$ a<sub>q</sub>_)</tt>
+<tt>&nbsp; :fairness (_f<sub>1</sub> $\cdots$ f<sub>h</sub>_)</tt>
+<tt>&nbsp; :reachable (_r<sub>1</sub> $\cdots$ r<sub>i</sub>_)</tt>
+<tt>&nbsp; :invariants (_p<sub>1</sub> $\cdots$ p<sub>k</sub>_)</tt>
 <tt>)</tt>
 
-<!-- <tt>&nbsp; :conjectures (_c<sub>1</sub> ⋅⋅⋅ c<sub>j</sub>_)</tt> -->
+<!-- <tt>&nbsp; :conjectures (_c<sub>1</sub> $\cdots$ c<sub>j</sub>_)</tt> -->
 
 
 where
 
-* _S_ is the identifier of a previously defined system with _m_ inputs, _n_ outputs, and _p_ local variables;
-* each _i<sub>j</sub>_ is a renaming of the corresponding input variable of _S_ of sort _δ<sub>i</sub>_;
-* each _o<sub>j</sub>_ is a renaming of the corresponding output variable of _S_ of sort _τ<sub>i</sub>_;
-* each _s<sub>j</sub>_ is a renaming of the corresponding local variable of _S_ of sort _σ<sub>i</sub>_;
+* $S$ is the identifier of a previously defined system with _m_ inputs, _n_ outputs, and _p_ local variables;
+* each _i<sub>j</sub>_ is a renaming of the corresponding input variable of $S$ of sort _δ<sub>i</sub>_;
+* each _o<sub>j</sub>_ is a renaming of the corresponding output variable of $S$ of sort _τ<sub>i</sub>_;
+* each _s<sub>j</sub>_ is a renaming of the corresponding local variable of $S$ of sort _σ<sub>i</sub>_;
 * each _a<sub>j</sub>_ is a triple of the form <tt>(_n<sub>j</sub> l<sub>j</sub> A<sub>j</sub>_)</tt>  
   with <tt>_A<sub>j</sub>_</tt> a formula over input and local variables 
   (called _environmental assumption_);
@@ -909,22 +912,22 @@ where
 **Note:** The ids _n<sub>j</sub>_ are meant to be user-defined names for the corresponding condition. The strings _n<sub>j</sub>_ are labels that can be attached for convenience, especially when producing output.
 
 
-Let _I<sub>S</sub>_ and _T<sub>S</sub>_ be respectively the initial state condition and transition predicate of _S_.
+Let _I<sub>S</sub>_ and _T<sub>S</sub>_ be respectively the initial state condition and transition predicate of $S$.
 
-Let _A = A<sub>1</sub> ∧ ⋅⋅⋅ ∧ A<sub>q</sub>_, _F = F<sub>1</sub> ∧ ⋅⋅⋅ ∧ F<sub>h</sub>_, _R = R<sub>1</sub> ∧ ⋅⋅⋅ ∧ R<sub>i</sub>_, _P = P<sub>1</sub> ∧ ⋅⋅⋅ ∧ P<sub>k</sub>_.
+Let _A = A<sub>1</sub> \land \cdots \land A<sub>q</sub>_, _F = F<sub>1</sub> \land \cdots \land F<sub>h</sub>_, _R = R<sub>1</sub> \land \cdots \land R<sub>i</sub>_, _P = P<sub>1</sub> \land \cdots \land P<sub>k</sub>_.
 
 The command above succeeds if both the following holds:
 
-1. there is a trace of _S_ that satisfies all the environmental assumptions and fairness conditions, and reaches a state that satisfies all the reachability conditions; that is, if the following LTL formula is satisfiable (in the chosen background theory):
+1. there is a trace of $S$ that satisfies all the environmental assumptions and fairness conditions, and reaches a state that satisfies all the reachability conditions; that is, if the following LTL formula is satisfiable (in the chosen background theory):
 
    _I<sub>S</sub> ∧ **always** T<sub>S</sub> ∧ **always** A ∧ **always eventually** F ∧ **eventually** R_
 
- 2. every property _P<sub>j</sub>_ is invariant for _S_ under the environmental assumptions and the fairness conditions; that is, if the following LTL formula is valid (in the chosen background theory):
+ 2. every property _P<sub>j</sub>_ is invariant for $S$ under the environmental assumptions and the fairness conditions; that is, if the following LTL formula is valid (in the chosen background theory):
 
     _I<sub>S</sub> ∧ **always** T<sub>S</sub> ∧ **always** A ∧ **always eventually** F ⇒ **always** P_
 
 
-<!-- Each conjecture _C<sub>j</sub>_ is a _possible_ auxiliary invariant of _S_, that is, _(I<sub>S</sub> ∧ **always** T<sub>S</sub>) ∧ **always** (A<sub>1</sub> ∧ ⋅⋅⋅ ∧ A<sub>n</sub>) ⇒ **always** C<sub>i</sub>)_ is possibly valid. If it is indeed invariant, it may be used to help prove the properties _P_ invariant. -->
+<!-- Each conjecture _C<sub>j</sub>_ is a _possible_ auxiliary invariant of $S$, that is, _(I<sub>S</sub> ∧ **always** T<sub>S</sub>) ∧ **always** (A<sub>1</sub> \land \cdots \land A<sub>n</sub>) ⇒ **always** C<sub>i</sub>)_ is possibly valid. If it is indeed invariant, it may be used to help prove the properties _P_ invariant. -->
 
 
 
