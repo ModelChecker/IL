@@ -27,7 +27,7 @@ to be produced and processed by tools, hence it was designed to have
 * minimal syntactic sugar, at least initially;
 * well-understood formal semantics;
 * a small but comprehensive set of commands;
-* simple translations to lower level modeling languages such as Btor2 and Aiger.
+* simple translations to lower level modeling languages such as [Btor2](https://link.springer.com/chapter/10.1007/978-3-319-96145-3_32).
 
 Based on these principles, IL provides no direct support for many of the features 
 offered by current hardware modeling languages such as VHDL and Verilog 
@@ -51,7 +51,7 @@ Each system definition:
 * is parametrized by a _state signature_, a sequence of typed variables;
 * partitions state variables into input, output and local variables;
 * can be expressed as the synchronous or asynchronous composition of other systems 
-* is _hierarchical_ ,i.e., may include (instances of) previously defined systems as subsystems;
+* is _hierarchical_, i.e., may include (instances of) previously defined systems as subsystems;
 * can encode both synchronous and asynchronous system composition.
 
 The current focus on _finite-state_ systems. 
@@ -82,7 +82,7 @@ we write $F[\boldsymbol{x}]$ or $F[x_1, \ldots, x_n]$ to express the fact that e
 in $\boldsymbol{x}$ is free in $F$ (although $F$ may have additional free variables).
 We write $\boldsymbol{x},\boldsymbol{y}$ to denote the concatenation of tuple 
 $\boldsymbol{x}$ with tuple $\boldsymbol{y}$.
-When its clear from the context, given a formula $F[\boldsymbol{x}]$ and 
+When it is clear from the context, given a formula $F[\boldsymbol{x}]$ and 
 a tuple $\boldsymbol{t} = (t_1, \ldots, t_n)$ of terms of the same type 
 as $\boldsymbol{x} = (x_1, \ldots, x_n)$, 
 we write $F[\boldsymbol{t}]$ or $F[t_1, \ldots, t_n]$ to denote the formula obtained from $F$ 
@@ -127,11 +127,11 @@ when combining systems together, to capture which of the state values are shared
 between two systems being combined, and how.
 
 **Note:** Similarly to Mealy machines, the initial state condition is also meant to specify 
-the initial system's output based on the initial state and input. 
+the initial system's output, based on the initial state and input. 
 Correspondingly, the transition relation is also meant to specify the system's output 
 in every later state of the computation.
 
-**Note:** The input and output values corresponding to the transition to the new state are 
+**Note:** The input and output values corresponding to the transition to the _new_ state are 
 those in the variables $\boldsymbol{i'}$ and 
 $\boldsymbol{o'}$. 
 The values of $\boldsymbol{i}, \boldsymbol{o}$ are the _old_ input and output values.
@@ -152,7 +152,7 @@ For our purposes of defining the semantics of transition systems
 it is enough to consider just the $\mathbf{always}$ and
 $\mathbf{eventually}$ operators.
 
-The non-temporal operators depend on the particular theory, in the sense of SMT, 
+The set of non-temporal operators depends on the particular theory, in the sense of SMT, 
 considered (linear integer/real arithmetic, bit vectors, strings, and so on, and 
 their combinations).
 The meaning of theory symbols (such as arithmetic operators) and theory sorts
@@ -166,7 +166,7 @@ is provided by an interpretation of the uninterpreted (constant and function) sy
 of $F$, if any,
 as well as an infinite sequence of valuations for the free variables of $F$.
 
-More precisely, we will fix a tuple $\boldsymbol x = (x_1,\ldots,x_n)$ 
+More precisely, let us fix a tuple $\boldsymbol x = (x_1,\ldots,x_n)$ 
 of distinct _state_ variables, meant to represent the state of a computation system. 
 We will denote by $\boldsymbol{x'}$ 
 the tuple $(x_1',\ldots,x_n')$ 
@@ -229,7 +229,6 @@ the meaning of the variable it quantifies does not change over time,
 that is, from state to state in $\pi$.
 The same is true for uninterpreted symbols. 
 They are _rigid_ in the same sense: their meaning does not change over time.
-
 Another way to understand the difference between rigid and non-rigid symbols is that 
 state variables are mutable over time 
 whereas quantified variables, theory symbols and uninterpreted symbols are all immutable.
@@ -290,7 +289,7 @@ In the general case, the claim can be shown by a simple inductive argument.
 
 The notion of $n$-satisfiability is useful when one is interested, as we are,
 in state reachability.
-The reason is that a state satisfying a (non-temporal) property $P$ is reachable 
+The reason is that a state satisfying a (non-temporal) state property $P$ is reachable 
 in a system $S$ 
 if and only if the temporal formula $\mathbf{eventually}~P$ is $n$-satisfied 
 by an execution of $S$ for some $n$.
@@ -298,8 +297,8 @@ by an execution of $S$ for some $n$.
 
 ## Supported SMT-LIB commands
 
-SMT-LIB is a command-based language with LISP-like syntax designed to be 
-a common input/output language for SMT solvers.
+SMT-LIB is a command-based language with LISP-like syntax ([s-expressions](https://en.wikipedia.org/wiki/S-expression), in prefix notation) designed 
+to be a common input/output language for SMT solvers.
 
 IL adopts the following SMT-LIB commands:
 
@@ -310,7 +309,7 @@ IL adopts the following SMT-LIB commands:
   ```scheme
   (declare-sort A 0)
   (declare-sort Set 1)
-  ; possible sorts: A, (Set A), (Set (Set A)), ...
+  ; possible sorts: A, (Set A), (Set (Set A)), (Array Int Real), ...
   ```
 
 * <tt>(define-sort $s$ ($u_1 \cdots u_n$) $\tau$)</tt>
@@ -320,6 +319,8 @@ IL adopts the following SMT-LIB commands:
   ```scheme
   (declare-sort NestedSet (X) (Set (Set X)))
   ; possible sorts: (NestedSet A), ...
+  (declare-sort Array2 (X Y) (Array X (Array X Y)))
+  ; possible sorts: (Array2 Int Bool), ...
   ```
 
 * <tt>(declare-const $c$ $\sigma$)</tt>
@@ -335,12 +336,21 @@ IL adopts the following SMT-LIB commands:
 
   Defines a (non-recursive) function $f$ with inputs $x_1, \ldots, x_n$ 
   (of respective sort $\sigma_1, \ldots, \sigma_n$), output sort $\sigma$, and body $t$.
+  Examples:
+  ```scheme
+  (declare-fun sq ((n Int)) Int (* n n))
+  (declare-fun isSqRoot ((m Int) (n Int)) Bool (= n (sq m)))
+  (declare-fun max ((m Int) (n Int)) Int (ite (> m n) m n))
+  ```
 
 * <tt>(set-logic $L$)</tt>
 
   Defines the model's _data logic_, that is, the background theories of relevant datatypes
   (e.g., integers, reals, bit vectors, and so on) as well as the language of allowed logical constraints 
   (e.g., quantifier-free, linear, etc.).
+  ```scheme
+  (set-logic QF_BV)
+  ```
 
 One addition to SMT-LIB is the binary symbol `!=` for disequality.
 For each term `s` and `t` of the same sort, `(!= s t)` has the same meaning as `(not (= s t))` or, equivalently, `(distinct s t)`.
@@ -355,16 +365,16 @@ Declares $s$ to be an enumerative type with (distinct) values $c_1, \ldots, c_n$
 
 ### System definition command
 
+A transition system is defined by a command of the form:
+
 <tt>(define-system $S$</tt><br>
 <tt>&nbsp; :input (($i_1$ $\sigma_1$) $\cdots$ ($i_m$ $\sigma_m$))</tt><br>
 <tt>&nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$))</tt><br>
 <tt>&nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$))</tt><br>
-<!-- <tt>&nbsp; :sub (_sub_1$ $\cdots$ sub_k$_) ; subsystems</tt><br> -->
-<tt>&nbsp; :init ($I_1$ $\cdots$ $I_q$)</tt><br>
-<tt>&nbsp; :trans ($T_1$ $\cdots$ $T_r$)</tt><br>
-<tt>&nbsp; :inv ($P_1$ $\cdots$ $P_s$)</tt><br>
+<tt>&nbsp; :init $I$</tt><br>
+<tt>&nbsp; :trans $T$</tt><br>
+<tt>&nbsp; :inv $P$</tt><br>
 <tt>)</tt>
-
 
 where
 
@@ -373,37 +383,105 @@ where
 * each $o_j$ is an _output_ variable of sort $\tau_j$;
 * each $s_j$ is a _local_ variable of sort $\sigma_j$;
 * each $i_j$, $o_j$, $s_j$ denote _current-state_ values
-* _next-state variables_ are not provided explicitly but are denoted by convention appending $'$ to the names of the current-state variables $i_j$, $o_j$, and $s_j$;
-* each $I_j$ is an SMT-LIB formula over the input, output and current-state variables or a _system application_ that expresses a constraint on the initial states of $S$; 
-* each $T_j$ is an SMT-LIB formula over all of the system's variables or a _system application_ that expresses a constraint on the state transitions of $S$;
-* each $P_j$ is an SMT-LIB formula over all of the _unprimed_ system's variables that expresses a constraint on all reachable states of $S$;
-* a system application has the form ($S_i$ $x_{i_1}$ $\cdots$ $x_{i_m}$ $y_{i_1}$ $\cdots$ $y_{i_n}$) 
-  where $S_i$ is a system other than $S$ with $i_m$ inputs and $i_n$ outputs, 
-  each $x_i$ is a variable of $S$, and 
-  each $y_i$ is a local or output variable of $S$.
+* _next-state variables_ are not provided explicitly but are denoted 
+  by convention by appending $'$ to the names of the current-state variables $i_j$, $o_j$, and $s_j$;
+* $I$ is a one-state formula over the unprimed system's variables (input, output and local state variables)
+  that expresses a constraint on the initial states of $S$; 
+* $T$ is a two-state formula over all of the system's variables (primed and unprimed)
+  that expresses a constraint on the state transitions of $S$;
+* $P$ is a one state formula over all of the _unprimed_ system's variables 
+  that expresses a constraint on all reachable states of $S$.
+
+Syntactically, the system identifier, the input, output and local variables are SMT-LIB symbols. 
+In contrast, the sorts $\delta_j$, $\tau_j$, $\sigma_j$ are SMT-LIB sorts,
+while the formulas $I$, $T$ and $P$ are SMT-LIB terms of type <tt>Bool</tt>.
+
+The various aspects of the system are provided as SMT-LIB attribute-value pairs. 
+The order of the attributes can be arbitrary but each attribute can occur at most once.
+A missing attribute stands for a default value: 
+the empty list <tt>()</tt> for <tt>:input</tt>, <tt>:output</tt> and <tt>:local</tt>; and 
+<tt>true</tt> for <tt>:init</tt>, <tt>:trans</tt> and <tt>:inv</tt>.
 
 
-The various aspects of the system are provided as SMT-LIB attribute-value pairs. The order of the attributes can be arbitrary but each attribute can occur at most once.  A missing attribute stands for a default value: the empty list <tt>()</tt>. The sequence of formulas in the <tt>:init</tt> (resp., <tt>:trans</tt> and <tt>:inv</tt>) attribute is to be understood conjunctively. 
+> **Discussion:**
+>
+> We could allow multiple occurrences of the :inv attribute with conjunctive semantics.
+> Should we allow multiple occurrences of the :trans attribute but with _disjunctive_ semantics?
+> The rationale would be to facilitate the recognition of systems defined by alternative sets of transitions.
+> 
+
+The value $P$ of the <tt>:inv</tt> attribute can contain as subformulas _system applications_ of the form
+<tt>($\hat S$ $\boldsymbol x$ $\boldsymbol y$)</tt>
+where
+
+* $\hat S$ is the identifier of _another_ system;
+* $\boldsymbol x$ and $\boldsymbol y$ consist of variables of $S$;
+* the type of $\boldsymbol x$ matches the type of $\hat S$'s input variables;
+* the type of $\boldsymbol y$ matches the type of $\hat S$'s output variables;
+
+Intuitively, the application 
+<tt>($\hat S$ $\boldsymbol x$ $\boldsymbol y$)</tt>
+constrains $\boldsymbol y$ to have the same value as the output of $\hat S$ 
+assuming that at each execution step the input of $\hat S$ is constrained to take the same value as $\boldsymbol x$. 
+
+Systems with such applications are _composite_ systems; systems without them are _atomic_.
+
+
 
 #### Semantics
 
-Formally, the system $S$ specified with a `define-system` is the pair
+Let 
+$\boldsymbol{i} = (i_1, \ldots, i_m)$,
+$\boldsymbol{o} = (o_1, \ldots, o_n)$,
+$\boldsymbol{s} = (s_1, \ldots, s_p)$,
+and
+$\boldsymbol{v}$ = $\boldsymbol{i},\boldsymbol{o},\boldsymbol{s}$.
 
-_S = ( λ**i**:**δ** λ**o**:**τ** I<sub>S</sub>[**i**,**o**,**s**], λ**i**:**δ** λ**i'**:**δ** λ**o**:**τ** λ**o'**:**τ** T<sub>S</sub>[**i**,**o**,**s**,**i'**,**o'**,**s'**] )_
+##### Atomic systems
 
-defining a transitions system with initial state condition _I<sub>S</sub>_ and transition relation _T<sub>S</sub>_ where
+Formally, an atoms system $S$ introduced by the <tt>define-system</tt> command above
+is a transition system whose behavior consists of all the (infinite) executions $(\mathcal I, \pi)$
+over $\boldsymbol{v}$ such that
 
-* _I<sub>S</sub> = I<sub>1</sub> ∧ $\cdots$ ∧ I<sub>q</sub> ∧ P<sub>1</sub> ∧ $\cdots$ ∧ P<sub>s</sub>_;
+$$(\mathcal I, \pi) \models
+  \underbrace{I[\boldsymbol{v}] \land P[\boldsymbol{v}]}_{I_S} \land
+  \underbrace{\mathbf{always}\ T[\boldsymbol{v},\boldsymbol{v'}] \land P[\boldsymbol{v'}]}_{T_S}
+$$
 
-* _T<sub>S</sub> = T<sub>1</sub> ∧ $\cdots$ ∧ T<sub>r</sub> ∧ (P<sub>1</sub> \land \cdots \land P<sub>s</sub> )[**i** ↦ **i'**, **o** ↦ **o'**, **s** ↦ **s'**]_;
+**Notes:** 
 
-* If _I<sub>i</sub>_ is the application (S<sub>i</sub> **x**<sub>i</sub> **y**<sub>i</sub>), it is syntactic sugar for the formula _fresh(fst(S<sub>i</sub>) **x**<sub>i</sub> **y**<sub>i</sub>)_;
+1. The relation expressed by the formula $T$ is not required to be functional over $\boldsymbol{i},\boldsymbol{o},\boldsymbol{s},\boldsymbol{i'}$, 
+   thus allowing the modeling of non-deterministic systems.
 
-* If _T<sub>i</sub>_ is the application (S<sub>i</sub> **x**<sub>i</sub> **y**<sub>i</sub>), it is syntactic sugar for the formula _fresh(snd(S<sub>i</sub>) **x**<sub>i</sub> **x'**<sub>i</sub> **y**<sub>i</sub> **y'**<sub>i</sub>)_;
+2. The <tt>:inv</tt> attribute is not strictly necessary since a system with a  declaration of the form 
 
-* _fst_ in the first projection over pairs and _snd_ is the second;
+   <tt>(define-system $S$</tt>
+   <tt>&nbsp; :input (($i_1$ $\sigma_1$) $\cdots$ ($i_m$ $\sigma_m$))</tt>
+   <tt>&nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$))</tt><br>
+   <tt>&nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$))</tt><br>
+   <tt>&nbsp; :init $I$</tt>
+   <tt>&nbsp; :trans $T$</tt>
+   <tt>&nbsp; :inv $P$</tt><br>
+   <tt>)</tt>
 
-* for any formula _F_,  the expression _fresh(F)_ denotes the formula obtained from _F_ by replacing each free variable of _F_ by a fresh variable.
+   can be equivalently expressed with a declaration of the form
+
+   <tt>(define-system $S$</tt>
+   <tt>&nbsp; :input (($i_1$ $\sigma_1$) $\cdots$ ($i_m$ $\sigma_m$))</tt>
+   <tt>&nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$))</tt><br>
+   <tt>&nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$))</tt><br>
+   <tt>&nbsp; :init (and $I$ $P$)</tt>
+   <tt>&nbsp; :trans (and $T$ $P'$)</tt><br>
+   <tt>)</tt>
+
+   where $P'$ is the formula obtained from $P$ by priming the input, output and local variables in $P$.
+##### Composite systems
+
+Consider a 
+= (IA[iA,oA,sA], TA[iA,oA,sA,iA′,o′A,s′A]) = (IB[iB,oB,sB], TB[iB,oB,sB,iB′,o′B,s′B])
+
+
+
 
 **Notes:** 
 * The full set _**s**_ of local variables of $S$ is (recursively) the disjoint union of the variables declared in the <tt>:local</tt> attribute together with the local variables of all the systems applied in <tt>:init</tt> or <tt>:trans</tt>.
