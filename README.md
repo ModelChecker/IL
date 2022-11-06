@@ -80,7 +80,7 @@ If $F$ is a formula and
 $\boldsymbol{x} = (x_1, \ldots, x_n)$ a tuple of distinct variables,
 we write $F[\boldsymbol{x}]$ or $F[x_1, \ldots, x_n]$ to express the fact that every variable
 in $\boldsymbol{x}$ is free in $F$ (although $F$ may have additional free variables).
-We write $\boldsymbol{x},\boldsymbol{y}$ to denote the concatenation of tuple
+We write $\boldsymbol{x} \circ \boldsymbol{y}$ to denote the concatenation of tuple
 $\boldsymbol{x}$ with tuple $\boldsymbol{y}$.
 When it is clear from the context, given a formula $F[\boldsymbol{x}]$ and
 a tuple $\boldsymbol{t} = (t_1, \ldots, t_n)$ of terms of the same type
@@ -424,7 +424,7 @@ the empty list <tt>()</tt> for <tt>:input</tt>, <tt>:output</tt> and <tt>:local<
 > The rationale would be to facilitate the recognition of systems defined by alternative sets of transitions.
 >
 
-#### Semantics
+#### Atomic System Semantics
 
 Let
 $\boldsymbol{i} = (i_1, \ldots, i_m)$,
@@ -434,7 +434,7 @@ and
 $\boldsymbol{v}$ = $\boldsymbol{i},\boldsymbol{o},\boldsymbol{s}$.
 
 
-Formally, an atoms system $S$ introduced by the <tt>define-system</tt> command above
+Formally, an atomic system $S$ introduced by the <tt>define-system</tt> command above
 is a transition system whose behavior consists of all the (infinite) executions $(\mathcal I, \pi)$
 over $\boldsymbol{v}$ such that
 
@@ -557,11 +557,11 @@ Equivalent formulation using unconstrained local state.
 <tt>TimedSwitch</tt> models a timed light switch where the light stays
 on for at most 10 steps unless it is switched off before.
 The input Boolean is interpreted as an on/off toggle.
+The transition predicate is formulated as a set of transitions.
 
 ```scheme
 (define-enum-sort LightStatus (on off))
 
-; set-of-transitions-style definition
 (define-system TimedSwitch1
  :input ( (press Bool) )
  :output ( (sig Bool) )
@@ -581,8 +581,12 @@ The input Boolean is interpreted as an on/off toggle.
   (or stay-off turn-on turn-off stay-on)
  )
 )
+```
 
-; guarded-transitions-style definition
+A variant of the system above where the transition predicate is formulated
+guarded-transitions style.
+
+```scheme
 (define-system TimedSwitch2
  :input ( (press Bool) )
  :output ( (sig Bool) )
@@ -592,7 +596,7 @@ The input Boolean is interpreted as an on/off toggle.
     (= n 0)
     (ite press (= s on) (s off))
   )
-  :trans (and
+ :trans (and
    (=> (and (= s off) (not press'))
        (and (= s' off) (= n' n)))            ; off --> off
    (=> (and (= s off) press')
@@ -603,103 +607,107 @@ The input Boolean is interpreted as an on/off toggle.
        (and (= s' off) (= n' 0)))            ; on --> off
   )
 )
+```
 
+Another variant but in equational style.
+
+```scheme
 (define-fun flip ((s LightStatus)) LightStatus
   (ite (= s off) on off)
 )
 
-; equational-style definition
 (define-system TimedSwitch3
  :input ( (press Bool) )
  :output ( (sig Bool) )
  :local ( (s LightStatus) (n Int) )
  :inv (= sig (= s on))
  :init (and
-  (= n 0)
-  (= s (ite press on off))
+   (= n 0)
+   (= s (ite press on off))
  )
-  :trans (and
+ :trans (and
    (= s' (ite press' (flip s)
             (ite (or (= s off) (>= n 10)) off
               on)))
    (= n' (ite (or (= s off) (s' off)) 0
             (+ n 1)))
   )
-) 
+)
 ```
 
 The non-deterministic arbiter below grants input requests expressed
-by the Boolean inputs <tt>req1</tt> and <tt>req2</tt>.
+by the Boolean inputs <tt>r1</tt> and <tt>r2</tt>.
 Initially, no requests are granted. Afterwards, a request is always granted,
-expressed by the Boolean outputs <tt>gran1</tt> or <tt>grant2</tt>,
+expressed by the Boolean outputs <tt>g1</tt> or <tt>grant2</tt>,
 if it is the only request.
 When both inputs contain a request, one of the two request is granted,
 with a non-deterministic  choice.
 
 ```scheme
 (define-system NonDetArbiter
-  :input ( (req1 Bool) (req2 Bool) )
-  :output ( (gran1 Bool) (gran2 Bool) )
-  :local ( (s Bool) )
-  :init ( (not gran1) (not gran2) )  ; nothing is granted initially
-  :trans (
-    (=> (and (not req1') (not req2'))
-        (and (not gran1') (not gran2')))
-    (=> (and req1' (not req2'))
-        (and 'gran1 (not gran2')))
-    (=> (and (not req1') req2')
-        (and (not gran1') gran2'))
-    (=> (and req1' req2')
-        ; the unconstrained value of `s` is used as non-deterministic choice
-        (ite s'
-          (and gran1' (not gran2')
-          (and (not gran1') gran2'))))
+ :input ( (r1 Bool) (r2 Bool) )
+ :output ( (g1 Bool) (g2 Bool) )
+ :local ( (s Bool) )
+ :init ( (not g1) (not g2) )  ; nothing is granted initially
+ :trans (and
+  (=> (and (not r1') (not r2'))
+      (and (not g1') (not g2')))
+  (=> (and r1' (not r2'))
+      (and g1' (not g2')))
+  (=> (and (not r1') r2')
+      (and (not g1') g2'))
+  (=> (and r1' r2')
+      ; the unconstrained value of `s` is used as non-deterministic choice
+      (ite s' (and g1' (not g2'))
+        (and (not g1') g2')))
   )
 )
+```
 
-; `DelayedArbiter` is similar to `NonDetArbiter` but grants requests a cycle later.
+The next arbiter is similar to <tt>NonDetArbiter</tt> but grants requests a cycle later and does not use a local variable for the non-deterministic choice.
+
+```scheme
 (define-system DelayedArbiter
-  :input ( (req1 Bool) (req2 Bool) )
-  :output ( (gran1 Bool) (gran2 Bool) )
-  :local ( (s Bool) )
-  :init ( (not gran1) (not gran2) )  ; nothing is granted initially
-  :trans (
-    (=> (and (not req1) (not req2))
-        (and (not gran1') (not gran2')))
-    (=> (and req1 (not req2))
-        (and gran1' (not gran2')))
-    (=> (and (not req1) req2)
-        (and (not gran1') gran2'))
-    (=> (and req1 req2)
-        ; the unconstrained value of `s` is used as non-deterministic choice
-        (ite s
-          (and gran1' (not gran2')
-          (and (not gran1') gran2'))))
+ :input ( (r1 Bool) (r2 Bool) )
+ :output ( (g1 Bool) (g2 Bool) )
+ :local ( (s Bool) )
+ :init ( (not g1) (not g2) )  ; nothing is granted initially
+ :trans (
+    (=> (and (not r1) (not r2))
+        (and (not g1') (not g2')))
+    (=> (and r1 (not r2))
+        (and g1' (not g2')))
+    (=> (and (not r1) r2)
+        (and (not g1') g2'))
+    (=> (and r1 r2)
+        (!= g1' g2'))
   )
 )
+```
 
+Similar to <tt>NonDetArbiter</tt> but for requests expressed as integer events.
 
-
-; Similar to `NonDetArbiter` but for requests expressed as integer events.
+```scheme
 (define-system IntNonDetArbiter
-  :input ( (req1 (Event Int)) (req2 (Event Int)) )
-  :output ( (gran1 (Event Int)) (gran2 (Event Int)) )
+  :input ( (r1 (Event Int)) (r2 (Event Int)) )
+  :output ( (g1 (Event Int)) (g2 (Event Int)) )
   :local ( (s Bool) )
-  :init ( (= gran1 gran2 none) )
+  :init ( (= g1 g2 none) )
   :trans (
-    (=> (= req1' req2' none)
-        (= gran1' gran2' none))
-    (=> (and (distinct req1' none) (= req2' none))
-        (and (= gran1' req1) (= gran2' none)))
-    (=> (and (= req1' none) (distinct' req2' none))
-        (and (= gran1' none) (= gran2' req2')))
-    (=> (and (distinct req1' none) (distinct req2' none))
-        (ite s
-          (and (= gran1' req1') (= gran2' none))
-          (and (= gran1' none) (= gran2' req2'))))
+    (=> (= r1' r2' none)
+        (= g1' g2' none))
+    (=> (and (!= r1' none) (= r2' none))
+        (and (= g1' r1) (= g2' none)))
+    (=> (and (= r1' none) (!= r2' none))
+        (and (= g1' none) (= g2' r2')))
+    (=> (and (!= r1' none) (!= r2' none))
+        (or (and (= g1' r1') (= g2' none))
+          (and (= g1' none) (= g2' r2'))))
   )
 )
+```
 
+<!--
 ; An event-triggered channel that arbitrarily loses its input data
 (define-system LossyIntChannel
   :input ( (in (Event Int)) )
@@ -719,42 +727,213 @@ with a non-deterministic  choice.
   :init ( (ite clock (= out s in) (= out s init)) )
   :trans ( (ite clock (= out' s' in) (= out' s' s)) )
 )
-```
-
+-->
 
 #### Composite Systems  - synchronous composition
 
+A transition systems can be defined as the synchronous composition
+of other systems by a command of the form:
 
-Consider a
-= (IA[iA,oA,sA], TA[iA,oA,sA,iA′,o′A,s′A]) = (IB[iB,oB,sB], TB[iB,oB,sB,iB′,o′B,s′B])
+<tt>
+(define-system $S$ <br>
+&nbsp; :input (($i_1$ $\sigma_1$) $\cdots$ ($i_m$ $\sigma_m$)) <br>
+&nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$)) <br>
+&nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$)) <br>
+&nbsp; :subsys ($N_1$ ($S_1$ $\boldsymbol x_1$ $\boldsymbol y_1$)) <br>
+&nbsp;&nbsp; $\cdots$<br>
+&nbsp; :subsys ($N_q$ ($S_q$ $\boldsymbol x_q$ $\boldsymbol y_q$)) <br>
+&nbsp; :init $I$<br>
+&nbsp; :trans $T$<br>
+&nbsp; :inv $P$<br>
+)
+</tt>
+
+where
+
+* <tt>:input</tt>, <tt>:output</tt>, <tt>:local</tt> <tt>:init</tt>, <tt>:trans</tt>, and <tt>:inv</tt> 
+  are as in atomic system definitions;
+* $q > 0$ and each $S_i$ is the name of a system other than $S$;
+* the names $S_1 \ldots,S_q$ need not be all distinct;
+* each $N_i$ is a local synonym for $S_i$, with $N_1,\ldots,N_q$ distinct;
+* each $\boldsymbol x_i$ consists of $S$'s variables of the same type as $S_i$'s input;
+* each $\boldsymbol y_i$ consists of $S$'s local/output variables of the same type as $S_i$' ’'s output;
+* the directed subsystem graph rooted at $S$ is acyclic.
+
+#### Composite System Semantics
+
+For $k=1,\ldots, q$, let
+$S_k = (I_k[\boldsymbol{i}_k,\boldsymbol{o}_k,\boldsymbol{s}_k],
+        T_k[\boldsymbol{i}_k,\boldsymbol{o}_k,\boldsymbol{s}_k,
+            \boldsymbol{i'}_k,\boldsymbol{o'}_k,\boldsymbol{s'}_k])$,
+with the elements of $\boldsymbol{s}_1,\ldots, \boldsymbol{s}_q$ all mutually distinct.
+
+Let
+$\boldsymbol{i} = (i_1, \ldots, i_m)$,
+$\boldsymbol{o} = (o_1, \ldots, o_n)$,
+$\boldsymbol{s} = (s_1, \ldots, s_p) \circ \boldsymbol{s}_1 \circ \cdots \circ \boldsymbol{s}_q$,
+and
+$\boldsymbol{v}$ = $\boldsymbol{i} \circ \boldsymbol{o} \circ \boldsymbol{s}$.
+
+Formally, a composit system $S$ introduced by the <tt>define-system</tt> command above
+is a transition system whose behavior consists of all the (infinite) executions $(\mathcal I, \pi)$
+over $\boldsymbol{v}$ such that
+
+$$(\mathcal I, \pi) \models
+  I_S[\boldsymbol{v}] \land \mathbf{always}\ T_S[\boldsymbol{v},\boldsymbol{v'}]
+$$
+where
+
+* $I_S[\boldsymbol{v}] =
+   I[\boldsymbol{v}] \land
+   \bigwedge_{k=1}^{q} I_k[\boldsymbol{x}_k,\boldsymbol{y}_k,\boldsymbol{s}_k]
+  $<br>
+and
+* $T_S[\boldsymbol{v},\boldsymbol{v'}] = 
+   P[\boldsymbol{v}] \land T[\boldsymbol{v},\boldsymbol{v'}] \land
+   \bigwedge_{k=1}^{q} T_k[\boldsymbol{x}_k,\boldsymbol{y}_k,\boldsymbol{s}_k,
+                           \boldsymbol{x'}_k,\boldsymbol{y'}_k,\boldsymbol{s'}_k]
+  $
+
+#### Examples, composite systems
+
+```scheme
+;----------------
+; Two-step delay
+;----------------
+
+;     +------------------------------------+
+;     |   DoubleDelay                      |
+;     |  +-----------+      +-----------+  |
+;  in |  |           | temp |           |  | out
+; ----+->|   Delay   |----->|   Delay   |--+---->
+;     |  |           |      |           |  |
+;     |  +-----------+      +-----------+  |
+;     +------------------------------------+
+
+; One-step delay
+(define-system Delay :input ( (i Int) ) :output ( (o Int) )
+  :local ( (s Int) )
+  :inv (= s i) 
+  :init (= o 0)
+  :trans (= o' s)
+)
+
+; Two-step delay
+(define-system DoubleDelay :input ( (in Int) ) :output ( (out Int) )
+  :local ( (temp Int) )
+  :subsys  (D1 (Delay in temp))
+  :subsys  (D2 (Delay temp out))
+)
+
+;; DoubleDelay expanded
+(define-system DoubleDelay
+  :input ( (in Int) )
+  :output ( (out Int) )
+  :local ( 
+    (temp Int)  
+    (s1 Int)      ; from `(Delay in temp)`
+    (s2 Int)      ; from `(Delay temp out)`
+  )
+  :inv (and
+    (= s1 in)     ; from `(Delay in temp)`
+    (= s2 temp)   ; from `(Delay temp out)`
+  )
+  :init (and
+    (= temp 0)   ; from `(Delay in temp)`
+    (= out 0)    ; from  `(Delay temp out)`
+  )
+  :trans (and
+    (= temp' s1) ; from `(Delay in temp)`
+    (= out' s2)  ; from `(Delay temp out)`
+  )
+)
+; Example trace:
+;   in = 1, 2, 3, 4, 5, 6, 7, ...
+;   s1 = 1, 2, 3, 4, 5, 6, 7, ...
+; temp = 0, 1, 2, 3, 4, 5, 6, ...
+;   s2 = 0, 1, 2, 3, 4, 5, 6, ...
+;  out = 0, 0, 1, 2, 3, 4, 5, ...
+````
+
+The next example defines a three-bit counter in terms of three identical one-bit counters.
+The one-bit counter uses a latch.
+The latch has a Boolean state represented by state variable <tt>s</tt> with arbitrary initial value.
+The value of output <tt>out</tt> is always the previous value of <tt>s</tt>.
+A set request (represented by input <tt>set</tt> being true) sets the new value of <tt>s</tt> to true
+unless there is a concurrent reset request (represented by input <tt>reset</tt> being true).
+In that case, the choice between the two requests is resolved arbitrarily using the value of
+the unconstrained local variable <tt>b</tt>.
+In the absence of either a set or a reset, the value of <tt>out</tt> is unchanged <tt>out</tt> .
 
 
+````scheme
+(define-system Latch  :input ( (set Bool) (reset Bool) )  :output ( (out Bool)) 
+ :local ( (s Bool) (b Bool) )
+ :init (and
+   (= out b)
+ )
+ :trans (and
+   (= out' s)
+   (= s' (or (and set (or (not reset) b)) 
+             (and (not set) (not reset) out)))
+ )
+)
+````
+
+The one-bit counter is implemented using the latch component modeled by `Latch`.
+The counter goes from 0 (represented as <tt>false</tt>) to 1 (<tt>true</tt>)
+with a carry value of 0, or from 1 to 0 with a carry value of 1 when
+the increment signal <tt>inc</tt> is true.
+It is reset to 0 (<tt>false</tt>) when the start signal is true.
+The initial value of the counter is arbitrary.
+
+````scheme
+;        +------------------------------------------------------------+
+;        |                                                            |
+;        | +--------------------------------------------------------+ |
+;        | |                                              +-------+ | |
+;        +-|-----------------------------------|``-.  set |       | | |
+;        | |                          |`-._    |    :---->|       | | |
+;        | +->|``-.                +--|   _]o--|..-`      | Latch | | |
+;        |    |    :--+----\``-.   |  |.-`          reset |       |-+-+--> out
+;   inc -+----|..-`   |     )   :--+--------------------->|       |   |
+;        |            | +--/..-`                          +-------+   |
+;        |            | |                                             |
+; start ----------------+                OneBitCounter                |
+;        |            |                                               |
+;        +------------+-----------------------------------------------+
+;                     |    
+;                     v carry
+
+(define-system OneBitCounter :input ( (inc Bool) (start Bool) ) 
+ :output ( (out Bool) (carry Bool) )
+ :local ( (set Bool) (reset Bool) )
+ :subsys (L (Latch set reset out))
+ :inv (and 
+   (= set (and inc (not reset)))
+   (= reset (or carry start))
+   (= carry (and inc out))
+ )
+)
+````
+
+The three-bit counter is a resettable counter obtained by cascading
+three 1-bit counters.
+The output is three Boolean values standing for the three bits,
+with <tt>out0</tt> being the least significant one.
+
+````scheme
+(define-system ThreeBitCounter  :input ( (inc Bool) (start Bool) )
+ :output ( (out0 Bool) (out1 Bool) (out2 Bool) ) 
+ :local ( (car0 Bool) (car1 Bool) (car2 Bool) ) 
+ :subsys (C1 (OneBitCounter inc start out0 car0))
+ :subsys (C2 (OneBitCounter car0 start out1 car1)) 
+ :subsys (C3 (OneBitCounter car1 start out2 car2))
+)
+````
 
 
-**Notes:**
-* The full set _**s**_ of local variables of $S$ is (recursively) the disjoint union of the variables declared in the <tt>:local</tt> attribute together with the local variables of all the systems applied in <tt>:init</tt> or <tt>:trans</tt>.
-
-* The order of the formulas in <tt>:init</tt>, <tt>:trans</tt> and   <tt>:inv</tt> attributes does not matter.
-
-* _T<sub>S</sub>_ is not required to be functional over inputs and current state, thus allowing the modeling of non-deterministic systems.
-
-##### Trace Semantics
-
-Let's extend the syntax and the semantics of (first-order) LTL to allow primed stated variables in formulas, interpreting them over a trace as the value they have in the second state of the trace.
-
-Then, the set of traces defined by the transition system _(I<sub>S</sub>, T<sub>S</sub>)_ is exactly the set of traces that satisfy the LTL formula: _I<sub>S</sub>[**i**,**o**,**s**] ∧ **always** T<sub>S</sub>[**i**,**o**,**s**,**i'**,**o'**,**s'**]_.
-
-> **Discussion:** Should we restrict the semantics to infinite traces only? 
->
-> Since it is possible to define systems that have _deadlock_ states (reachable states with no successors, more precisely, reachable states falsifying the transition constraints), finite traces ending in a deadlock state have to be excluded from the semantics. In that case though, it is not possible to disprove safety properties by means of a finite counterexample trace because that trace may not extend to an infinite trace of the system.
->
-> In contrast, allowing finite traces as well in the semantics has the problem that ...
->
-
-
-
-
-##### Sanity requirements on _I<sub>S</sub>_ and _T<sub>S</sub>_
+#### Sanity requirements on _I<sub>S</sub>_ and _T<sub>S</sub>_
 
 One way to address the deadlock state problem is to consider only infinite traces in the semantics (systems that are meant to reach a final state can be always modeled with states that cycle back to themselves and produce stuttering outputs).
 In that semantics, the reachability of a deadlock state (a state with no successors in the transition relation) indicates an error in the system's definition.
@@ -780,212 +959,12 @@ The first restriction above guarantees that the system can start at all. The sec
 
 
 
-#### Examples, composite systems
-
-Parallel composition is achieved by applying systems in initial state or transition conditions.
-
-```scheme
-;----------------
-; Two-step delay
-;----------------
-
-;     +------------------------------------+
-;     |   DoubleDelay                      |
-;     |  +-----------+      +-----------+  |
-;  in |  |           | temp |           |  | out
-; ----+->|   Delay   |----->|   Delay   |--+---->
-;     |  |           |      |           |  |
-;     |  +-----------+      +-----------+  |
-;     +------------------------------------+
-
-; One-step delay
-(define-system Delay
-  :input ( (i Int) )
-  :output ( (o Int) )
-  :init  ( (= o 0) )
-  :trans ( (= o' i) )
-)
-
-; Two-step delay
-(define-system DoubleDelay
-  :input ( (in Int) )
-  :output ( (out Int) )
-  :local ( (temp Int) )
-  :init  ( (Delay in temp)  ; can be understood as a macro call that also adds state
-           (Delay temp out) )
-  :trans ( (Delay in temp)
-           (Delay temp out) )
-)
-;; DoubleDelay expanded
-(define-system DoubleDelay
-  :input ( (in Int) )
-  :output ( (out Int) )
-  :local ( (temp Int) )
-  :init ( (= temp 0)   ; expansion of `(Delay in temp)`
-          (= out 0)    ; expansion of `(Delay temp out)`
-        ) 
-  )
-  :trans ( (= temp' in)    ; expansion of `(Delay in temp)`
-           (= out' temp)   ; expansion of `(Delay temp out)`
-         )
-)
-; Example trace:
-;   in = 1, 2, 3, 4, 5, 6, 7, ...
-; temp = 0, 1, 2, 3, 4, 5, 6, ...
-;  out = 0, 0, 1, 2, 3, 4, 5, ...
 
 
-; 'Latch' has a Boolean state represented by state variable `s` with arbitrary initial value.
-; A set request (represented by input `set` being true) sets the new value of `s` to true
-; unless there is a concurrent reset request (represented by input `reset` being true).
-; In that case, the choice between the two requests is resolved arbitrarily.
-; In the absence of either a set or a reset, the value of `s` is unchanged.
-; The initial value of output 'out' is arbitrary. Afterwards, it is the previous value of 's'.
-;
-(define-system Latch
-  :input ( (set Bool) (reset Bool) )
-  :output ( (out Bool) )
-  :local ( (s Bool) )
-  :trans (
-    (= out' s)
-    (=> (and (not set) (not reset)) (= s' s))
-    (=> (and set (not reset)) (= s' true))
-    (=> (and (not set) reset) (= s' false))
-    ; when the old values of `set` and `reset` are both `true`,
-    ; the new value of `s` is arbitrary
-  )
-)
-
-; More compact, equational definition of Latch
-(define-system Latch1
-  :input ( (set Bool) (reset Bool) )
-  :output ( (out Bool) )
-  :local ( (b Bool) )  ; used for non-deterministic choice
-  :trans (
-    (= out' (or (and set (or (not reset) b))
-                (and (not set) (not reset) out)))
-  )
-)
 
 
-;---------------
-; 3-bit counter
-;---------------
-
-; 'OneBitCounter' is a stateful 1-bit counter implemented using
-; the latch component modeled by `Latch`.
-; The counter goes from 0 (represented as `false`) to 1 (`true`)
-; with a carry value of 0, or from 1 to 0 with a carry value of 1 when
-; the increment signal `inc` is true.
-; It is reset to 0 (`false`) when the start signal is true.
-; The initial value of the counter is arbitrary.
-
-;        +------------------------------------------------------------+
-;        |                                                            |
-;        | +--------------------------------------------------------+ |
-;        | |                                              +-------+ | |
-;        +-|-----------------------------------|``-.  set |       | | |
-;        | |                          |`-._    |    :---->|       | | |
-;        | +->|``-.                +--|   _]o--|..-`      | Latch | | |
-;        |    |    :--+----\``-.   |  |.-`          reset |       |-+-+--> out
-;   inc -+----|..-`   |     )   :--+--------------------->|       |   |
-;        |            | +--/..-`                          +-------+   |
-;        |            | |                                             |
-; start ----------------+                OneBitCounter                |
-;        |            |                                               |
-;        +------------+-----------------------------------------------+
-;                     |    
-;                     v carry
-
-(define-system OneBitCounter
-  :input ( (inc Bool) (start Bool) )
-  :output ( (out Bool) (carry Bool) )
-  :local ( (set Bool) (reset Bool) )
-  :init (
-    (Latch set reset out)
-    (= set (and inc (not reset)))
-    (= reset (or carry start))
-    (= carry (and inc out))
-  )
-  :trans (
-    (Latch set reset out)
-    (= set' (and inc' (not reset')))
-    (= reset' (or carry' start'))
-    (= carry' (and inc' out'))
-  )
-)
-
-; a more concise version
-(define-system OneBitCounter
-  :input ( (inc Bool) (start Bool) )
-  :output ( (out Bool) (carry Bool) )
-  :local ( (set Bool) (reset Bool) )
-  :inv (
-     ; _one-state_ constraints asserted for every state
-     (= set (and inc (not reset)))
-     (= reset (or carry start))
-     (= carry (and inc out))
-  )
-  :init (
-    (Latch set reset out)
-  )
-  :trans (
-    (Latch set reset out)
-  )
-)
-
-; an even more concise version
-(define-system OneBitCounter
-  :input ( (inc Bool) (start Bool) )
-  :output ( (out Bool) (carry Bool) )
-  :local ( (set Bool) (reset Bool) )
-  :inv (
-     ; _one-state_ constraints asserted for every state
-     (= set (and inc (not reset)))
-     (= reset (or carry start))
-     (= carry (and inc out))
-  )
-  :compose ( ; new attribute
-    ; application below is implicitly added to both :init and :trans
-    (Latch set reset out)
-  )
-)
 
 
-; 'ThreeBitCounter' implements a 3-bit resettable counter
-; by cascading three 1-bit counters.
-; The output is three Boolean values standing for the three bits,
-; with out0 being the least significant one.
-;
-(define-system ThreeBitCounter
-  :input ( (inc Bool) (start Bool) )
-  :output ( (out0 Bool) (out1 Bool) (out2 Bool) )
-  :local ( (car0 Bool) (car1 Bool) (car2 Bool) )
-  :init (
-    (OneBitCounter inc start out0 car0)
-    (OneBitCounter car0 start out1 car1)
-    (OneBitCounter car1 start out2 car2)
-  )
-  :trans (
-    (OneBitCounter inc start out0 car0)
-    (OneBitCounter car0 start out1 car1)
-    (OneBitCounter car1 start out2 car2)
-  )
-)
-
-; more concisely
-define-system ThreeBitCounter
-  :input ( (inc Bool) (start Bool) )
-  :output ( (out0 Bool) (out1 Bool) (out2 Bool) )
-  :local ( (car0 Bool) (car1 Bool) (car2 Bool) )
-  :compose (
-    (OneBitCounter inc start out0 car0)
-    (OneBitCounter car0 start out1 car1)
-    (OneBitCounter car1 start out2 car2)
-  )
-)
-
-```
 
 ### System verification command
 
@@ -1056,22 +1035,22 @@ The command above succeeds if both the following holds:
 ;---------
 
 (define-system NonDetArbiter
-  :input ( (req1 Bool) (req2 Bool) )
-  :output ( (gran1 Bool) (gran2 Bool) )
+  :input ( (r1 Bool) (r2 Bool) )
+  :output ( (g1 Bool) (g2 Bool) )
   :local ( (s Bool) )
-  :init ( (not gran1) (not gran2) )  ; nothing is granted initially
+  :init ( (not g1) (not g2) )  ; nothing is granted initially
   :trans (
-    (=> (and (not req1') (not req2'))
-        (and (not gran1') (not gran2')))
-    (=> (and req1' (not req2'))
-        (and 'gran1 (not gran2')))
-    (=> (and (not req1') req2')
-        (and (not gran1') gran2'))
-    (=> (and req1' req2')
+    (=> (and (not r1') (not r2'))
+        (and (not g1') (not g2')))
+    (=> (and r1' (not r2'))
+        (and 'g1 (not g2')))
+    (=> (and (not r1') r2')
+        (and (not g1') g2'))
+    (=> (and r1' r2')
         ; the unconstrained value of `s` is used as non-deterministic choice
         (ite s'
-          (and gran1' (not gran2')
-          (and (not gran1') gran2'))))
+          (and g1' (not g2')
+          (and (not g1') g2'))))
   )
 )
 
