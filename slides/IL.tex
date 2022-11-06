@@ -38,7 +38,7 @@
 %
 \author{\large The NSF:CCRI Team}
 
-\date{Apr 19, 2022}
+\date{\today}
 
 %\institute{}
 
@@ -208,23 +208,23 @@ but with an eye to \alert{infinite-state} systems too
 % \lambda\vec i{:}\vec\delta\, \lambda\vec o{:}\vec\tau\: 
 %    \alert{I_S}[\vec i,\vec o,\vec s],\;
 % \lambda\vec i{:}\vec\delta\, \lambda\vec o{:}\vec\tau\,
-% \lambda\vec i'{:}\vec\delta\, \lambda\vec o'{:}\vec\tau\:
-%   \alert{T_S}[\vec i,\vec o,\vec s, \vec i',\vec o',\vec s']\,
+% \lambda\vec{i'}{:}\vec\delta\, \lambda\vec{o'}{:}\vec\tau\:
+%   \alert{T_S}[\vec i,\vec o,\vec s, \vec{i'},\vec{o'},\vec{s'}]\,
 % )
 %\]
 %}
 %where 
 %\begin{itemize}
 %\item 
-%$\vec i$ and $\vec i'$ are two tuples of \df{input variables}, both of type $\vec\delta$
+%$\vec i$ and $\vec{i'}$ are two tuples of \df{input variables}, both of type $\vec\delta$
 %\item 
-%$\vec s$ and $\vec s'$ are two tuples of \df{local variables}, both of type $\vec\sigma$
+%$\vec s$ and $\vec{s'}$ are two tuples of \df{local variables}, both of type $\vec\sigma$
 %\item 
-%$\vec o$ and $\vec o'$ are two tuples of \df{output variables}, both of type $\vec\tau$
+%$\vec o$ and $\vec{o'}$ are two tuples of \df{output variables}, both of type $\vec\tau$
 %\item 
 %$\alert{I_S}$, the \df{initial state condition} is an SMT-LIB formula with free vars from $[\vec i,\vec o,\vec s]$ 
 %\item
-%$\alert{T_S}$, the \df{transition condition} is an SMT-LIB formula with free vars from $[\vec i,\vec o,\vec s, \vec i',\vec o',\vec s']$
+%$\alert{T_S}$, the \df{transition condition} is an SMT-LIB formula with free vars from $[\vec i,\vec o,\vec s, \vec{i'},\vec{o'},\vec{s'}]$
 %\end{itemize}
 %
 %\end{frame}
@@ -238,7 +238,7 @@ Formally, a transition system is a pair $S$ of predicates of the form
 \[
  S \ = \ (\,
  \alert{I_S}[\vec i,\vec o,\vec s],\;
- \alert{T_S}[\vec i,\vec o,\vec s, \vec i',\vec o',\vec s']\,
+ \alert{T_S}[\vec i,\vec o,\vec s, \vec{i'},\vec{o'},\vec{s'}]\,
  )
 \]
 }
@@ -247,15 +247,15 @@ Formally, a transition system is a pair $S$ of predicates of the form
 where 
 \begin{itemize}
 \item 
-$\vec i$ and $\vec i'$ are two tuples of \df{input variables} with the same length and type
+$\vec i$ and $\vec{i'}$ are two tuples of \df{input variables} with the same length and type
 \item 
-$\vec o$ and $\vec o'$ are two tuples of \df{output variables} with the same length and type
+$\vec o$ and $\vec{o'}$ are two tuples of \df{output variables} with the same length and type
 \item 
-$\vec s$ and $\vec s'$ are two tuples of \df{local variables} with the same length and type
+$\vec s$ and $\vec{s'}$ are two tuples of \df{local variables} with the same length and type
 \item 
 $\alert{I_S}$, the \df{initial state condition} is a formula with free vars from $[\vec i,\vec o,\vec s]$ 
 \item
-$\alert{T_S}$, the \df{transition condition} is a formula with free vars from $[\vec i,\vec o,\vec s, \vec i',\vec o',\vec s']$
+$\alert{T_S}$, the \df{transition condition} is a formula with free vars from $[\vec i,\vec o,\vec s, \vec{i'},\vec{o'},\vec{s'}]$
 \end{itemize}
 \bigskip
 
@@ -445,32 +445,41 @@ $I$ and $P$ are \alert{one-state} formulas (over unprimed vars only)
 $T$ is a \alert{two-state} formula (over unprimed and primed vars)
 
 \item
-all \alert{attributes} are \alert{optional} and their \alert{order} is \alert{immaterial}
+all \alert{attributes} are \alert{optional} and
+their \alert{order} is \alert{immaterial}
+
+\begin{itemize}
+\item[${\color{black}\blacktriangleright}$]
+however, \inputa, \outputa, \locala must occur before
+\inita, \transa, \inva 
+\end{itemize}
 \end{itemize}
 }
 \bigskip
 
 \only<3>{
 \medskip
-\textbf{\large Semantics:} \ 
-All \alert{infinite} traces that satisfy the \alert{FO-LTL} formula 
+\textbf{\large Semantics}
 \[
-\begin{array}{c@{~~}c@{~}c}
- \underbrace{
-  I[\vec i,\vec o,\vec s] \land 
-  P[\vec i,\vec o,\vec s]
- }_{} 
- & \land ~~\textbf{always}
- & (\underbrace{
-  T[\vec i,\vec o,\vec s,\vec i',\vec o',\vec s'] \land 
-  P[\vec i',\vec o',\vec s']
- }_{})
- \\[-1ex]
- \alert{I_S} & & \alert{T_S}
-\end{array}
+ S = (\alert{I_S}, \alert{T_S})
+   = (I[\vec i,\vec o,\vec s], \ 
+      P[\vec i,\vec o,\vec s] \land
+      T[\vec i,\vec o,\vec s,\vec{i'},\vec{o'},\vec{s'}]
+     )
 \]
-%with
-%$P = P_1 \land \cdots \land P_n$  
+where 
+$\vec i = (i_1,\ldots,i_m)$, 
+$\vec o = (o_1,\ldots,o_n)$, 
+$\vec s = (s_1,\ldots,s_n)$
+\bigskip
+
+$S$ denotes the set of all \alert{infinite} traces 
+that satisfy the \alert{FO-LTL} formula 
+\[
+  \alert{I_S}%[\vec i,\vec o,\vec s] 
+  ~\land~
+  \textbf{always}\ \alert{T_S}%[\vec i,\vec o,\vec s,\vec{i'},\vec{o'},\vec{s'}]
+\]
 }
 
 \only<4->{
@@ -528,7 +537,7 @@ However, they may not be because of the generality of $T$ and $P$
 (\definesys StutteringClockedCopy  \\
 ~~\inputa ((clock Bool) (in Int)) \\
 ~~\outputa ((out Int)) \\
-~~\inita (=> clock (= out in)) \comm{; output is arbitrary when clock is off}\\
+~~\inita (=> clock (= out in)) \comm{; out is arbitrary when clock is false}\\
 ~~\transa (ite clock (= out' in') (= out' out)) \\
 )}
 
@@ -672,18 +681,18 @@ A Boolean input is provided as a toggle signal
 For every system 
 $S = (\,
   I_S[\vec i, \vec o, \vec s],\: 
-  T_S[\vec i, \vec o, \vec s, \vec i', \vec o', \vec s']
+  T_S[\vec i, \vec o, \vec s, \vec{i'}, \vec{o'}, \vec{s'}]
  \,)
 $
 \bigskip
 
-\expr{OnlyChange} is a \emph{multi-arity} predicate over $\vec o, \vec s, \vec o', \vec s'$:
+\expr{OnlyChange} is a \emph{multi-arity} predicate over $\vec o, \vec s, \vec{o'}, \vec{s'}$:
 
 \begin{eqnarray*}
  \expr{OnlyChange}(x_1, \ldots, x_n) & \equiv &
  \bigwedge 
  \{ y' = y \mid 
-    y \in (\vec o \cup \vec s \cup \vec o' \cup \vec s') \setminus 
+    y \in (\vec o \cup \vec s \cup \vec{o'} \cup \vec{s'}) \setminus 
     \{ x_1, \ldots, x_n \}
  \}
 \end{eqnarray*}
@@ -738,189 +747,162 @@ in any way
 
 %---------------------------------------------------------------------
 
-\begin{frame}{System \alert{definition} command \qquad \deemph{(Composite case)}}
+\begin{frame}[t]{System \alert{definition} --- Synchronous composition}
 
-\definesystem
-\bigskip
+\small
+
+\expr{(\definesys $S$ \\
+\begin{tabular}{lll}
+ \inputa 
+   & (\,($i_1$ $\mi{\delta}_1$) $\,\cdots$ ($i_m$ $\mi{\delta}_m$)\,)
+   & \comm{; input vars} \\
+ \outputa
+   & (\,($o_1$ $\mi{\tau}_1$) $\,\cdots$ ($o_n$ $\mi{\tau}_n$)\,)
+   & \comm{; output vars} \\
+ \locala 
+   & (\,($s_1$ $\mi{\sigma}_1$) $\,\cdots$ ($s_p$ $\mi{\delta}_p$)\,)
+   & \comm{; local vars} \\
+ \subsysa 
+   & (\,$N_1$ ($S_1$ $\vec x_1$ $\vec y_1$)\,)
+   & \comm{; component subsystem} \\
+ $\quad\cdots$
+ \\
+ \subsysa 
+   & (\,$N_q$ ($S_q$ $\vec x_q$ $\vec y_q$)\,)
+   & \comm{; component subsystem}
+\end{tabular} \\
+)
+}
+
+\medskip
 
 \only<1>{
-$I$, $T$ and $P$ can contain \df{system applications}
-\expr{($S_i$ $\vec x$ $\vec y$)} as subformulas
-\medskip
-
-%\small
 where
 
-\begin{itemize}
-\item
-$S_i$ is another system
-
-\item $\vec x$, $\vec y$ consist of $S$'s variables
-\end{itemize}
+\begin{enumerate}
+\item $q > 0$ and each $S_i$ is the name of a system other than $S$
+\item $S_1, \ldots, S_q$ need not be all distinct
+\item each $N_i$ is a local synonym for $S_i$, with $N_1$, \ldots $N_q$ distinct
+\item each $\vec x_i$ consist of $S$'s variables of the same type as $S_i$'s input
+\item each $\vec y_i$ consist of $S$'s local/output variables of the same type as $S_i$'s output
+\item the subsystem directed graph rooted at $S$ is acyclic 
+\end{enumerate}
 }
 
+\only<2>{
+\smallskip
+
+\textbf{\normalsize Semantics}
 \medskip
-[May be prudent to allow system applications only in \expr{:inv} formulas]
 
-\end{frame}
+Let \ 
+\(
+ S_k = (\,
+   \alert{I_k}[\vec i_k,\vec o_k,\vec s_k],\;
+   \alert{T_k}[\vec i_k,\vec o_k,\vec s_k,\vec{i'}_k,\vec{o'}_k,\vec{s'}_k]
+   \,)
+\)
+for $k = 1, \ldots, q$,
+with $\vec s_1, \ldots, \vec s_q$ all distinct
+\medskip
 
-%---------------------------------------------------------------------
+Let \ 
+$\vec i = (i_1, \ldots, i_m)$, \ 
+$\vec o = (o_1, \ldots, o_n)$, \ 
+$\vec s = s_1, \ldots, s_q, \vec s_1, \ldots, \vec s_q$
 
-\begin{frame}{Semantics of system applications}
-Let
-\begin{eqnarray*}
- A & = & (\,
-   \alert{I_A}[\vec i_A,\vec o_A,\vec s_A],\;
-   \alert{T_A}[\vec i_A,\vec o_A,\vec s_A, \vec i_A',\vec o_A',\vec s_A']\,
- )
-\\[1ex]
- B & = & (\,
-   \alert{I_B}[\vec i_B,\vec o_B,\vec s_B],\;
-   \alert{T_B}[\vec i_B,\vec o_B,\vec s_B, \vec i_B',\vec o_B',\vec s_B']\,
- )
-\end{eqnarray*}
+\[
+S = (\alert{I_S}[\vec i,\vec o,\vec s], 
+     \alert{T_S}[\vec i,\vec o,\vec s,\vec{i'},\vec{o'},\vec{s'}])
+\]
 
-\begin{tabular}{l@{~~~}l@{~~~}l@{~~~}l@{~~~}l}
- An application \expr{($B$ $\vec x$ $\vec y$)}
- & in & $\alert{I_A}$ & abbreviates & $\alert{I_B}[\vec x,\vec y,\vec s_B]$
- \\
- & in & $\alert{T_A}$  & abbreviates & $\alert{T_B}[\vec x,\vec y,\vec s_B,\vec x',\vec y',\vec s'_B]$
+\begin{tabular}{l@{\qquad}l@{\qquad\quad}l}
+ with
+ &
+ $\alert{I_S} ~=~ 
+ \bigwedge_{k=1}^q \alert{I_k}[\vec x_k,\vec y_k,\vec s_k]$
+ &
+ $\alert{T_S} ~=~ 
+ \bigwedge_{k=1}^q \alert{T_k}[\vec x_k,\vec y_k,\vec s_k,\vec{x'}_k,\vec{y'}_k,\vec{s'}_k]$
 \end{tabular}
-\bigskip
-\medskip
-
-\pause
-
-\textbf{Restrictions}
-\begin{itemize}
-\item
-No cycles in the application graph
-
-\item
-Usual hygiene conditions on local variable names
-\end{itemize}
-\bigskip
-
-\pause
-
-\textbf{Note:}
-If $A$ contains an application of $B$, its local state is actually
-$\vec s_A, \vec s_B$ (at least)
+}
 
 \end{frame}
 
 %---------------------------------------------------------------------
 
-\tikzstyle{system} = 
- [draw, thick, text centered, text width=2.3em, fill=brown!10, 
-  minimum height=4ex, rounded corners, drop shadow]
-\tikzstyle{mjoin} = [draw, circle, thick] 
-%\tikzstyle{sc} = [block, text width=13em, fill=red!20, 
-%    minimum height=10em, rounded corners, drop shadow]
-%---------------------------------------------------------------------
+\begin{frame}[t]{System \alert{definition} --- Synchr.~composition extended}
+\small
 
+\expr{(\definesys $S$ \\
+\begin{tabular}{lll}
+ \inputa 
+   & (\,($i_1$ $\mi{\delta}_1$) $\,\cdots$ ($i_m$ $\mi{\delta}_m$)\,)
+   & \comm{; input vars} \\
+ \outputa
+   & (\,($o_1$ $\mi{\tau}_1$) $\,\cdots$ ($o_n$ $\mi{\tau}_n$)\,)
+   & \comm{; output vars} \\
+ \locala 
+   & (\,($s_1$ $\mi{\sigma}_1$) $\,\cdots$ ($s_p$ $\mi{\delta}_p$)\,)
+   & \comm{; local vars} \\
+ \subsysa 
+   & (\,$N_1$ ($S_1$ $\vec x_1$ $\vec y_1$)\,)
+   & \comm{; component subsystem} \\
+ $\quad\cdots$ & $\quad\cdots$ & $\quad\cdots$
+ \\
+ \subsysa 
+   & (\,$N_q$ ($S_q$ $\vec x_q$ $\vec y_q$)\,)
+   & \comm{; component subsystem} \\
+ \inita 
+   & $I$
+   & \comm{; initial state formula} \\
+ \transa 
+   & $T$
+   & \comm{; transition formula} \\
+ \inva 
+   & $P$
+   & \comm{; invariant formula} \\
+\end{tabular} \\
+)
+}
 
-
-\begin{frame}{Composition patterns --- examples}
-
-\expr{%
-(\definesys $A$
-  \inputa  (($i$ $\delta_A$))
-  \outputa (($o$ $\tau_A$))
-  $\ldots$
-)}
+\medskip
 \smallskip
 
-\expr{%
-(\definesys $B$
-  \inputa  (($i$ $\delta_B$))
-  \outputa (($o$ $\tau_B$))
-  $\ldots$
-)
-}
-\bigskip
-\smallskip
-\pause
+\textbf{\large Semantics}
+%\medskip
+%
+%Let \ 
+%\(
+% S_k = (\,
+%   \alert{I_k}[\vec i_k,\vec o_k,\vec s_k],\;
+%   \alert{T_k}[\vec i_k,\vec o_k,\vec s_k,\vec{i'}_k,\vec{o'}_k,\vec{s'}_k]
+%   \,)
+%\)
+%for $k = 1, \ldots, q$
+%\medskip
 
-\textbf{Synchronous composition} ($\tau_A = \delta_B$)
-\medskip
+%Let \ 
+%$\vec i = (i_1, \ldots, i_m)$, \ 
+%$\vec o = (o_1, \ldots, o_n)$, \ 
+%$\vec s = (s_1, \ldots, s_q)$ %, \vec s_1, \ldots, \vec s_q$
 
-\begin{columns}
-\begin{column}{0.5\textwidth}
-\expr{%
-(\definesys $C$
- \inputa  (($i$ $\delta_A$)) \\
-~\outputa (($o$ $\tau_B$)) \\
-~\locala (($s$ $\tau_A$)) \\
-~\inva (and (A $i$ $s$) (B $s$ $o$)) \\
-)
-}
-\end{column}
-\begin{column}{0.4\textwidth}
-\begin{tikzpicture} 
-    \node (input) [] {};
-%
-    \path (input.east)+(1.2,0) 
-    node (A) [system]  {$A$};
-%
-    \path (A.east)+(1.3,0) 
-    node (B) [system] {$B$};
-%
-    \path (B.east)+(.8,0) 
-    node (output) [] {};
-%%
-    \path [draw, thick, ->] (input.east)  -- node [above] {$i$} (A.180);
-    \path [draw, thick, ->] (A.east) -- node [above] {$s$} (B.west);
-    \path [draw, thick, ->] (B.east)  -- node [above] {$o$} (output.180);
-\end{tikzpicture}
-\end{column}
-\end{columns}
+\[
+S = (\alert{I_S}[\vec i,\vec o,\vec s], 
+     \alert{T_S}[\vec i,\vec o,\vec s,\vec{i'},\vec{o'},\vec{s'}])
+\]
 
-\bigskip
-\pause
-
-\textbf{Asynchronous composition} ($\delta_A = \delta_B$, $\tau_A = \tau_B$)
-\medskip
-
-
-\begin{columns}
-\begin{column}{0.5\textwidth}
-\expr{%
-(\definesys $D$
- \inputa  (($i$ $\delta_A$)) \\
-~\outputa (($o$ $\tau_A$)) \\
-~\inva (or (A $i$ $o$) (B $i$ $o$)) \\
-)
-}
-\end{column}
-\begin{column}{0.4\textwidth}
-\begin{tikzpicture} 
-    \node (input) [] {};
-%
-    \path (input.east)+(0.8,0) 
-    node (join1) [mjoin] {};
-%
-    \path (join1.east)+(1.2,0.5) 
-    node (A) [system] {$A$};
-%
-    \path (join1.east)+(1.2,-0.5) 
-    node (B) [system] {$B$};
-%
-    \path (A.east)+(0.7,-0.5) 
-    node (join2) [mjoin] {};
-%
-    \path (join2.east)+(0.8,0) 
-    node (output) [] {};
-%
-    \path [draw, thick, ->] (input.east)  -- node [above] {$i$} (join1);
-    \path [draw, thick, ->] (join1) -- node [above] {} (A.west);
-    \path [draw, thick, ->] (join1) -- node [above] {} (B.west);
-    \path [draw, thick, ->] (A.east)  -- node [above] {} (join2);
-    \path [draw, thick, ->] (B.east)  -- node [above] {} (join2);
-    \path [draw, thick, ->] (join2)  -- node [above] {$o$} (output);
-\end{tikzpicture}
-\end{column}
-\end{columns}
+\begin{tabular}{l@{\qquad}l@{\qquad\quad}l}
+ with
+ &
+ $\alert{I_S} ~=~ 
+ \alert{I} \land 
+ \bigwedge_{k=1}^q \alert{I_k}[\vec x_k,\vec y_k,\vec s_k]$
+ &
+ $\alert{T_S} ~=~ 
+ \alert{T} \land \alert{P} \land 
+ \bigwedge_{k=1}^q \alert{T_k}[\vec x_k,\vec y_k,\vec s_k,\vec{x'}_k,\vec{y'}_k,\vec{s'}_k]$
+\end{tabular}
 
 \end{frame}
 
@@ -931,36 +913,440 @@ $\vec s_A, \vec s_B$ (at least)
 
 \expr{%
 (\definesys Latch
-  \inputa ((set Bool) (reset Bool)) \\
-~~\outputa ((out Bool)) \ldots \
-) 
+  \inputa ((s Bool) (r Bool))
+  \outputa ((o Bool)) \\
+~~\locala ((b Bool)) \\
+~~\transa (= o' (or (and s (or (not r) b)) \\
+~~~~~~~~~~~~~~~~~~~(and (not s) (not r) o))) \\
+)
 \\[1.3ex]
 (\definesys OneBitCounter
   \inputa ((inc Bool) (start Bool)) \\
 ~~\outputa ((out Bool) (carry Bool)) \\
 ~~\locala ((set Bool) (reset Bool)) \\
-~~\inva (and \\
-~~~~(= set (and inc (not reset))) \\
-~~~~(= reset (or carry start)) \\
-~~~~(= carry (and inc out)) \\
-~~~~(\alert{Latch} set reset out)  \\
-~~) \\
+~~\subsysa (L (\alert{Latch} set reset out)) \\
+~~\inva (and (= set (and inc (not reset))) \\
+~~~~~~~~~~~~(= reset (or carry start)) \\
+~~~~~~~~~~~~(= carry (and inc out))) \\
 )
 \\[1.3ex]
-\definesys ThreeBitCounter 
-  \inputa ((inc Bool) (start Bool)) \\
+(\definesys ThreeBitCounter \\
+~~\inputa ((inc Bool) (start Bool)) \\
 ~~\outputa ((out0 Bool) (out1 Bool) (out2 Bool)) \\
 ~~\locala ((car0 Bool) (car1 Bool) (car2 Bool)) \\
-~~\inva (and \\
-~~~~(\alert{OneBitCounter} inc start out0 car0)  \\
-~~~~(\alert{OneBitCounter} car0 start out1 car1) \\
-~~~~(\alert{OneBitCounter} car1 start out2 car2)  \\
-~~) \\
+~~\subsysa (C1 (\alert{OneBitCounter} inc start out0 car0)) \\
+~~\subsysa (C2 (\alert{OneBitCounter} car0 start out1 car1)) \\
+~~\subsysa (C3 (\alert{OneBitCounter} car1 start out2 car2)) \\
 )
 }
 \end{frame}
 
 %---------------------------------------------------------------------
+
+
+%%---------------------------------------------------------------------
+%
+%\begin{frame}[t]{System \alert{definition} --- Asynchronous composition V.~1}
+%
+%\small
+%
+%\expr{(\definesys $S$ \\
+%\begin{tabular}{lll}
+% \inputa 
+%   & (\,($i_1$ $\mi{\delta}_1$) $\,\cdots$ ($i_m$ $\mi{\delta}_m$)\,)
+%   & \comm{; input vars} \\
+% \outputa
+%   & (\,($o_1$ $\mi{\tau}_1$) $\,\cdots$ ($o_n$ $\mi{\tau}_n$)\,)
+%   & \comm{; output vars} \\
+% \locala 
+%   & (\,($s_1$ $\mi{\sigma}_1$) $\,\cdots$ ($s_p$ $\mi{\delta}_p$)\,)
+%   & \comm{; local vars} \\
+% \proca 
+%   & (\,$N_1$ ($S_1$ $\vec x_1$ $\vec y_1$)\,)
+%   & \comm{; component process} \\
+% $\quad\cdots$
+% \\
+% \proca 
+%   & (\,$N_q$ ($S_q$ $\vec x_q$ $\vec y_q$)\,)
+%   & \comm{; component process}
+%\end{tabular} \\
+%)
+%}
+%
+%\medskip
+%\smallskip
+%
+%\textbf{\normalsize Semantics}
+%\medskip
+%
+%Let \ 
+%\(
+% S_k = (\,
+%   \alert{I_k}[\vec i_k,\vec o_k,\vec s_k],\;
+%   \alert{T_k}[\vec i_k,\vec o_k,\vec s_k,\vec{i'}_k,\vec{o'}_k,\vec{s'}_k]
+%   \,)
+%\)
+%for $k = 1, \ldots, q$
+%\smallskip
+%
+%Let \ 
+%$\vec i = (i_1, \ldots, i_m)$, \ 
+%$\vec o = (o_1, \ldots, o_n)$, \ 
+%$\vec s = (s_1, \ldots, s_q,\alert{t}), \vec s_1, \ldots, \vec s_q$
+%
+%\[
+%S = (\alert{I_S}[\vec i,\vec o,\vec s], 
+%     \alert{T_S}[\vec i,\vec o,\vec s,\vec{i'},\vec{o'},\vec{s'}])
+%\]
+%
+%\(
+%\begin{array}{l@{\qquad}l@{~}l@{~}c}
+% \text{with}
+% &
+% \only<1>{
+%  ~\alert{I_S} ~=~ 1 \leq \alert{t} \leq q & \land & 
+%   (\alert{t} = 1 \Rightarrow \alert{I_1}[\vec x_1,\vec y_1,\vec s_1])
+%  \\
+%  & & & \vdots
+%  \\
+%  & & \land &
+%  (\alert{t} = q \Rightarrow \alert{I_q}[\vec x_q,\vec y_q,\vec s_q])
+%  \\
+% }%
+% \only<2>{%
+%  \alert{T_S} ~=~ 1 \leq \alert{t} \leq q & \land & 
+%   (\alert{t} = 1 \Rightarrow \alert{T_1}[\vec x_1,\vec y_1,\vec s_1, \vec x_1',\vec y_1',\vec s_1'] \land
+%  \bigwedge_{k=2}^q \vec y_k' = \vec y_k \land \vec s_k' = \vec s_k)
+%  \\
+%  & & & \vdots
+%  \\
+%  & & \land &
+%  (\alert{t} = q \Rightarrow \alert{T_q}[\vec x_q,\vec y_q,\vec s_q,\vec x_1',\vec y_1',\vec s_1'] \land
+%  \bigwedge_{k=1}^{q-1} \vec y_k' = \vec y_k \land \vec s_k' = \vec s_k)
+%  \\
+% }%
+%% \only<2>{
+%% $\alert{T_S} ~=~ 
+%% \bigwedge_{k=1}^q \alert{T_k}[\vec x_k,\vec y_k,\vec s_k,\vec{x'}_k,\vec{y'}_k,\vec{s'}_k]$
+%% }
+%\end{array}
+%\)
+%\end{frame}
+%
+%%---------------------------------------------------------------------
+%
+%\begin{frame}[t]{System \alert{definition} --- Asynchronous composition V.~2}
+%
+%\small
+%
+%\expr{(\definesys $S$ \\
+%\begin{tabular}{lll}
+% \inputa 
+%   & (\,($i_1$ $\mi{\delta}_1$) $\,\cdots$ ($i_m$ $\mi{\delta}_m$)\,)
+%   & \comm{; input vars} \\
+% \outputa
+%   & (\,($o_1$ $\mi{\tau}_1$) $\,\cdots$ ($o_n$ $\mi{\tau}_n$)\,)
+%   & \comm{; output vars} \\
+% \locala 
+%   & (\,($s_1$ $\mi{\sigma}_1$) $\,\cdots$ ($s_p$ $\mi{\delta}_p$)\,)
+%   & \comm{; local vars} \\
+% \proca 
+%   & (\,$N_1$ ($S_1$ $\vec x_1$ $\vec y_1$)\,)
+%   & \comm{; component process} \\
+% $\quad\cdots$
+% \\
+% \proca 
+%   & (\,$N_q$ ($S_q$ $\vec x_q$ $\vec y_q$)\,)
+%   & \comm{; component process}
+%\end{tabular} \\
+%)
+%}
+%
+%\medskip
+%\smallskip
+%
+%\textbf{\normalsize Semantics}
+%\medskip
+%
+%Let \ 
+%\(
+% S_k = (\,
+%   \alert{I_k}[\vec i_k,\vec o_k,\vec s_k],\;
+%   \alert{T_k}[\vec i_k,\vec o_k,\vec s_k,\vec{i'}_k,\vec{o'}_k,\vec{s'}_k]
+%   \,)
+%\)
+%for $k = 1, \ldots, q$
+%\smallskip
+%
+%Let \ 
+%$\vec i = (i_1, \ldots, i_m)$, \ 
+%$\vec o = (o_1, \ldots, o_n)$, \ 
+%$\vec s = (s_1, \ldots, s_q),\alert{(b_1,\ldots,b_q)}, \vec s_1, \ldots, \vec s_q$
+%
+%\[
+%S = (\alert{I_S}[\vec i,\vec o,\vec s], 
+%     \alert{T_S}[\vec i,\vec o,\vec s,\vec{i'},\vec{o'},\vec{s'}])
+%\]
+%
+%\(
+%\begin{array}{l@{\qquad}l@{~}c}
+% \text{with}
+% &
+% \only<1>{
+%  ~\alert{I_S} ~=~ 
+%  & 
+%   (\alert{b_1} \Rightarrow \alert{I_1}[\vec x_1,\vec y_1,\vec s_1]) \land {}
+%  \\
+%  & & \vdots
+%  \\
+%  & & 
+%  (\alert{b_q} \Rightarrow \alert{I_q}[\vec x_q,\vec y_q,\vec s_q]) \phantom{\land {}}
+%  \\
+% }%
+% \only<2>{%
+%  \alert{T_S} ~=~
+%  &
+%   (\mathsf{if}\ \alert{b_1} \ \mathsf{then}\ \alert{T_1}[\vec x_1,\vec y_1,\vec s_1, \vec x_1',\vec y_1',\vec s_1'] \ \mathsf{else}\
+%  \bigwedge_{k=2}^q \vec y_k' = \vec y_k \land \vec s_k' = \vec s_k) \land {}
+%  \\
+%  & & \vdots
+%  \\
+%  & &
+%  (\mathsf{if}\ \alert{b_q} \ \mathsf{then}\  \alert{T_q}[\vec x_q,\vec y_q,\vec s_q,\vec x_1',\vec y_1',\vec s_1'] \ \mathsf{else}\
+%  \bigwedge_{k=1}^{q-1} \vec y_k' = \vec y_k \land \vec s_k' = \vec s_k)\phantom{\land {}}
+%  \\
+% }%
+%\end{array}
+%\)
+%\end{frame}
+%
+%\end{document}
+
+
+%\begin{frame}{System \alert{definition} command \qquad \deemph{(Syncronous Composition)}}
+%
+%\definesystem
+%\bigskip
+%
+%\only<1>{
+%$I$, $T$ and $P$ can contain \df{system applications}
+%\expr{($S_i$ $\vec x$ $\vec y$)} as subformulas
+%\medskip
+%
+%%\small
+%where
+%
+%\begin{itemize}
+%\item
+%$S_i$ is another system
+%
+%\item $\vec x$, $\vec y$ consist of $S$'s variables
+%\end{itemize}
+%}
+%
+%\medskip
+%[May be prudent to allow system applications only in \expr{:inv} formulas]
+%
+%\end{frame}
+%
+%%---------------------------------------------------------------------
+%
+%\begin{frame}{Semantics of system applications}
+%Let
+%\begin{eqnarray*}
+% A & = & (\,
+%   \alert{I_A}[\vec i_A,\vec o_A,\vec s_A],\;
+%   \alert{T_A}[\vec i_A,\vec o_A,\vec s_A, \vec i_A',\vec o_A',\vec s_A']\,
+% )
+%\\[1ex]
+% B & = & (\,
+%   \alert{I_B}[\vec i_B,\vec o_B,\vec s_B],\;
+%   \alert{T_B}[\vec i_B,\vec o_B,\vec s_B, \vec i_B',\vec o_B',\vec s_B']\,
+% )
+%\end{eqnarray*}
+%
+%\begin{tabular}{l@{~~~}l@{~~~}l@{~~~}l@{~~~}l}
+% An application \expr{($B$ $\vec x$ $\vec y$)}
+% & in & $\alert{I_A}$ & abbreviates & $\alert{I_B}[\vec x,\vec y,\vec s_B]$
+% \\
+% & in & $\alert{T_A}$  & abbreviates & $\alert{T_B}[\vec x,\vec y,\vec s_B,\vec x',\vec y',\vec{s'}_B]$
+%\end{tabular}
+%\bigskip
+%\medskip
+%
+%\pause
+%
+%\textbf{Restrictions}
+%\begin{itemize}
+%\item
+%No cycles in the application graph
+%
+%\item
+%Usual hygiene conditions on local variable names
+%\end{itemize}
+%\bigskip
+%
+%\pause
+%
+%\textbf{Note:}
+%If $A$ contains an application of $B$, its local state is actually
+%$\vec s_A, \vec s_B$ (at least)
+%
+%\end{frame}
+%
+%%---------------------------------------------------------------------
+%
+%\tikzstyle{system} = 
+% [draw, thick, text centered, text width=2.3em, fill=brown!10, 
+%  minimum height=4ex, rounded corners, drop shadow]
+%\tikzstyle{mjoin} = [draw, circle, thick] 
+%%\tikzstyle{sc} = [block, text width=13em, fill=red!20, 
+%%    minimum height=10em, rounded corners, drop shadow]
+%%---------------------------------------------------------------------
+%
+%
+%
+%\begin{frame}{Composition patterns --- examples}
+%
+%\expr{%
+%(\definesys $A$
+%  \inputa  (($i$ $\delta_A$))
+%  \outputa (($o$ $\tau_A$))
+%  $\ldots$
+%)}
+%\smallskip
+%
+%\expr{%
+%(\definesys $B$
+%  \inputa  (($i$ $\delta_B$))
+%  \outputa (($o$ $\tau_B$))
+%  $\ldots$
+%)
+%}
+%\bigskip
+%\smallskip
+%\pause
+%
+%\textbf{Synchronous composition} ($\tau_A = \delta_B$)
+%\medskip
+%
+%\begin{columns}
+%\begin{column}{0.5\textwidth}
+%\expr{%
+%(\definesys $C$
+% \inputa  (($i$ $\delta_A$)) \\
+%~\outputa (($o$ $\tau_B$)) \\
+%~\locala (($s$ $\tau_A$)) \\
+%~\inva (and (A $i$ $s$) (B $s$ $o$)) \\
+%)
+%}
+%\end{column}
+%\begin{column}{0.4\textwidth}
+%\begin{tikzpicture} 
+%    \node (input) [] {};
+%%
+%    \path (input.east)+(1.2,0) 
+%    node (A) [system]  {$A$};
+%%
+%    \path (A.east)+(1.3,0) 
+%    node (B) [system] {$B$};
+%%
+%    \path (B.east)+(.8,0) 
+%    node (output) [] {};
+%%%
+%    \path [draw, thick, ->] (input.east)  -- node [above] {$i$} (A.180);
+%    \path [draw, thick, ->] (A.east) -- node [above] {$s$} (B.west);
+%    \path [draw, thick, ->] (B.east)  -- node [above] {$o$} (output.180);
+%\end{tikzpicture}
+%\end{column}
+%\end{columns}
+%
+%\bigskip
+%\pause
+%
+%\textbf{Asynchronous composition} ($\delta_A = \delta_B$, $\tau_A = \tau_B$)
+%\medskip
+%
+%
+%\begin{columns}
+%\begin{column}{0.5\textwidth}
+%\expr{%
+%(\definesys $D$
+% \inputa  (($i$ $\delta_A$)) \\
+%~\outputa (($o$ $\tau_A$)) \\
+%~\inva (or (A $i$ $o$) (B $i$ $o$)) \\
+%)
+%}
+%\end{column}
+%\begin{column}{0.4\textwidth}
+%\begin{tikzpicture} 
+%    \node (input) [] {};
+%%
+%    \path (input.east)+(0.8,0) 
+%    node (join1) [mjoin] {};
+%%
+%    \path (join1.east)+(1.2,0.5) 
+%    node (A) [system] {$A$};
+%%
+%    \path (join1.east)+(1.2,-0.5) 
+%    node (B) [system] {$B$};
+%%
+%    \path (A.east)+(0.7,-0.5) 
+%    node (join2) [mjoin] {};
+%%
+%    \path (join2.east)+(0.8,0) 
+%    node (output) [] {};
+%%
+%    \path [draw, thick, ->] (input.east)  -- node [above] {$i$} (join1);
+%    \path [draw, thick, ->] (join1) -- node [above] {} (A.west);
+%    \path [draw, thick, ->] (join1) -- node [above] {} (B.west);
+%    \path [draw, thick, ->] (A.east)  -- node [above] {} (join2);
+%    \path [draw, thick, ->] (B.east)  -- node [above] {} (join2);
+%    \path [draw, thick, ->] (join2)  -- node [above] {$o$} (output);
+%\end{tikzpicture}
+%\end{column}
+%\end{columns}
+%
+%\end{frame}
+%
+%%---------------------------------------------------------------------
+%
+%\begin{frame}[t]{Examples}
+%\footnotesize
+%
+%\expr{%
+%(\definesys Latch
+%  \inputa ((set Bool) (reset Bool)) \\
+%~~\outputa ((out Bool)) \ldots \
+%) 
+%\\[1.3ex]
+%(\definesys OneBitCounter
+%  \inputa ((inc Bool) (start Bool)) \\
+%~~\outputa ((out Bool) (carry Bool)) \\
+%~~\locala ((set Bool) (reset Bool)) \\
+%~~\inva (and \\
+%~~~~(= set (and inc (not reset))) \\
+%~~~~(= reset (or carry start)) \\
+%~~~~(= carry (and inc out)) \\
+%~~~~(\alert{Latch} set reset out)  \\
+%~~) \\
+%)
+%\\[1.3ex]
+%\definesys ThreeBitCounter 
+%  \inputa ((inc Bool) (start Bool)) \\
+%~~\outputa ((out0 Bool) (out1 Bool) (out2 Bool)) \\
+%~~\locala ((car0 Bool) (car1 Bool) (car2 Bool)) \\
+%~~\inva (and \\
+%~~~~(\alert{OneBitCounter} inc start out0 car0)  \\
+%~~~~(\alert{OneBitCounter} car0 start out1 car1) \\
+%~~~~(\alert{OneBitCounter} car1 start out2 car2)  \\
+%~~) \\
+%)
+%}
+%\end{frame}
+%
+%%---------------------------------------------------------------------
+
 
 \begin{frame}[t]{Expressiveness}
 
@@ -1126,7 +1512,7 @@ the model checker is expected to produce
 
 \begin{frame}{Example 2 --- Temporal queries}
 
-\footnotesize
+\scriptsize
 \expr{%
 (\definesys Historically \inputa ((b Bool)) \outputa ((hb Bool)) \\
 ~~\inita (= hb b)  \transa (= hb' (and b' hb))) 
@@ -1137,24 +1523,27 @@ the model checker is expected to produce
 (\definesys Count \inputa ((b Bool)) \outputa ((c Int)) \\
 ~~\inita (= c (ite b 1 0)) \transa (= c' (+ c (ite b 0 1)))) 
 \\[1.4ex]
-(\definesys Monitor \inputa ((r1 Bool) (r2 Bool)) \\
-~~\outputa ((g1 Bool) (g2 Bool))
-  \locala ((b1 Bool) (b2 Bool)) \\
+(\definesys Monitor \inputa ((r1 Bool) (r2 Bool))
+  \outputa ((g1 Bool) (g2 Bool)) \\
+~~\locala ((a1 Bool) (a2 Bool) (b0 Bool) (b1 Bool) (b2 Bool) \\
+~~~~~~~~~  (h1 Bool) (h2 Bool) (c Int) (bf Bool)) \\
+~~\subsysa (A (NonDetArbiter r1 r2 g1 g2)) \\
+~~\subsysa (H1 (Historically a1 h1)) \\
+~~\subsysa (H2 (Historically a2 h2)) \\
+~~\subsysa (C (Count g1 c)) \\
+~~\subsysa (B (Before b0 bf)) \\
 ~~\inva (and \\
-~~~~(NonDetArbiter r1 r2 g1 g2)\\
-~~~~\comm{; If there have been no requests, there have been no grants} \\
-~~~~(= b1 (=> (Historically (and (not r1) (not r2))) \\
-~~~~~~~~~~~~~~(Historically (and (not g1) (not g2))))) \\
-~~~~\comm{; A request can be granted at most 4 times} \\
-~~~~(= b2 (=> (Before (= (Count g1) 4)) (not g1)))))
+~~~~(= a1 (and (not r1) (not r2))) ~~ (= a2 (and (not g1) (not g2))) ~~ (= b0 (= c 4)) \\
+~~~~(= b1 (=> h1 h2)) \comm{; b1 = if there have been no requests, there have been no grants}\\
+~~~~(= b2 (=> bf (not g1))))) \comm{; b2 = a request is granted at most 4 times}
 \\[1.4ex]
 (\checksys Monitor
   \inputa ((r1 Bool) (r2 Bool)) \\
 ~~\outputa ((g1 Bool) (g2 Bool)) \\
-~~\locala ((b1 Bool) (b2 Bool)) \\
-~~\assumptiona (a (not (and r1 r2)))
-  \reachablea (p (not (and b1 b2))) \\
-~~\querya (q (a p))%
+~~\locala (\_ \_ \_ (b1 Bool) (b2 Bool) \_ \_ \_ \_) \\
+~~\assumptiona (A (not (and r1 r2)))
+  \reachablea (P (not (and b1 b2))) \\
+~~\querya (Q (A P)) \\
 )
 }
 \end{frame}
@@ -1203,12 +1592,68 @@ by a \alert{different} $\T$-interpretation and trace in it
 
 %---------------------------------------------------------------------
 
+\begin{frame}{\alert{Output format} for \checksys}
+\smallskip
+\footnotesize
+
+\expr{%
+(\definesys $A$
+  \inputa  (($i$ $\sigma_A$))
+  \outputa (($o$ $\tau_A$)) 
+  \locala (($s$ $\theta_A$))
+  $\ldots$
+)
+\ \\[1.3ex]
+(\definesys $B$
+  \inputa  (($i$ $\sigma_B$))
+  \outputa (($o$ $\tau_B$))
+  \locala (($s$ $\theta_B$)) \\
+~\subsysa ( $\cdots$ (S (A $\cdots$)) $\cdots$) $\ldots$
+)
+\ \\[1.2ex]
+(\checksys $B$ ~$\cdots$~
+ \fairnessa ($f$ $\cdots$)~
+ \reachablea ($r$ $\cdots$)~
+ $\cdots$~ \\
+~\querya ($q$ ($r$ $f$ $\cdots$)) $\cdots$  )\\ %\querya ($q_n$ ($r_{n,1}$ $\cdots$)))\\
+}
+\bigskip
+Output:
+\medskip
+
+\expr{%
+(\checkres \\
+~\resulta ((q \sat) $\cdots$) \comm{; result is \sat or \unsat for each query} \\
+~\modela ($\:\cdots$) ~~~~~~~~\;\comm{; SMT-LIB interpretation of free symbols} \\
+~\traila ($p$ (\comm{; state sequence} \\
+~~~~~~~~~~~~(($i$ $i_0$) ($o$ $o_0$) ($s$ $s_0$)
+                  ($S$::$i$ $i_{S,0}$) ($S$::$o$ $o_{S,0}$) ($S$::$s$ $s_{S,0}$) ($r$ $r_0$) ($f$ $f_0$) $\cdots$) \\
+~~~~~~~~~~~~~~~~$\cdots$ \\
+~~~~~~~~~~~~(($i$ $i_k$) ($o$ $o_k$) ($s$ $s_k$)
+                  ($S$::$i$ $i_{S,k}$) ($S$::$o$ $o_{S,k}$) ($S$::$s$ $s_{S,k}$) ($r$ $r_k$) ($f$ $f_k$) $\cdots$) \\
+~~~~~~~~~~~)\\
+~~~~~~~~) \\
+~\traila ($l$ ( $\cdots$ )) \\
+%~:\traila ($l$ ((($i$ $i_{n}$) ($o$ $o_{n}$) ($s$ $s_{n}$)
+%                  ($S$::$i$ $i_{S,n}$) ($S$::$o$ $o_{S,n}$) ($S$::$s$ $s_{S,n}$) ($r$ $r_n$) $\cdots$)\\
+%~~~~~~~~~~~~~~~~$\cdots$ \\
+%~~~~~~~~) \\
+~~~~~~$\cdots$ \\
+~\tracea ($q$ \prefixa $p$ \lassoa $l$) \comm{; witness trace for query $q$ is $pl^\omega$} \\
+~$\cdots$ \\
+)
+}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
 \begin{frame}{Special predicate:\, \expr{Deadlock}}
 
 For every system 
 $S = (\,
   I_S[\vec i, \vec o, \vec s],\: 
-  T_S[\vec i, \vec o, \vec s, \vec i', \vec o', \vec s']
+  T_S[\vec i, \vec o, \vec s, \vec{i'}, \vec{o'}, \vec{s'}]
  \,)
 $
 \medskip
@@ -1234,8 +1679,8 @@ iff
 \smallskip
 
 it satisfies the formula \ 
-$\exists \vec i'\, \forall \vec o'\, \forall \vec s'\, 
- \lnot T_S[\vec i,\vec o,\vec s,\vec i',\vec o',\vec s']
+$\exists \vec{i'}\, \forall \vec{o'}\, \forall \vec{s'}\, 
+ \lnot T_S[\vec i,\vec o,\vec s,\vec{i'},\vec{o'},\vec{s'}]
 $
 \end{center}
 \end{frame}
@@ -1284,38 +1729,38 @@ checks the \alert{reachability} of $R$ on \alert{infinite}
 \begin{itemize}
 \item
 Restrictions to just bit vector types \\[.5ex]
-\uncover<2,9>{\empha{Other types are useful!}}
+\uncover<2,8>{\empha{Other types are useful!}}
 \smallskip
 
 \item
 Stronger syntactic restrictions for \inita and \transa formulas \\[.5ex]
-\uncover<3,9>{\empha{Should be enforced in the user-facing language}}
+\uncover<3,8>{\empha{Should be enforced in the user-facing language}}
 \smallskip
 
 \item
 Direct support for LTL, or your favorite temporal logic, in \checksys \\[.5ex]
-\uncover<4,9>{\empha{Generality, mostly}}
+\uncover<4,8>{\empha{Generality, mostly}}
 \smallskip
 
 \item
 Global (mutable) variables \emph{a la} SAL \\[.5ex]
-\uncover<5,9>{\empha{Tricky to get right}}
+\uncover<5,8>{\empha{Tricky to get right}}
 \smallskip
 
 \item
 Parametric components as in SMV or SAL \\[.5ex] 
-\uncover<6,9>{\empha{Some support. The rest is better provided in the user-facing language }}
+\uncover<6,8>{\empha{Some support. The rest is better provided in the user-facing language }}
 \smallskip
 
 \item
 Compositional reasoning features
 (i.e., assume-guarantee contracts) \\[.5ex]
-\uncover<7,9>{\empha{Too many different approaches out there}}
+\uncover<7,8>{\empha{Too many different approaches out there}}
 \smallskip
 
-\item
-Commands for getting the results of the analysis \\[.5ex]
-\uncover<8->{\empha{Currently working on them!}}
+%\item
+%Commands for getting the results of the analysis \\[.5ex]
+%\uncover<8->{\empha{Currently working on them!}}
 \end{itemize}
 
 \end{frame}
@@ -1579,53 +2024,6 @@ when $l = h$
 
 %---------------------------------------------------------------------
 
-\begin{frame}{\alert{Output format} for satisfied queries}
-\small
-
-\expr{%
-(\definesys $A$
-  \inputa  (($i$ $\sigma_A$))
-  \outputa (($o$ $\tau_A$)) 
-  \locala (($s$ $\theta_A$))
-  $\ldots$
-)
-\ \\[1.3ex]
-(\definesys $B$
-  \inputa  (($i$ $\sigma_B$))
-  \outputa (($o$ $\tau_B$))
-  \locala (($s$ $\theta_B$)) \\
-~~\inva ( $\cdots$ (A $\cdots$) $\cdots$) $\ldots$
-)
-\ \\[1.2ex]
-(\checksys B ~$\cdots$~
- \querya ($q_1$ $\cdots$) $\cdots$  \querya ($q_n$ $\cdots$) )\\
-}
-\bigskip
-Output of \expr{\checksys}:
-\medskip
-
-\footnotesize
-\expr{%
-(($q_1$ 
-     (\comm{; SMT-LIB interpretation of free symbols} \\
-~~~~~~$\cdots$ \\
-~~~~~) \\ 
-~~~~~(\comm{; trace prefix} \\
-~~~~~~(0 (($i$ $v_{i,0}$) ($o$ $v_{o,0}$) ($s$ $v_{s,0}$)
-              ($A$::$i$ $v_{i,0}$) ($A$::$o$ $v_{o,0}$) ($A$::$s$ $v_{s,0}$))) \\
-~~~~~~$\cdots$ \\
-~~~~~) \\
-~~~~~(\comm{; lasso} \\
-~~~~~~($k$ (($i$ $v_{i,1}$) ($o_1$ $v_{o,1}$) ($s_1$ $v_{s,1}$)
-              ($A$::$i_1$ $v_{i,1}$) ($A$::$o_1$ $v_{o,1}$) ($A$::$s_1$ $v_{s,1}$))) \\
-~~~~~~$\cdots$ \\
-~~~~~) \\
-~) \\
-~$\cdots$ \\
-)
-}
-
-\end{frame}
 \end{document}
 
 
