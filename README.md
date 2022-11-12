@@ -470,7 +470,7 @@ thus allowing the modeling of non-deterministic systems.
 The <tt>:inv</tt> attribute is not strictly necessary since a system
 with a  declaration of the form
 > 
->  <tt>(define-system $S$</tt> :input ( ( $i_1$ $\sigma_1$ ) $\cdots$ ( $i_m$ $\sigma_m$ ) )</tt><br>
+>  <tt>(define-system $S$ :input ( ( $i_1$ $\sigma_1$ ) $\cdots$ ( $i_m$ $\sigma_m$ ) )</tt><br>
 >  <tt>&nbsp; :output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) )</tt><br>
 >  <tt>&nbsp; :local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) )</tt><br>
 >  <tt>&nbsp; :init $I$</tt><br>
