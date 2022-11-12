@@ -248,9 +248,11 @@ state variables are mutable over time
 whereas quantified variables, theory symbols and uninterpreted symbols are all immutable.
 
 Now let
+
 $$S = (I_S [\boldsymbol i, \boldsymbol o,  \boldsymbol s],~
        T_S [\boldsymbol i, \boldsymbol o, \boldsymbol s, \boldsymbol{i'}, \boldsymbol{o'}, \boldsymbol{s'}]
 )$$
+
 be a transition system with state variables $\boldsymbol i, \boldsymbol o,  \boldsymbol s$.
 
 The _infinite trace semantics_ of $S$ is the set of all pairs $(\mathcal I, \pi)$
@@ -345,7 +347,7 @@ IL adopts the following SMT-LIB commands:
   (declare-const n Int)
   ```
 
-* <tt>(define-fun $f$ (($x_1$ $\sigma_1$) $\cdots$ ($x_1$ $\sigma_1$)) $\sigma$ $t$)</tt>
+* <tt>(define-fun $f$ ( ( $x_1$ $\sigma_1$ ) $\cdots$ ( $x_1$ $\sigma_1$ ) ) $\sigma$ $t$)</tt>
 
   Defines a (non-recursive) function $f$ with inputs $x_1, \ldots, x_n$
   (of respective sort $\sigma_1, \ldots, \sigma_n$), output sort $\sigma$, and body $t$.
@@ -378,7 +380,7 @@ or, equivalently, <tt>(distinct s t)</tt>.
 
 ### Enumeration declaration
 
-<tt>(declare-enum-sort $s$ ($c_1$ $\cdots$ $c_n$))</tt>
+<tt>(declare-enum-sort $s$ ( $c_1$ $\cdots$ $c_n$ ) )</tt>
 
 Declares $s$ to be an enumerative type with (distinct) values $c_1, \ldots, c_n$.
 
@@ -388,16 +390,14 @@ Declares $s$ to be an enumerative type with (distinct) values $c_1, \ldots, c_n$
 
 An atomic transition system is defined by a command of the form:
 
-<tt>
-(define-system $S$ <br>
-&nbsp; :input (($i_1$ $\delta_1$) $\cdots$ ($i_m$ $\delta_m$)) <br>
-&nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$)) <br>
-&nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$)) <br>
-&nbsp; :init $I$<br>
-&nbsp; :trans $T$<br>
-&nbsp; :inv $P$<br>
-)
-</tt>
+<tt>(define-system $S$</tt><br>
+<tt>&nbsp; :input ( ( $i_1$ $\delta_1$ ) $\cdots$ ( $i_m$ $\delta_m $) ) </tt><br>
+<tt>&nbsp; :output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) ) </tt><br>
+<tt>&nbsp; :local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) ) </tt><br>
+<tt>&nbsp; :init $I$</tt><br>
+<tt>&nbsp; :trans $T$</tt><br>
+<tt>&nbsp; :inv $P$</tt><br>
+</tt>)</tt>
 
 where
 
@@ -470,28 +470,22 @@ thus allowing the modeling of non-deterministic systems.
 The <tt>:inv</tt> attribute is not strictly necessary since a system
 with a  declaration of the form
 > 
->  <tt>
->  (define-system $S$
->  :input (($i_1$ $\sigma_1$) $\cdots$ ($i_m$ $\sigma_m$))<br>
->  &nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$))<br>
->  &nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$))<br>
->  &nbsp; :init $I$
->   &nbsp; :trans $T$
->   &nbsp; :inv $P$<br>
->   )
->   </tt>
+>  <tt>(define-system $S$</tt> :input (($i_1$ $\sigma_1$) $\cdots$ ($i_m$ $\sigma_m$))</tt><br>
+>  <tt>&nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$))</tt><br>
+>  <tt>&nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$))</tt><br>
+>  <tt>&nbsp; :init $I$</tt><br>
+>  <tt>&nbsp; :trans $T$</tt><br>
+>  <tt>&nbsp; :inv $P$</tt><br>
+>  <tt>)</tt>
 >
 > can be equivalently expressed with a declaration of the form
 >
->  <tt>
->  (define-system $S$
->  :input (($i_1$ $\sigma_1$) $\cdots$ ($i_m$ $\sigma_m$))<br>
->  &nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$))<br>
->  &nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$))<br>
->  &nbsp; :init (and $I$ $P$)
->  &nbsp; :trans (and $T$ $P'$)<br>
->  )
->  </tt>
+>  <tt>(define-system $S$ :input (($i_1$ $\sigma_1$) $\cdots$ ($i_m$ $\sigma_m$))</tt><br>
+>  <tt>&nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$))</tt><br>
+>  <tt>&nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$))</tt><br>
+>  <tt>&nbsp; :init (and $I$ $P$)</tt><br>
+>  <tt>&nbsp; :trans (and $T$ $P'$)</tt><br>
+>  <tt>)</tt>
 >
 >where $P'$ is the formula obtained from $P$ by priming all the system variables in $P$.
 >
@@ -1009,18 +1003,16 @@ impossible or very expensive because of the quantifier alternations in the condi
 ### System verification command
 
 
-<tt>
-(check-system $S$ <br>
-&nbsp; :input (($i_1$ $\delta_1$) $\cdots$ ($i_m$ $\delta_m$)) <br>
-&nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$)) <br>
-&nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$)) <br>
-&nbsp; :assumption ($a$ A) <br>
-&nbsp; :fairness ($f$ $F$) <br>
-&nbsp; :reachable ($r$ $R$) <br>
-&nbsp; :current ($c$ $C$) <br>
-&nbsp; :query ($q$ ($g_1$ $\cdots$ $g_q$)) <br>
-)
-</tt>
+<tt>(check-system $S$ <br>
+<tt>&nbsp; :input (($i_1$ $\delta_1$) $\cdots$ ($i_m$ $\delta_m$)) </tt><br>
+<tt>&nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$)) </tt><br>
+<tt>&nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$)) </tt><br>
+<tt>&nbsp; :assumption ($a$ A) </tt><br>
+<tt>&nbsp; :fairness ($f$ $F$) </tt><br>
+<tt>&nbsp; :reachable ($r$ $R$) </tt><br>
+<tt>&nbsp; :current ($c$ $C$) </tt><br>
+<tt>&nbsp; :query ($q$ ($g_1$ $\cdots$ $g_q$))</tt><br>
+<tt>)</tt>
 
 where
 
