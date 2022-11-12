@@ -248,9 +248,9 @@ state variables are mutable over time
 whereas quantified variables, theory symbols and uninterpreted symbols are all immutable.
 
 Now let
-$$S = (
-   I_S [\boldsymbol i, \boldsymbol o,  \boldsymbol s],~
-   T_S [\boldsymbol i, \boldsymbol o, \boldsymbol s, \boldsymbol{i'}, \boldsymbol{o'}, \boldsymbol{s'}]
+$$S = (I_S [\boldsymbol i, \boldsymbol o,  \boldsymbol s],~
+       T_S [\boldsymbol i, \boldsymbol o, \boldsymbol s,
+            \boldsymbol{i'}, \boldsymbol{o'}, \boldsymbol{s'}]
 )$$
 be a transition system with state variables $\boldsymbol i, \boldsymbol o,  \boldsymbol s$.
 
@@ -274,8 +274,8 @@ For every $n \geq 0$, $(\mathcal I, \pi)$ _$n$-satisfies_ $F$,
 written $(\mathcal I, \pi) \models_n F$, iff
 
 * $F$ is atomic and
-  $\mathcal I[\boldsymbol x \mapsto \pi[0](\boldsymbol x),
-              \boldsymbol{x'} \mapsto \pi[1](\boldsymbol x)]$ satisfies $F$ as in FOL;
+  $\mathcal I[\boldsymbol x \mapsto \pi[0](\boldsymbol x), \boldsymbol{x'} \mapsto \pi[1](\boldsymbol x)]$
+  satisfies $F$ as in FOL;
 
 * $F = \lnot G$ and $(\mathcal I, \pi) \not\models_n G$
 
