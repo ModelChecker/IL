@@ -1004,14 +1004,14 @@ impossible or very expensive because of the quantifier alternations in the condi
 
 
 <tt>(check-system $S$ <br>
-<tt>&nbsp; :input (($i_1$ $\delta_1$) $\cdots$ ($i_m$ $\delta_m$)) </tt><br>
-<tt>&nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$)) </tt><br>
-<tt>&nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$)) </tt><br>
-<tt>&nbsp; :assumption ($a$ A) </tt><br>
-<tt>&nbsp; :fairness ($f$ $F$) </tt><br>
-<tt>&nbsp; :reachable ($r$ $R$) </tt><br>
-<tt>&nbsp; :current ($c$ $C$) </tt><br>
-<tt>&nbsp; :query ($q$ ($g_1$ $\cdots$ $g_q$))</tt><br>
+<tt>&nbsp; :input ( ($i_1$ $\delta_1$ ) $\cdots$ ( $i_m$ $\delta_m$ ) ) </tt><br>
+<tt>&nbsp; :output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) ) </tt><br>
+<tt>&nbsp; :local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) ) </tt><br>
+<tt>&nbsp; :assumption ( $a$ A ) </tt><br>
+<tt>&nbsp; :fairness ( $f$ $F$ ) </tt><br>
+<tt>&nbsp; :reachable ( $r$ $R$ ) </tt><br>
+<tt>&nbsp; :current ( $c$ $C$ ) </tt><br>
+<tt>&nbsp; :query ( $q$ ( $g_1$ $\cdots$ $g_q$ ) )</tt><br>
 <tt>)</tt>
 
 where
