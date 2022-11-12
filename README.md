@@ -123,11 +123,11 @@ where
 * $\boldsymbol s$ and $\boldsymbol{s'}$ are two tuples of _local variables_
   with the same length and type;
 * $I_S$ is the system's _initial state condition_, expressed as a formula
-  with no (free) variables from $\boldsymbol{i'},\boldsymbol{o'},\boldsymbol{s'}$;
+  with no (free) variables from $\boldsymbol{i'}$, $\boldsymbol{o'}$, and 
+  $\boldsymbol{s'}$;
 * $T_S$ is the system's _transition condition_, expressed as a formula
-  over the variables
-  $\boldsymbol{i},\boldsymbol{o},\boldsymbol{s},
-   \boldsymbol{i'},\boldsymbol{o'},\boldsymbol{s'}$.
+  over the variables $\boldsymbol{i}$, $\boldsymbol{o}$, $\boldsymbol{s}$,
+  $\boldsymbol{i'}$, $\boldsymbol{o'}$, and $\boldsymbol{s'}$.
 
 >**Note:**
 For convenience, but differently from other formalizations, a (full) state
@@ -324,7 +324,7 @@ IL adopts the following SMT-LIB commands:
   ; possible sorts: A, (Set A), (Set (Set A)), (Array Int Real), ...
   ```
 
-* <tt>(define-sort $s$ ($u_1 \cdots u_n$) $\tau$)</tt>
+* <tt>(define-sort $s$ ($u_1$ $\cdots$ $u_n$) $\tau$)</tt>
 
   Defines $S$ as synonym of a parametric type $\tau$ with parameters $u_1 \cdots u_n$.
   Examples:
@@ -763,7 +763,7 @@ of other systems by a command of the form:
 
 <tt>
 (define-system $S$ <br>
-&nbsp; :input (($i_1$ $\sigma_1$) $\cdots$ ($i_m$ $\sigma_m$)) <br>
+&nbsp; :input (($i_1$ $\sigma_1$) $\cdots$ ($i_m$ $\sigma_m$))<br>
 &nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$)) <br>
 &nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$)) <br>
 &nbsp; :subsys ($N_1$ ($S_1$ $\boldsymbol x_1$ $\boldsymbol y_1$)) <br>
