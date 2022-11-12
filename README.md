@@ -378,7 +378,7 @@ or, equivalently, <tt>(distinct s t)</tt>.
 
 ### Enumeration declaration
 
-<tt>(declare-enum-sort $s$ ($c_{1}$ $\cdots$ $c_n$))</tt>
+<tt>(declare-enum-sort $s$ ($c_1$ $\cdots$ $c_n$))</tt>
 
 Declares $s$ to be an enumerative type with (distinct) values $c_1, \ldots, c_n$.
 
@@ -809,11 +809,9 @@ $$
 
 where
 
-* $I_S[\boldsymbol{v}] =
-   I[\boldsymbol{v}] \land \bigwedge_{k=1}^{q} I_k[\boldsymbol{x}_k,\boldsymbol{y}_k,\boldsymbol{s}_k]$ <br>
+* $I_S[\boldsymbol{v}] = I[\boldsymbol{v}] \land \bigwedge_{k=1,\ldots,q} I_k[\boldsymbol{x}_k,\boldsymbol{y}_k,\boldsymbol{s}_k]$ <br>
 and
-* $T_S[\boldsymbol{v},\boldsymbol{v'}] = 
-   P[\boldsymbol{v}] \land T[\boldsymbol{v},\boldsymbol{v'}] \land \bigwedge_{k=1}^{q} T_k[\boldsymbol{x}_k,\boldsymbol{y}_k,\boldsymbol{s}_k, \boldsymbol{x'}_k,\boldsymbol{y'}_k,\boldsymbol{s'}_k]$
+* $T_S[\boldsymbol{v},\boldsymbol{v'}] = P[\boldsymbol{v}] \land T[\boldsymbol{v},\boldsymbol{v'}] \land \bigwedge_{k=1,\ldots,q} T_k[\boldsymbol{x}_k,\boldsymbol{y}_k,\boldsymbol{s}_k, \boldsymbol{x'}_k,\boldsymbol{y'}_k,\boldsymbol{s'}_k]$
 
 #### Examples, composite systems
 
