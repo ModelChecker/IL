@@ -131,7 +131,7 @@ where
 
 >**Note:**
 For convenience, but differently from other formalizations, a (full) state
-of system $S$is expressed by a valuation of the variables
+of system $S$ is expressed by a valuation of the variables
 $\boldsymbol{i},\boldsymbol{o},\boldsymbol{s}$.
 In other words, input and output variables are automatically _stateful_
 since the transition relation formula can access old values of inputs and outputs
@@ -248,10 +248,10 @@ state variables are mutable over time
 whereas quantified variables, theory symbols and uninterpreted symbols are all immutable.
 
 Now let
-$S = (
+$$S = (
    I_S [\boldsymbol i, \boldsymbol o,  \boldsymbol s],~
    T_S [\boldsymbol i, \boldsymbol o, \boldsymbol s, \boldsymbol{i'}, \boldsymbol{o'}, \boldsymbol{s'}]
-)$
+)$$
 be a transition system with state variables $\boldsymbol i, \boldsymbol o,  \boldsymbol s$.
 
 The _infinite trace semantics_ of $S$ is the set of all pairs $(\mathcal I, \pi)$
