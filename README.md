@@ -249,8 +249,7 @@ whereas quantified variables, theory symbols and uninterpreted symbols are all i
 
 Now let
 $$S = (I_S [\boldsymbol i, \boldsymbol o,  \boldsymbol s],~
-       T_S [\boldsymbol i, \boldsymbol o, \boldsymbol s,
-            \boldsymbol{i'}, \boldsymbol{o'}, \boldsymbol{s'}]
+       T_S [\boldsymbol i, \boldsymbol o, \boldsymbol s, \boldsymbol{i'}, \boldsymbol{o'}, \boldsymbol{s'}]
 )$$
 be a transition system with state variables $\boldsymbol i, \boldsymbol o,  \boldsymbol s$.
 
@@ -379,7 +378,7 @@ or, equivalently, <tt>(distinct s t)</tt>.
 
 ### Enumeration declaration
 
-<tt>(declare-enum-sort $s$ ($c_1$ $\cdots$ $c_n$))</tt>
+<tt>(declare-enum-sort $s$ ($c_{1}$ $\cdots$ $c_n$))</tt>
 
 Declares $s$ to be an enumerative type with (distinct) values $c_1, \ldots, c_n$.
 
@@ -791,8 +790,7 @@ where
 
 For $k=1,\ldots, q$, let
 $S_k = (I_k[\boldsymbol{i}_k,\boldsymbol{o}_k,\boldsymbol{s}_k],
-        T_k[\boldsymbol{i}_k,\boldsymbol{o}_k,\boldsymbol{s}_k,
-            \boldsymbol{i'}_k,\boldsymbol{o'}_k,\boldsymbol{s'}_k])$,
+        T_k[\boldsymbol{i}_k,\boldsymbol{o}_k,\boldsymbol{s}_k,\boldsymbol{i'}_k,\boldsymbol{o'}_k,\boldsymbol{s'}_k])$,
 with the elements of $\boldsymbol{s}_1,\ldots, \boldsymbol{s}_q$ all mutually distinct.
 
 Let
@@ -802,8 +800,8 @@ $\boldsymbol{s} = (s_1, \ldots, s_p) \circ \boldsymbol{s}_1 \circ \cdots \circ \
 and
 $\boldsymbol{v}$ = $\boldsymbol{i} \circ \boldsymbol{o} \circ \boldsymbol{s}$.
 
-Formally, a composite system $S$ introduced by the <tt>define-system</tt> command above
-is a transition system whose behavior consists of all the (infinite) executions 
+Formally, a composite system $S$ introduced by the <tt>define-system</tt> command
+above is a transition system whose behavior consists of all the (infinite) executions
 $(\mathcal I, \pi)$ over $\boldsymbol{v}$ such that
 
 $$(\mathcal I, \pi) \models
