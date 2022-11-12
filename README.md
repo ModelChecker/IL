@@ -457,9 +457,16 @@ is a transition system whose behavior consists of all the (infinite) executions
 $(\mathcal I, \pi)$ over $\boldsymbol{v}$ such that
 
 $$(\mathcal I, \pi) \models
-  \underbrace{I[\boldsymbol{v}] \land P[\boldsymbol{v}]}_{I_S} \land
-  \mathbf{always}\ (\underbrace{T[\boldsymbol{v},\boldsymbol{v'}] \land P[\boldsymbol{v'}]}_{T_S})
+  I_S[\boldsymbol{v}] \land \mathbf{always}\ T_S[\boldsymbol{v},\boldsymbol{v'}]
 $$
+
+where
+&nbsp;&nbsp;
+$I_S[\boldsymbol{v}] = I[\boldsymbol{v}] \land P[\boldsymbol{v}]$
+&nbsp;&nbsp;
+and
+&nbsp;&nbsp;
+$T_S[\boldsymbol{v},\boldsymbol{v'}] = T[\boldsymbol{v},\boldsymbol{v'}] \land P[\boldsymbol{v'}]$ .
 
 > **Note:**
 The relation expressed by the formula $T$ is not required to be functional
@@ -976,9 +983,9 @@ the system can move to another state (_and so_ also produce output).
 * A sufficient condition for (2) is that the following formula is valid
   in the background theory:
 
-  $$\forall \boldsymbol{i}\, \forall \boldsymbol{o}\, \forall \boldsymbol{s}\,
-    \forall \boldsymbol{i'}\,
-    \exists \boldsymbol{o'}\, \exists \boldsymbol{s'}\, T_S
+  $$\forall \boldsymbol{i}~ \forall \boldsymbol{o}~ \forall \boldsymbol{s}~
+    \forall \boldsymbol{i'}~
+    \exists \boldsymbol{o'}~ \exists \boldsymbol{s'}~ T_S
   $$
 
   This condition is not necessary, however, since it need not apply to unreachable
@@ -988,9 +995,9 @@ the system can move to another state (_and so_ also produce output).
   of $S$.
   Then, a more accurate sufficient condition for (2) above would be the validity of the formula:
 
-  $$\forall \boldsymbol{i}\, \forall \boldsymbol{o}\, \forall \boldsymbol{s}\,
-    \forall \boldsymbol{i'}\,
-    \exists \boldsymbol{o'}\, \exists \boldsymbol{s'}\,
+  $$\forall \boldsymbol{i}~ \forall \boldsymbol{o}~ \forall \boldsymbol{s}~
+    \forall \boldsymbol{i'}~
+    \exists \boldsymbol{o'}~ \exists \boldsymbol{s'}~
      \textrm{Reachable} \Rightarrow T_S[\boldsymbol{i}, \boldsymbol{o}, \boldsymbol{s}]
   $$
 
