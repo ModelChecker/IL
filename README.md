@@ -4,10 +4,12 @@ author: Cesare Tinelli
 date: 2022-06-27
 ---
 
+--------------------------------------------------------------------------------
+
 # Model Checking Intermediate Language (Draft)
 
-The Model Checking Intermediate Language (IL, for short) is an intermediate language
-meant to be a common input and output standard for model checker
+The Model Checking Intermediate Language (IL, for short) is an intermediate
+language meant to be a common input and output standard for model checker
 for finite- and infinite-state systems,
 with an initial focus is on finite-state ones.
 
@@ -27,7 +29,8 @@ to be produced and processed by tools, hence it was designed to have
 * minimal syntactic sugar, at least initially;
 * well-understood formal semantics;
 * a small but comprehensive set of commands;
-* simple translations to lower level modeling languages such as [Btor2](https://link.springer.com/chapter/10.1007/978-3-319-96145-3_32).
+* simple translations to lower level modeling languages such as
+  [Btor2](https://link.springer.com/chapter/10.1007/978-3-319-96145-3_32).
 
 Based on these principles, IL provides no direct support for many of the features
 offered by current hardware modeling languages such as VHDL and Verilog
@@ -36,22 +39,27 @@ such as SMV, TLA+, PROMELA, Simulink, SCADE, Lustre.
 However, it strives to offer enough capability so that problems expressed
 in those languages can be reduced to problems in IL.
 
-IL is an extension the [SMT-LIB language](https://smtlib.cs.uiowa.edu/language.shtml)
+IL is an extension the 
+[SMT-LIB language](https://smtlib.cs.uiowa.edu/language.shtml)
 with new commands to define and verify systems.
-It allows the definition of multi-component synchronous or asynchronous reactive systems.
+It allows the definition of multi-component synchronous or
+asynchronous reactive systems.
 It also allows the specification and checking of reachability conditions
 (or, indirectly state and transition invariants) and deadlocks,
 possibly under fairness conditions on input values.
 
-IL assumes a discrete and linear notion of time and hence has a standard trace-based semantics.
+IL assumes a discrete and linear notion of time and hence has 
+a standard trace-based semantics.
 
 Each system definition:
+
 * defines a _transition system_ via the use of SMT formulas,
   imposing minimal syntactic restrictions on those formulas;
 * is parametrized by a _state signature_, a sequence of typed variables;
 * partitions state variables into input, output and local variables;
 * can be expressed as the synchronous or asynchronous composition of other systems
-* is _hierarchical_, i.e., may include (instances of) previously defined systems as subsystems;
+* is _hierarchical_, i.e., may include (instances of) previously defined systems
+  as subsystems;
 * can encode both synchronous and asynchronous system composition.
 
 The current focus on _finite-state_ systems.
@@ -63,30 +71,33 @@ of infinite-state system as well.
 The base logic of IL is the same as that of SMT-LIB:
 many-sorted first-order logic with equality and let binders.
 We refer to this logic simply as FOL.
-When we say _formula_, with no further qualifications, we refer to an arbitrary formula
-of FOL (possibly with quantifiers and let binders).
+When we say _formula_, with no further qualifications, we refer
+to an arbitrary formula of FOL (possibly with quantifiers and let binders).
 
 We say that a formula is _quantifier-free_ if it contains no occurrences
 of the quantifiers $\forall$ and
 $\exists$.
-We say that it is _binder-free_ if it is quantifier-free and also contains no occurrences
-of the let binder.
+We say that it is _binder-free_ if it is quantifier-free and also contains
+no occurrences of the let binder.
 
-The _scope_ of binders and the notion of _free_ and _bound_ (occurrences of) variables
-in a formula are defined as usual.
+The _scope_ of binders and the notion of _free_ and _bound_ (occurrences of)
+variables in a formula are defined as usual.
 
-#### Notation
+### Notation
+
 If $F$ is a formula and
 $\boldsymbol{x} = (x_1, \ldots, x_n)$ a tuple of distinct variables,
-we write $F[\boldsymbol{x}]$ or $F[x_1, \ldots, x_n]$ to express the fact that every variable
-in $\boldsymbol{x}$ is free in $F$ (although $F$ may have additional free variables).
-We write $\boldsymbol{x} \circ \boldsymbol{y}$ to denote the concatenation of tuple
-$\boldsymbol{x}$ with tuple $\boldsymbol{y}$.
+we write $F[\boldsymbol{x}]$ or $F[x_1, \ldots, x_n]$ to express the fact
+that every variable in $\boldsymbol{x}$ is free in $F$
+(although $F$ may have additional free variables).
+We write $\boldsymbol{x} \circ \boldsymbol{y}$ to denote the concatenation
+of tuple $\boldsymbol{x}$ with tuple $\boldsymbol{y}$.
 When it is clear from the context, given a formula $F[\boldsymbol{x}]$ and
 a tuple $\boldsymbol{t} = (t_1, \ldots, t_n)$ of terms of the same type
 as $\boldsymbol{x} = (x_1, \ldots, x_n)$,
-we write $F[\boldsymbol{t}]$ or $F[t_1, \ldots, t_n]$ to denote the formula obtained from $F$
-by simultaneously replacing each occurrence of $x_i$ by $t_i$ for all $i=1,\ldots,n$.
+we write $F[\boldsymbol{t}]$ or $F[t_1, \ldots, t_n]$ to denote the formula
+obtained from $F$ by simultaneously replacing each occurrence of $x_i$
+by $t_i$ for all $i=1,\ldots,n$.
 
 A formula may contain _uninterpreted_ constant and function symbols,
 that is, symbols with no constraints on their interpretation.
@@ -99,7 +110,8 @@ Formally, a transition system $S$ is a pair of predicates of the form
 
 $$S = (
    I_S [\boldsymbol i, \boldsymbol o,  \boldsymbol s],~
-   T_S [\boldsymbol i, \boldsymbol o, \boldsymbol s, \boldsymbol{i'}, \boldsymbol{o'}, \boldsymbol{s'}]
+   T_S [\boldsymbol i, \boldsymbol o, \boldsymbol s,
+        \boldsymbol{i'}, \boldsymbol{o'}, \boldsymbol{s'}]
 )$$
 
 where
@@ -114,19 +126,23 @@ where
   with no (free) variables from $\boldsymbol{i'},\boldsymbol{o'},\boldsymbol{s'}$;
 * $T_S$ is the system's _transition condition_, expressed as a formula
   over the variables
-  $\boldsymbol{i},\boldsymbol{o},\boldsymbol{s},\boldsymbol{i'},\boldsymbol{o'},\boldsymbol{s'}$.
+  $\boldsymbol{i},\boldsymbol{o},\boldsymbol{s},
+   \boldsymbol{i'},\boldsymbol{o'},\boldsymbol{s'}$.
 
 >**Note:**
-For convenience, but differently from other formalizations, a (full) state of system $S$
-is expressed by a valuation of the variables $\boldsymbol{i},\boldsymbol{o},\boldsymbol{s}$.
-In other words, input and output variables are automatically _stateful_ since the transition relation formula can access old values of inputs and outputs in addition to the old values
-of the local state.
+For convenience, but differently from other formalizations, a (full) state
+of system $S$is expressed by a valuation of the variables
+$\boldsymbol{i},\boldsymbol{o},\boldsymbol{s}$.
+In other words, input and output variables are automatically _stateful_
+since the transition relation formula can access old values of inputs and outputs
+in addition to the old values of the local state.
 This means that, technically, $S$ is a closed system.
 The designation of some state variables as input or output is, however, important
 when combining systems together, to capture which of the state values are shared
 between two systems being combined, and how.
 >
-> **Note:** Similarly to Mealy machines, the initial state condition is also meant to specify
+> **Note:**
+Similarly to Mealy machines, the initial state condition is also meant to specify
 the initial system's output, based on the initial state and input.
 Correspondingly, the transition relation is also meant to specify the system's output
 in every later state of the computation.
@@ -250,7 +266,6 @@ We call any such pair an _execution_ of $S$.
 > **Note:**
 [We focus on reactive systems]
 
-
 ### Finite-Trace Semantics
 
 Let $F[\boldsymbol f, \boldsymbol x, \boldsymbol{x'}]$, $\mathcal I$, $\mathcal T$ and $\pi$
@@ -271,7 +286,6 @@ written $(\mathcal I, \pi) \models_n F$, iff
 * $F = \mathbf{eventually}~G$ and $(\mathcal I, \pi^i) \models_{n-i} G$ for some $i = 0, \ldots, n$;
 
 * $F = \mathbf{always}~G$ and $(\mathcal I, \pi^i) \models_{n-i} G$ for all $i = 0, \ldots, n$;
-
 
 The semantics of the propositional connectives $\lor, \rightarrow, \leftrightarrow$
 and the quantifier $\forall$
@@ -346,8 +360,10 @@ IL adopts the following SMT-LIB commands:
 
 * <tt>(set-logic $L$)</tt>
 
-  Defines the model's _data logic_, that is, the background theories of relevant datatypes
-  (e.g., integers, reals, bit vectors, and so on) as well as the language of allowed logical constraints
+  Defines the model's _data logic_, that is, the background theories
+  of relevant data types
+  (e.g., integers, reals, bit vectors, and so on)
+  as well as the language of allowed logical constraints
   (e.g., quantifier-free, linear, etc.).
 
   ```scheme
@@ -375,7 +391,7 @@ An atomic transition system is defined by a command of the form:
 
 <tt>
 (define-system $S$ <br>
-&nbsp; :input (($i_1$ $\sigma_1$) $\cdots$ ($i_m$ $\sigma_m$)) <br>
+&nbsp; :input (($i_1$ $\delta_1$) $\cdots$ ($i_m$ $\delta_m$)) <br>
 &nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$)) <br>
 &nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$)) <br>
 &nbsp; :init $I$<br>
@@ -392,21 +408,24 @@ where
 * each $s_j$ is a _local_ variable of sort $\sigma_j$;
 * each $i_j$, $o_j$, $s_j$ denote _current-state_ values
 * _next-state variables_ are not provided explicitly but are denoted
-  by convention by appending $'$ to the names of the current-state variables $i_j$, $o_j$, and $s_j$;
-* $I$ is a one-state formula over the unprimed system's variables (input, output and local state variables)
+  by convention by appending $'$ to the names of the current-state variables 
+  $i_j$, $o_j$, and $s_j$;
+* $I$ is a one-state formula over the unprimed system's variables 
+  (input, output and local state variables)
   that expresses a constraint on the initial states of $S$;
 * $T$ is a two-state formula over all of the system's variables (primed and unprimed)
   that expresses a constraint on the state transitions of $S$;
 * $P$ is a one state formula over all of the _unprimed_ system's variables
   that expresses a constraint on all reachable states of $S$;
 * all attributes are optional and their order is immaterial except that
-  <tt>:input</tt>, <tt>:output</tt>, and <tt>:local</tt> must occur before <tt>:init</tt>, <tt>:trans</tt>, and <tt>:inv</tt>;
-* the default value for a missing attribute is the empty list <tt>()</tt> 
+  <tt>:input</tt>, <tt>:output</tt>, and <tt>:local</tt> must occur before
+  <tt>:init</tt>, <tt>:trans</tt>, and <tt>:inv</tt>;
+* the default value for a missing attribute is the empty list <tt>()</tt>
   for <tt>:input</tt>, <tt>:output</tt>, and <tt>:local</tt>, 
   and <tt>true</tt> for <tt>:init</tt>, <tt>:trans</tt>, and <tt>:inv</tt>.
   
-  
-Syntactically, the system identifier, the input, output and local variables are SMT-LIB symbols.
+Syntactically, the system identifier, the input, output and local variables are 
+SMT-LIB symbols.
 In contrast, the sorts $\delta_j$, $\tau_j$, $\sigma_j$ are SMT-LIB sorts,
 while the formulas $I$, $T$ and $P$ are SMT-LIB terms of type <tt>Bool</tt>.
 
@@ -419,10 +438,11 @@ the empty list <tt>()</tt> for <tt>:input</tt>, <tt>:output</tt> and <tt>:local<
 -->
 
 > **Discussion:**
-> We could allow multiple occurrences of the :inv attribute with conjunctive semantics.
-> Should we allow multiple occurrences of the :trans attribute but with _disjunctive_ semantics?
-> The rationale would be to facilitate the recognition of systems defined by alternative sets of transitions.
->
+We could allow multiple occurrences of the :inv attribute with conjunctive semantics.
+Should we allow multiple occurrences of the :trans attribute but with _disjunctive_
+semantics?
+The rationale would be to facilitate the recognition of systems defined
+by alternative sets of transitions.
 
 #### Atomic System Semantics
 
@@ -433,10 +453,9 @@ $\boldsymbol{s} = (s_1, \ldots, s_p)$,
 and
 $\boldsymbol{v}$ = $\boldsymbol{i},\boldsymbol{o},\boldsymbol{s}$.
 
-
 Formally, an atomic system $S$ introduced by the <tt>define-system</tt> command above
-is a transition system whose behavior consists of all the (infinite) executions $(\mathcal I, \pi)$
-over $\boldsymbol{v}$ such that
+is a transition system whose behavior consists of all the (infinite) executions 
+$(\mathcal I, \pi)$ over $\boldsymbol{v}$ such that
 
 $$(\mathcal I, \pi) \models
   \underbrace{I[\boldsymbol{v}] \land P[\boldsymbol{v}]}_{I_S} \land
@@ -447,7 +466,7 @@ $$
 The relation expressed by the formula $T$ is not required to be functional
 over $\boldsymbol{i},\boldsymbol{o},\boldsymbol{s},\boldsymbol{i'}$,
 thus allowing the modeling of non-deterministic systems.
-
+>
 > **Note:**
 The <tt>:inv</tt> attribute is not strictly necessary since a system
 with a  declaration of the form
@@ -476,9 +495,11 @@ with a  declaration of the form
 >  </tt>
 >
 >where $P'$ is the formula obtained from $P$ by priming all the system variables in $P$.
-
+>
 > **Note:**
-Systems are meant to be progressive: every reachable state has a successor with respect $T_S$. However, they may not be because of the generality of $T$ and $P$.
+Systems are meant to be progressive: every reachable state has a successor
+with respect $T_S$.
+However, they may not be because of the generality of $T$ and $P$.
 In other words, it is possible to define deadlocking systems.
 (See later for more details on deadlocked states.)
 
@@ -486,7 +507,12 @@ In other words, it is possible to define deadlocking systems.
 
 (Adapted from "Principles of Cyber-Physical Systems" by R. Alur, 2015)
 
-When reading these examples, it is helpful to keep in mind that, intuitively, in the <tt>:init</tt> formulas the input values are given and the local and output values are to be defined with respect to them. In contrast, in the <tt>:trans</tt> formulas the new input values, and old input, output and local values are given, and the new local and output values are to be defined.
+When reading these examples, it is helpful to keep in mind that, intuitively,
+in the <tt>:init</tt> formulas the input values are given and the local and output
+values are to be defined with respect to them.
+In contrast, in the <tt>:trans</tt> formulas the new input values, and old input,
+output and local values are given, and the new local and output values are
+to be defined.
 
 The output of system <tt>Delay</tt> below is initially <tt>0</tt> and
 then is the previous input.
@@ -664,7 +690,8 @@ with a non-deterministic  choice.
 )
 ```
 
-The next arbiter is similar to <tt>NonDetArbiter</tt> but grants requests a cycle later and does not use a local variable for the non-deterministic choice.
+The next arbiter is similar to <tt>NonDetArbiter</tt> but grants requests
+a cycle later and does not use a local variable for the non-deterministic choice.
 
 ```scheme
 (define-system DelayedArbiter
@@ -756,7 +783,8 @@ where
 * the names $S_1 \ldots,S_q$ need not be all distinct;
 * each $N_i$ is a local synonym for $S_i$, with $N_1,\ldots,N_q$ distinct;
 * each $\boldsymbol x_i$ consists of $S$'s variables of the same type as $S_i$'s input;
-* each $\boldsymbol y_i$ consists of $S$'s local/output variables of the same type as $S_i$' ’'s output;
+* each $\boldsymbol y_i$ consists of $S$'s local/output variables of the same type
+  as $S_i$' ’'s output;
 * the directed subsystem graph rooted at $S$ is acyclic.
 
 #### Composite System Semantics
@@ -774,9 +802,9 @@ $\boldsymbol{s} = (s_1, \ldots, s_p) \circ \boldsymbol{s}_1 \circ \cdots \circ \
 and
 $\boldsymbol{v}$ = $\boldsymbol{i} \circ \boldsymbol{o} \circ \boldsymbol{s}$.
 
-Formally, a composit system $S$ introduced by the <tt>define-system</tt> command above
-is a transition system whose behavior consists of all the (infinite) executions $(\mathcal I, \pi)$
-over $\boldsymbol{v}$ such that
+Formally, a composite system $S$ introduced by the <tt>define-system</tt> command above
+is a transition system whose behavior consists of all the (infinite) executions 
+$(\mathcal I, \pi)$ over $\boldsymbol{v}$ such that
 
 $$(\mathcal I, \pi) \models
   I_S[\boldsymbol{v}] \land \mathbf{always}\ T_S[\boldsymbol{v},\boldsymbol{v'}]
@@ -785,14 +813,12 @@ where
 
 * $I_S[\boldsymbol{v}] =
    I[\boldsymbol{v}] \land
-   \bigwedge_{k=1}^{q} I_k[\boldsymbol{x}_k,\boldsymbol{y}_k,\boldsymbol{s}_k]
-  $<br>
+   \bigwedge_{k=1}^{q} I_k[\boldsymbol{x}_k,\boldsymbol{y}_k,\boldsymbol{s}_k]$ <br>
 and
 * $T_S[\boldsymbol{v},\boldsymbol{v'}] = 
    P[\boldsymbol{v}] \land T[\boldsymbol{v},\boldsymbol{v'}] \land
    \bigwedge_{k=1}^{q} T_k[\boldsymbol{x}_k,\boldsymbol{y}_k,\boldsymbol{s}_k,
-                           \boldsymbol{x'}_k,\boldsymbol{y'}_k,\boldsymbol{s'}_k]
-  $
+                           \boldsymbol{x'}_k,\boldsymbol{y'}_k,\boldsymbol{s'}_k]$
 
 #### Examples, composite systems
 
@@ -855,16 +881,18 @@ and
 ;  out = 0, 0, 1, 2, 3, 4, 5, ...
 ````
 
-The next example defines a three-bit counter in terms of three identical one-bit counters.
+The next example defines a three-bit counter in terms of three identical
+one-bit counters.
 The one-bit counter uses a latch.
-The latch has a Boolean state represented by state variable <tt>s</tt> with arbitrary initial value.
+The latch has a Boolean state represented by state variable <tt>s</tt> with arbitrary
+initial value.
 The value of output <tt>out</tt> is always the previous value of <tt>s</tt>.
-A set request (represented by input <tt>set</tt> being true) sets the new value of <tt>s</tt> to true
-unless there is a concurrent reset request (represented by input <tt>reset</tt> being true).
-In that case, the choice between the two requests is resolved arbitrarily using the value of
-the unconstrained local variable <tt>b</tt>.
-In the absence of either a set or a reset, the value of <tt>out</tt> is unchanged <tt>out</tt> .
-
+A set request (represented by input <tt>set</tt> being true) sets the new value
+of <tt>s</tt> to true unless there is a concurrent reset request
+(represented by input <tt>reset</tt> being true).
+In that case, the choice between the two requests is resolved arbitrarily using
+the value of the unconstrained local variable <tt>b</tt>.
+In the absence of either a set or a reset, the value of <tt>out</tt> is unchanged.
 
 ````scheme
 (define-system Latch  :input ( (set Bool) (reset Bool) )  :output ( (out Bool)) 
@@ -932,477 +960,116 @@ with <tt>out0</tt> being the least significant one.
 )
 ````
 
+#### Sanity requirements on $I_S$ and $T_S$
 
-#### Sanity requirements on _I<sub>S</sub>_ and _T<sub>S</sub>_
-
-One way to address the deadlock state problem is to consider only infinite traces in the semantics (systems that are meant to reach a final state can be always modeled with states that cycle back to themselves and produce stuttering outputs).
-In that semantics, the reachability of a deadlock state (a state with no successors in the transition relation) indicates an error in the system's definition.
+Because of the infinite trace semantics every system defined in IL is expected
+to execute forever.
+This is not a limitation in practice because systems that are meant to reach
+a final state can be always modeled with states that cycle back to themselves and
+produce stuttering outputs.
+In such semantics, the reachability of a _deadlocked state_
+(i.e., a state with no successors in the transition relation) indicates the presence
+of an error in the system's definition.
 
 Intuitively, for a system definition to define a system with no deadlocks:
 
-1. Any assignment of values to the input variables can be extended to a total assignment (to all the unprimed variables) that satisfies _I<sub>S</sub>_.
+1. Any assignment of values to the input variables can be extended
+   to a total assignment (to all the unprimed variables) that satisfies $I_S$.
 
-2. For any reachable state $S$, any assignment to the primed input variables can be extended to a total assignment _s'_ so that _s,s'_ satisfies _T<sub>S</sub>_.
+2. For any reachable state $S$, any assignment $s$ to the primed input variables
+   can be extended to a total assignment $s'$ so that $s,s'$ satisfies $T_S$.
 
+The first restriction above guarantees that the system can start at all.
+The second ensures that from any reachable state and for any new input
+the system can move to another state (_and so_ also produce output).
 
-The first restriction above guarantees that the system can start at all. The second ensures that from any reachable state and for any new input the system can move to another state (_and so_ also produce output).
+* A sufficient condition for (1) is that the following formula is valid
+  in the (previously specified) background theory:
 
-* A sufficient condition for (1) is that the following formula is valid in the (previously specified) background theory:  _∀ **i** ∃ **o** ∃ **s** I<sub>S</sub>_
+  $$\forall \boldsymbol{i}\, \exists \boldsymbol{o}\, \exists \boldsymbol{s}\, I_S$$
 
-* A sufficient condition for (2) is that the following formula is valid in the background theory: _∀ **i** ∀ **o** ∀ **s** ∀ **i'** ∃ **o'** ∃ **s'** T<sub>S</sub>_
+* A sufficient condition for (2) is that the following formula is valid
+  in the background theory:
 
-  This condition is not necessary, however, since it need not apply to unreachable states. Let _Reachable[**i**, **o**, **s**]_ denote the (possibly higher-order) formula satisfied exactly by the reachable states of $S$. Then, a more accurate sufficient condition for (2) above would be the validity of the formula:
+  $$\forall \boldsymbol{i}\, \forall \boldsymbol{o}\, \forall \boldsymbol{s}\,
+    \forall \boldsymbol{i'}\,
+    \exists \boldsymbol{o'}\, \exists \boldsymbol{s'}\, T_S
+  $$
 
-  _∀ **i** ∀ **o** ∀ **s** ∀ **i'** ∃ **o'** ∃ **s'** (Reachable[**i**,**o**,**s**] ⇒ T<sub>S</sub>)_
+  This condition is not necessary, however, since it need not apply to unreachable
+  states.
+  Let $\textrm{Reachable}[\boldsymbol{i}, \boldsymbol{o}, \boldsymbol{s}]$ denote
+  the (possibly higher-order) formula satisfied exactly by the reachable states
+  of $S$.
+  Then, a more accurate sufficient condition for (2) above would be the validity of the formula:
 
-**Note:** In general, checking the two sufficient conditions above automatically can be impossible or very expensive (because of the quantifier alternations in the conditions).
+  $$\forall \boldsymbol{i}\, \forall \boldsymbol{o}\, \forall \boldsymbol{s}\,
+    \forall \boldsymbol{i'}\,
+    \exists \boldsymbol{o'}\, \exists \boldsymbol{s'}\,
+     \textrm{Reachable} \Rightarrow T_S[\boldsymbol{i}, \boldsymbol{o}, \boldsymbol{s}]
+  $$
 
-
-
-
-
-
-
-
-
+> **Note:**
+In general, checking the two sufficient conditions above automatically can be
+impossible or very expensive because of the quantifier alternations in the conditions.
 
 ### System verification command
 
-<tt>(check-system $S$</tt>
-<tt>&nbsp; :input ((_i<sub>1</sub> δ<sub>1</sub>_)  $\cdots$ (_i<sub>m</sub> δ<sub>m</sub>_))</tt>
-<tt>&nbsp; :output ((_o<sub>1</sub> τ<sub>1</sub>_) $\cdots$ (_o<sub>n</sub> τ<sub>n</sub>_))</tt>
-<tt>&nbsp; :local ((_s<sub>1</sub> σ<sub>1</sub>_) $\cdots$ (_s<sub>p</sub> σ<sub>p</sub>_))</tt>
-<tt>&nbsp; :assumptions (_a<sub>1</sub> $\cdots$ a<sub>q</sub>_)</tt>
-<tt>&nbsp; :fairness (_f<sub>1</sub> $\cdots$ f<sub>h</sub>_)</tt>
-<tt>&nbsp; :reachable (_r<sub>1</sub> $\cdots$ r<sub>i</sub>_)</tt>
-<tt>&nbsp; :invariants (_p<sub>1</sub> $\cdots$ p<sub>k</sub>_)</tt>
-<tt>)</tt>
 
-<!-- <tt>&nbsp; :conjectures (_c<sub>1</sub> $\cdots$ c<sub>j</sub>_)</tt> -->
-
+<tt>
+(check-system $S$ <br>
+&nbsp; :input (($i_1$ $\delta_1$) $\cdots$ ($i_m$ $\delta_m$)) <br>
+&nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$)) <br>
+&nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$)) <br>
+&nbsp; :assumption ($a$ A) <br>
+&nbsp; :fairness ($f$ $F$) <br>
+&nbsp; :reachable ($r$ $R$) <br>
+&nbsp; :current ($c$ $C$) <br>
+&nbsp; :query ($q$ ($g_1$ $\cdots$ $g_q$)) <br>
+)
+</tt>
 
 where
 
-* $S$ is the identifier of a previously defined system with _m_ inputs, _n_ outputs, and _p_ local variables;
-* each _i<sub>j</sub>_ is a renaming of the corresponding input variable of $S$ of sort _δ<sub>i</sub>_;
-* each _o<sub>j</sub>_ is a renaming of the corresponding output variable of $S$ of sort _τ<sub>i</sub>_;
-* each _s<sub>j</sub>_ is a renaming of the corresponding local variable of $S$ of sort _σ<sub>i</sub>_;
-* each _a<sub>j</sub>_ is a triple of the form <tt>(_n<sub>j</sub> l<sub>j</sub> A<sub>j</sub>_)</tt> 
-  with <tt>_A<sub>j</sub>_</tt> a formula over input and local variables
-  (called _environmental assumption_);
-* each _f<sub>j</sub>_ is a triple of the form <tt>(_n<sub>j</sub> l<sub>j</sub> F<sub>j</sub>_)</tt>
-  with <tt>_F<sub>j</sub>_</tt> a formula over input, output and local variables
-  (called _fairness condition_);
-* each _r<sub>j</sub>_ is a triple of the form <tt>(_n<sub>j</sub> l<sub>j</sub> R<sub>j</sub>_)</tt>
-  where <tt>_R<sub>j</sub>_</tt> is a formula over input, output and local variables
-  (called _reachability condition_);
-* each _p<sub>j</sub>_ is a triple of the form <tt>(_n<sub>j</sub> l<sub>j</sub> P<sub>j</sub>_)</tt>
-  where <tt>_P<sub>j</sub>_</tt> is a formula over input, output and local variables
-  (called _invariance condition_);
-* each _n<sub>j</sub>_ is fresh identifier
-* each _l<sub>j</sub>_ is a string literal
-* a formula is an (quantifier-free?) FOL formula over primed and unprimed variables
-<!-- * each _c<sub>j</sub>_ is a triple of the form <tt>(_n<sub>j</sub> l<sub>j</sub> C<sub>j</sub>_)</tt> -->
-<!-- * each _C<sub>j</sub>_ is a formula over input, output and local variables; -->
+* $S$ is the identifier of a previously defined system with $m$ inputs, $n$ outputs,
+  and $p$ local variables;
+* all attributes are optional and their order is immaterial except that
+  <tt>:input</tt>, <tt>:output</tt>, <tt>:local</tt>, have to come
+  before the other attributes [may not need this restriction];
+* all attributes except <tt>:input</tt>, <tt>:output</tt>, <tt>:local</tt>
+  are repeatable.
+* $\boldsymbol{i} = (i_1, \ldots, i_m)$ is a (possible) renaming of the corresponding
+  input variables of $S$ of sort $\boldsymbol{\delta} = (\delta_1, \ldots, \delta_m)$;
+* $\boldsymbol{o} = (o_1, \ldots, o_n)$ is a (possible) renaming of the corresponding
+  output variables of $S$ of sort $\boldsymbol{\tau} = (\tau_1, \ldots, \tau_n)$;
+* $\boldsymbol{s} = (s_1, \ldots, s_p)$ is a (possible) renaming of the corresponding
+  local variables of $S$ of sort $\boldsymbol{\sigma} = (\sigma_1, \ldots, \sigma_n)$;
+* $a$, $r$, $f$, $c$, and $q$ are identifiers;
+  each $g_i$ ranges over such identifiers;
+* $A$ is (non-temporal) formula over the system variables
+  $\boldsymbol{i}$, $\boldsymbol{o}$, $\boldsymbol{s}$, and $\boldsymbol{i'}$
+  expressing an _environmental assumption_ on $\boldsymbol{i'}$;
+* $F$ is (non-temporal) formula over the system variables
+  $\boldsymbol{i}$, $\boldsymbol{o}$, $\boldsymbol{s}$, and $\boldsymbol{i'}$
+  expressing a _fairness condition_ on $\boldsymbol{i'}$;
+* $R$ is (non-temporal) formula over all the system variables, primed and unprimed,
+  expressing a state _reachability condition_;
+* $C$ is (non-temporal) formula over all the unprimed system variables
+  expressing a state _initiality condition_;
 
-**Note:** The ids _n<sub>j</sub>_ are meant to be user-defined names for the corresponding condition. The strings _n<sub>j</sub>_ are labels that can be attached for convenience, especially when producing output.
-
-
-Let _I<sub>S</sub>_ and _T<sub>S</sub>_ be respectively the initial state condition and transition predicate of $S$.
-
-Let _A = A<sub>1</sub> \land \cdots \land A<sub>q</sub>_, _F = F<sub>1</sub> \land \cdots \land F<sub>h</sub>_, _R = R<sub>1</sub> \land \cdots \land R<sub>i</sub>_, _P = P<sub>1</sub> \land \cdots \land P<sub>k</sub>_.
-
-The command above succeeds if both the following holds:
-
-1. there is a trace of $S$ that satisfies all the environmental assumptions and fairness conditions, and reaches a state that satisfies all the reachability conditions; that is, if the following LTL formula is satisfiable (in the chosen background theory):
-
-   _I<sub>S</sub> ∧ **always** T<sub>S</sub> ∧ **always** A ∧ **always eventually** F ∧ **eventually** R_
-
- 2. every property _P<sub>j</sub>_ is invariant for $S$ under the environmental assumptions and the fairness conditions; that is, if the following LTL formula is valid (in the chosen background theory):
-
-    _I<sub>S</sub> ∧ **always** T<sub>S</sub> ∧ **always** A ∧ **always eventually** F ⇒ **always** P_
+> **Note:**
+The list of identifiers for a query $a$ contains all the elements of the query.
+When the command contains more than one instance of the attributes
+<tt>:assumption</tt>, <tt>:reachable</tt>, <tt>:fairness</tt> and <tt>:current</tt>,
+the list of elements of a query $q$ can refer to any of the identifiers
+in those attributes.
 
 
-<!-- Each conjecture _C<sub>j</sub>_ is a _possible_ auxiliary invariant of $S$, that is, _(I<sub>S</sub> ∧ **always** T<sub>S</sub>) ∧ **always** (A<sub>1</sub> \land \cdots \land A<sub>n</sub>) ⇒ **always** C<sub>i</sub>)_ is possibly valid. If it is indeed invariant, it may be used to help prove the properties _P_ invariant. -->
+#### Semantics
 
+Each query in the <tt>check-system</tt> command asks for the existence of a trace.
+Specifically, given such a command for a system $S$
+let $I_S$ and $T_S$ be the initial state and transition predicate of $S$ 
+_modulo_ the variable renamings in the command.
 
-
-#### Examples
-
-```scheme
-;---------
-; Arbiter
-;---------
-
-(define-system NonDetArbiter
-  :input ( (r1 Bool) (r2 Bool) )
-  :output ( (g1 Bool) (g2 Bool) )
-  :local ( (s Bool) )
-  :init ( (not g1) (not g2) )  ; nothing is granted initially
-  :trans (
-    (=> (and (not r1') (not r2'))
-        (and (not g1') (not g2')))
-    (=> (and r1' (not r2'))
-        (and 'g1 (not g2')))
-    (=> (and (not r1') r2')
-        (and (not g1') g2'))
-    (=> (and r1' r2')
-        ; the unconstrained value of `s` is used as non-deterministic choice
-        (ite s'
-          (and g1' (not g2')
-          (and (not g1') g2'))))
-  )
-)
-
-(verify-system NonDetArbiter
-  :input ( (r1 Bool) (r2 Bool) )
-  :output ( (g1 Bool) (g2 Bool) )
-  :properties (
-    (p1 "Every request is immediately granted" ; not invariant
-      (and (=> r1 g1) (=> r2 g2))
-    )
-    (p2 "In the absence of other requests, every request is immediately granted" ; invariant
-      (=> (distinct r1 r2)
-          (and (=> r1 g1) (=> r2 g2)))
-    )
-    (p3 "A request is granted only if present" ; invariant
-      (and (=> g1 r1) (=> g2 r2))
-    )
-    (p4 "At most one request is granted at any one time" ; invariant
-      (not (and g1 g2))
-    )
-    (p5 "In case of concurrent requests one of them is always granted" ; invariant
-      (=> (and r1 r2) (or g1 g2))
-    )
-    (p6 "If there have been no requests so far then there have been no grants" ; invariant
-      (=> (historically (and (not r1) (not r2)))
-          (historically (and (not g1) (not g2))))
-    )
-  )
-)
-
-(verify-system NonDetArbiter
-  :input ( (r1 Bool) (r2 Bool) )
-  :output ( (g1 Bool) (g2 Bool) )
-  :assumptions (
-    (a1 "There are no concurrent requests"
-      (not (and r1 r2))
-    )
-  )
-  :properties (
-    (p1 "Every request is immediately granted" ; invariant
-      (and (=> r1 g1) (=> r2 g2))
-    )
-  )
-)
-
-;---------------
-; 3-bit counter
-;---------------
-
-(define-fun toBit ((b Bool)) Int (ite b 1 0))
-
-(define-fun toInt ( (b2 Bool) (b1 Bool) (b0 Bool) ) Bool
-  (+ (* 4 (toBit b2)) (* 2 (toBit b1)) (toBit b0))
-)
-
-(verify-system ThreeBitCounter
-  :input ( (inc Bool) (start Bool) )
-  :output ( (o0 Bool) (o1 Bool) (o2 Bool) )
-  :local ( (c0 Bool) (c1 Bool) (c2 Bool) )
-  :properties (
-    (p1 "Sanity-check invariant"
-      (<= 0 (toInt o2 o1 o0) 7)
-    )
-    (p2 "A start signal resets the counter to 0 in the next"
-      (=> (before start)
-          (= 0 (toInt o2 o1 o0)))
-    )
-    (p2A "Alternative formulation of p2 as a transition invariant"
-      (=> start
-          (= 0 (toInt o2' o1' o0')))
-    )
-    (p3 "If no increment requests are ever sent, the counter stays at 0"
-      (=> (historically (not inc))
-          (= (toInt o2 o1 o0) 0))
-    )
-    (p4 "If there is an increment request and the counter is below 7
-         then it will increase by 1 next"
-      (let ( (n (toInt o2 o1 o0)) )
-        (=> (and inc (< n 7))
-            (= (toInt o2' o1' o0') (+ n 1))))
-    )
-  )
-)
-
-(define-system DelayedCounter
-  :input ( (inc Bool) (start Bool) )
-  :output ( (n Int) )
-  :local ( (c Int) )
-  :init (
-    (= n 0)
-    (= c (ite (and inc (not start)) 1 0))
-  )
-  :trans (
-    (= n' c)
-    (= c' (ite start' 0
-            (ite (not inc') c
-              (ite (= c 7) 0 (+ c 1)))))
-  )
-)
-
-(define-system CountObserver
-  :input ( (inc Bool) (start Bool) )
-  :output ( (n1 Int) (n2 Int) )
-  :local ( (o0 Bool) (o1 Bool) (o2 Bool) )
-  :init (
-    (= n1 (count o2 o1 o0))
-    (ThreeBitCounter inc start o0 o1 o2)
-    (DelayedCounter inc start n2)
-  )
-  :trans (
-    (= n1' (count o2' o1' o0'))
-    (ThreeBitCounter inc start o0 o1 o2)
-    (DelayedCounter inc start n2)
-  )
-)
-
-; more concisely
-(define-system CountObserver
-  :input ( (inc Bool) (start Bool) )
-  :output ( (n1 Int) (n2 Int) )
-  :local ( (o0 Bool) (o1 Bool) (o2 Bool) )
-  :inv ( (= n1 (count o2 o1 o0)) )
-  :compose (
-    (ThreeBitCounter inc start o0 o1 o2)
-    (DelayedCounter inc start n2)
-  )
-)
-
-(verify-system CountObserver
-  :input ( (inc Bool) (start Bool) )
-  :output ( (n1 Int) (n2 Int) )
-  :properties (
-    (p1 "" (= n1 n2))                                 ; not invariant
-    (p2 "" (since start (= n1 n2)))                   ; not invariant
-    (p3 "" (=> (once start) (since start (= n1 n2)))) ; invariant
-  )
-)
-```
-
-## Extensions
-
-### Contracts
-
-[more]
-
-#### Examples
-
-##### Thermostat Controller
-
-```scheme
-;            +-----------------------------------+
-;            |  ThermostatController             |
-;            |                                   |
-;            |    +--------------------+         |
-; --up----------->|                    |         |
-;            |    |   SetDesiredTemp   |--+----------set_temp-->
-; --down--------->|                    |  |      |
-;            |    +--------------------+  |      |
-;            |                            v      |
-;            |    +--------------------------+   |
-; -switch-------->|                          |-------cool-->
-;            |    |       ControlTemp        |   |
-; -out_temp------>|                          |-------heat-->
-;            |    +--------------------------+   |
-;            |                                   |
-;            +-----------------------------------+
-
-;-------------------
-; Global parameters
-;-------------------
-;
-(define-const MIN_TEMP Real 40.0)
-(define-const MAX_TEMP Real 100.0)
-(define-const INI_TEMP Real 70.0)
-(define-const DEADBAND Real 3.0)
-(define-const DIFF Real 3.0)
-
-(declare-enum-sort SwitchPos (Cool Off Heat))
-
-;----------------
-; SetDesiredTemp
-;----------------
-;
-(define-system SetDesiredTemp
-  :input ( (up_button Bool) (down_button Bool) )
-  :output ( (set_temp Real) )
-  :auxiliary (
-    (inc Bool
-      :def (and up_button (<= set_temp (- MAX_TEMP DIFF))))
-    (dec Bool
-      :def (and down_button (>= set_temp (+ MIN_TEMP DIFF))))
-  )
-  :assumptions (
-    (a1 "Up/Down button signals are mutually exclusive"
-      (not (and up_button down_button))
-    )
-  )
-  :guarantees (
-    (g0 "Initial set_temp"
-      (initially (= set_temp INIT_TEMP))
-    )
-    (g1 "set_temp increment"
-      (=> inc (= set_temp' (+ set_temp DIFF)))
-    )
-    (g2 "set_temp decrement"
-      (=> dec (= set_temp' (- set_temp DIFF)))
-    )
-    (g3 "set_temp invariance"
-      (=> (not (or inc dec))
-        (= set_temp' set_temp))
-    )
-  )
-)
-
-;-------------
-; ControlTemp
-;-------------
-;
-(define-system ControlTemp
-  :input ( (switch SwitchPos) (current_temp Real) (set_temp Real) )
-  :output ( (cool_act_sig Bool) (heat_act_sig Bool) )
-  :auxiliary (
-    (cool_start Bool
-      :def (and (= switch Cool)
-             (> current_temp (+ set_temp DEADBAND)))
-    )
-    (cool_mode Bool
-      :init cool_start
-      :next (or cool_start'
-              (and cool_mode
-                (= switch' Cool)
-                (> current_temp' set_temp')))
-    )
-    (heat_start Bool
-      :def (and (= switch Heat)
-             (< current_temp (- set_temp DEADBAND)))
-    )
-    (heat_mode Bool
-      :init heat_start
-      :next (or heat_start'
-              (and heat_mode
-                (= switch' Heat)
-                (< current_temp' set_temp')))
-    )
-    (off_mode Bool
-      :def (and (not cool_mode) (not heat_mode))
-    )
-  )
-  :guarantees (
-    (g1 "Cooling activation"
-      (= cool_act_sig cool_mode)
-    )
-    (g2 "Heating activation"
-      (= heat_act_sig heat_mode)
-    )
-    (g3 "Heating and cooling mutually exclusive"
-      (not (and heat_act_sig cool_act_sig))
-    )
-  )
-)
-
-;----------------------
-; ThermostatController
-;----------------------
-;
-(define-system ThermostatController
-  :input ( (switch SwitchPo) (up Bool) (down Bool) (in_temp Real) )
-  :output ( (cool Bool) (heat Bool) (set_tempReal) )
-  :inv (
-    (SetDesireTemp up down set_temp)
-    (ControlTemp switch in_temp set_temp cool heat)
-  )
-  :assumptions (
-    (a1 "Up/Down button signals are mutually exclusive"
-      (not (and up_button down_button))
-    ) 
-
-  )
-  :auxiliary (
-    (in_deadzone Bool
-      :def (<= (- set_temp DEADBAND) in_temp (+ set_temp DEADBAND))
-    )
-    (system_off Bool
-      :def (and (not cool) (not heat))
-    )
-
-  )
-  :guarantees (
-    (g1 "Initial temperature is in range":
-      (<= MIN_TEM INIT_TEMP MAX_TEMP)
-    ) 
-    (g2 "Deadband and Diff are positive values"
-      (and (> DEADBAND 0.0) (> DIFF 0.0))
-    )
-    (g3 "No activation signal is enabled if switch is in Off"
-      (=> (= switch Off) (and (not cool) (not heat)))
-    )
-    (g4 "Cooling system is turned On only if switch is in Cool"
-      (=> cool (= switch Cool))
-    )
-    (g5 "Heating system is turned On only if switch is in Heat"
-      (=> cool (= switch Heat))
-    )
-    (g6 "Activation signals are never enabled at the same time"
-      (not (and cool heat))
-    )
-    (g7 "set_temp is always in range"
-      (<= MIN_TEMP set_temp MAX_TEMP)
-    )
-    (g8 "set_temp doesn't change if no button is pressed"
-      (=> (and (not up') (not down')
-        (= set_temp' set_temp))
-    )     
-    (g9 "set_temp doesn't decrease if the up button is pressed"
-      (=> up'
-        (>= set_temp' set_temp))
-    )
-    (g10 "set_temp doesn't increase if the down button is pressed":
-      (=> down'
-        (<= set_temp' set_temp))
-    )
-    (g11 "System is Off if indoor temperature is in the dead zone and system was Off in the previous step"
-      (=> (and in_deadzone' system_off) system_off')
-    )
-    (g12 "Cooling system is On only if indoor temperature is higher than set_temp":
-      (=> cool (> in_temp set_temp))
-    )
-    (g13 "Heating system is On only if indoor temperature is lower than set_temp":
-      (=> heat (< in_temp set_temp))
-    )
-    (g14 "Cooling system is On if switch is in Cool and the indoor temperature is higher than set_temp plus deadband"
-      (=> (and (= switch Cool) (> in_temp (+ set_temp DEADBAND)))
-        cool)
-    )
-    (g15 "Heating system is On if switch is in Heat and the indoor temperature is lower than set_temp plus deadband"
-      (=> (and (= switch Heat) (> in_temp (+ set_temp DEADBAND)))
-        cool)
-    )
-    (g16 "Once cooling system is On, it remains On as long as set_temp has not been reached and switch is in Cool"
-      (=> (and (since cool (= switch Cool))
-            (> in_temp set_temp))
-        cool))
-    )
-    (g17 "Once heating system is On, it remains On as long as set_temp has not been reached and switch is in Heat"
-      (=> (and (since heat (= switch Heat))
-            (< in_temp set_temp))
-        heat))
-    )
-  )
-)
-```
-
-## Parameters
-
-[parameters as rigid variables]
+[to be continued]
