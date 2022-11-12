@@ -754,19 +754,17 @@ Similar to <tt>NonDetArbiter</tt> but for requests expressed as integer events.
 A transition systems can be defined as the synchronous composition
 of other systems by a command of the form:
 
-<tt>
-(define-system $S$ <br>
-&nbsp; :input ( ( $i_1$ $\sigma_1$ ) $\cdots$ ( $i_m$ $\sigma_m$ ) )<br>
-&nbsp; :output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) ) <br>
-&nbsp; :local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) ) <br>
-&nbsp; :subsys ( $N_1$ ( $S_1$ $\boldsymbol x_1$ $\boldsymbol y_1$ ) ) <br>
-&nbsp;&nbsp; $\cdots$<br>
-&nbsp; :subsys ( $N_q$ ( $S_q$ $\boldsymbol x_q$ $\boldsymbol y_q$ ) ) <br>
-&nbsp; :init $I$<br>
-&nbsp; :trans $T$<br>
-&nbsp; :inv $P$<br>
-)
-</tt>
+<tt>(define-system $S$</tt><br>
+<tt>&nbsp; :input ( ( $i_1$ $\sigma_1$ ) $\cdots$ ( $i_m$ $\sigma_m$ ) )</tt><br>
+<tt>&nbsp; :output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) ) </tt><br>
+<tt>&nbsp; :local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) ) </tt><br>
+<tt>&nbsp; :subsys ( $N_1$ ( $S_1$ $\boldsymbol x_1$ $\boldsymbol y_1$ ) ) </tt><br>
+<tt>&nbsp;&nbsp; $\cdots$</tt><br>
+<tt>&nbsp; :subsys ( $N_q$ ( $S_q$ $\boldsymbol x_q$ $\boldsymbol y_q$ ) ) </tt><br>
+<tt>&nbsp; :init $I$</tt><br>
+<tt>&nbsp; :trans $T$</tt><br>
+<tt>&nbsp; :inv $P$</tt><br>
+<tt>)</tt>
 
 where
 
@@ -1003,8 +1001,8 @@ impossible or very expensive because of the quantifier alternations in the condi
 ### System verification command
 
 
-<tt>(check-system $S$ <br>
-<tt>&nbsp; :input ( ($i_1$ $\delta_1$ ) $\cdots$ ( $i_m$ $\delta_m$ ) ) </tt><br>
+<tt>(check-system $S$</tt> <br>
+<tt>&nbsp; :input ( ( $i_1$ $\delta_1$ ) $\cdots$ ( $i_m$ $\delta_m$ ) ) </tt><br>
 <tt>&nbsp; :output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) ) </tt><br>
 <tt>&nbsp; :local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) ) </tt><br>
 <tt>&nbsp; :assumption ( $a$ A ) </tt><br>
