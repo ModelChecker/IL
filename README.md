@@ -271,7 +271,7 @@ We call any such pair an _execution_ of $S$.
 
 Let $F[\boldsymbol f, \boldsymbol x, \boldsymbol{x'}]$, $\mathcal I$, $\mathcal T$ and $\pi$
 be defined is in the subsection above.
-For every $n \geq 0$, $(\mathcal I, \pi)$ _$n$-satisfies_ $F$,
+For every $n \geq 0$, $(\mathcal I, \pi)$ $n$_-satisfies_ $F$,
 written $(\mathcal I, \pi) \models_n F$, iff
 
 * $F$ is atomic and
@@ -325,7 +325,7 @@ IL adopts the following SMT-LIB commands:
   ; possible sorts: A, (Set A), (Set (Set A)), (Array Int Real), ...
   ```
 
-* <tt>(define-sort $s$ ($u_1$ $\cdots$ $u_n$) $\tau$)</tt>
+* <tt>(define-sort $s$ ( $u_1$ $\cdots$ $u_n$ ) $\tau$)</tt>
 
   Defines $S$ as synonym of a parametric type $\tau$ with parameters $u_1 \cdots u_n$.
   Examples:
@@ -470,9 +470,9 @@ thus allowing the modeling of non-deterministic systems.
 The <tt>:inv</tt> attribute is not strictly necessary since a system
 with a  declaration of the form
 > 
->  <tt>(define-system $S$</tt> :input (($i_1$ $\sigma_1$) $\cdots$ ($i_m$ $\sigma_m$))</tt><br>
->  <tt>&nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$))</tt><br>
->  <tt>&nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$))</tt><br>
+>  <tt>(define-system $S$</tt> :input ( ( $i_1$ $\sigma_1$ ) $\cdots$ ( $i_m$ $\sigma_m$ ) )</tt><br>
+>  <tt>&nbsp; :output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) )</tt><br>
+>  <tt>&nbsp; :local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) )</tt><br>
 >  <tt>&nbsp; :init $I$</tt><br>
 >  <tt>&nbsp; :trans $T$</tt><br>
 >  <tt>&nbsp; :inv $P$</tt><br>
@@ -480,9 +480,9 @@ with a  declaration of the form
 >
 > can be equivalently expressed with a declaration of the form
 >
->  <tt>(define-system $S$ :input (($i_1$ $\sigma_1$) $\cdots$ ($i_m$ $\sigma_m$))</tt><br>
->  <tt>&nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$))</tt><br>
->  <tt>&nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$))</tt><br>
+>  <tt>(define-system $S$ :input ( ( $i_1$ $\sigma_1$ ) $\cdots$ ( $i_m$ $\sigma_m$ ) )</tt><br>
+>  <tt>&nbsp; :output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) )</tt><br>
+>  <tt>&nbsp; :local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) )</tt><br>
 >  <tt>&nbsp; :init (and $I$ $P$)</tt><br>
 >  <tt>&nbsp; :trans (and $T$ $P'$)</tt><br>
 >  <tt>)</tt>
@@ -756,12 +756,12 @@ of other systems by a command of the form:
 
 <tt>
 (define-system $S$ <br>
-&nbsp; :input (($i_1$ $\sigma_1$) $\cdots$ ($i_m$ $\sigma_m$))<br>
-&nbsp; :output (($o_1$ $\tau_1$) $\cdots$ ($o_n$ $\tau_n$)) <br>
-&nbsp; :local (($s_1$ $\sigma_1$) $\cdots$ ($s_p$ $\sigma_p$)) <br>
-&nbsp; :subsys ($N_1$ ($S_1$ $\boldsymbol x_1$ $\boldsymbol y_1$)) <br>
+&nbsp; :input ( ( $i_1$ $\sigma_1$ ) $\cdots$ ( $i_m$ $\sigma_m$ ) )<br>
+&nbsp; :output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) ) <br>
+&nbsp; :local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) ) <br>
+&nbsp; :subsys ( $N_1$ ( $S_1$ $\boldsymbol x_1$ $\boldsymbol y_1$ ) ) <br>
 &nbsp;&nbsp; $\cdots$<br>
-&nbsp; :subsys ($N_q$ ($S_q$ $\boldsymbol x_q$ $\boldsymbol y_q$)) <br>
+&nbsp; :subsys ( $N_q$ ( $S_q$ $\boldsymbol x_q$ $\boldsymbol y_q$ ) ) <br>
 &nbsp; :init $I$<br>
 &nbsp; :trans $T$<br>
 &nbsp; :inv $P$<br>
