@@ -6,6 +6,10 @@ date: 2022-06-27
 
 --------------------------------------------------------------------------------
 
+[TOC]
+
+--------------------------------------------------------------------------------
+
 # Model Checking Intermediate Language (Draft)
 
 The Model Checking Intermediate Language (IL, for short) is an intermediate
@@ -1085,7 +1089,7 @@ Specifically:
    each $r_j$ naming a reachability condition $R_j$,
    is _satisfiable_ iff the formula
 
-   $$\begin{array}{l@{}l}
+    $$\begin{array}{rcl}
       I_S
       & \land & \mathbf{always}\ T_S \\
       & \land & \mathbf{always}\ (A_1 \land \cdots \land A_n) \\
@@ -1102,7 +1106,7 @@ Specifically:
    each $r_j$ naming a reachability condition $R_j$,
    is _satisfiable_ iff the formula
 
-   $$\begin{array}{l@{}l}
+    $$\begin{array}{rcl}
       C
       & \land & \mathbf{always}\ T_S \\
       & \land & \mathbf{always}\ (A_1 \land \cdots \land A_n) \\
@@ -1119,15 +1123,17 @@ Specifically:
    each $f_j$ naming a fairness condition $F_j$,
    _satisfiable_ iff the formula
 
-    $$\begin{array}{l@{}l}
+    $$\begin{array}{rcl}
        I_S
        & \land & \mathbf{always}\ T_S \\
        & \land & \mathbf{always}\ (A_1 \land \cdots \land A_n) \\
        & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u \\
-       & \land & \mathbf{always}\ \mathbf{eventually}\ (F_1 \land \cdots \land F_v)
+       & \land & \mathbf{always}\ \mathbf{eventually}\ F_1 \land \cdots 
+         \land   \mathbf{always}\ \mathbf{eventually}\ F_v
       \end{array}
     $$
-   is **satisfiable** in LTL.
+
+    is **satisfiable** in LTL.
 
 For each successful query in a <tt>check-system</tt>  command,
 the model checker is expected to produce
@@ -1136,6 +1142,7 @@ the model checker is expected to produce
   in the formulas in the query and
 * a witnessing trace in $\mathcal I$.
 
+[revise]
 The interpretation $\mathcal I$ _must be the same for each query in the command_.
 In contrast, the witnessing trace may be specific to each query.
 To allow different interpretations for two different queries one must
@@ -1152,6 +1159,73 @@ a trace of the system. [Elaborate]
 > **Note**:
 The witnessing trace for a query may satisfy each reachability condition
 in the query in a different state.
+
+#### Check-system examples
+
+Non-deterministic arbiter.
+
+````scheme
+(check-system NonDetArbiter
+ :input ( (req1 Bool) (req2 Bool) )
+ :output ( (gr1 Bool) (gr2 Bool) )
+ ; There are never concurrent requests
+ :assumption (a1 (not (and req1 req2)))
+ ; The same request is never issued twice in a row
+ :assumption (a2 (and (=> req1 (not req1')) (=> req2 (not req2'))))
+ ; Neg of: every request is immediately granted
+ :reachable (r (not (and (=> req1 gr1) (=> req2 gr2))))
+ ; check the reachability of r under assumptions a1 and a2
+ :query (q (a1 a2 r)) 
+)
+````
+
+Temporal queries.
+
+````scheme
+(define-system Historically :input ((b Bool)) :output ((hb Bool)) 
+ :init (= hb b) 
+ :trans (= hb’ (and b’ hb))
+)
+
+(define-system Before :input ((b Bool)) :output ((bb Bool)) 
+ :init (= bb' false) 
+ :trans (= bb’ b)
+)
+
+(define-system Count :input ((b Bool)) :output ((c Int)) 
+ :init (= c (ite b 1 0))
+ :trans (= c’ (+ c (ite b 0 1)))
+)
+
+(define-system Monitor :input ((r1 Bool) (r2 Bool)) :output ((g1 Bool) (g2 Bool))  
+ :local ((a1 Bool) (a2 Bool) (b Bool) (h1 Bool) (h2 Bool) (bf Bool) (c1 Int))
+ :subsys (A (NonDetArbiter r1 r2 g1 g2))
+ :subsys (H1 (Historically a1 h1))
+ :subsys (H2 (Historically a2 h2))
+ :subsys (C (Count g1 c1))
+ :subsys (B (Before b bf))
+ :inv (and
+   ; a1 <=> no requests
+   (= a1 (and (not r1) (not r2)))
+   ; a2 <=> no grants
+   (= a2 (and (not g1) (not g2)))
+   ; b <=> c is 4
+   (= b (= c 4))
+ )
+)
+
+(check-system Monitor :input ((r1 Bool) (r2 Bool)) :output ((g1 Bool) (g2 Bool))
+ :local ((a1 Bool) (a2 Bool) (b Bool) (h1 Bool) (h2 Bool) (bf Bool) (c1 Int))
+ ; no concurrent requests
+ :assumption (A (not (and r1 r2))) 
+ ; neg of: if there have been no requests, there have been no grants 
+ :reachable (P1 (not (=> h1 h2))) 
+ ; neg of: a request is granted at most 4 times
+ :reachable (P2 (not (=> bf (not g1)))) 
+ :query (Q1 (A P1))
+ :query (Q2 (A P2))
+)
+````
 
 
 
