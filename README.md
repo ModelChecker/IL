@@ -302,10 +302,14 @@ In the general case, the claim can be shown by a simple inductive argument.
 
 The notion of $n$-satisfiability is useful when one is interested, as we are,
 in state reachability.
-The reason is that a state satisfying a (non-temporal) state property $P$ is reachable
-in a system $S$
-if and only if the temporal formula $\mathbf{eventually}~P$ is $n$-satisfied
+The reason is that a state satisfying a (non-temporal) state property $R$ is
+reachable in a system $S$
+only if the temporal formula $\mathbf{eventually}~R$ is $n$-satisfied
 by an execution of $S$ for some $n$.
+Note, however, that the converse does not hold.
+That is, it is possible for $R$ to be reachable in a system $S$
+without being $n$-satisfied by an execution of $S$.
+See Section [todo](#add_link) for more details.
 
 ## Supported SMT-LIB commands
 
@@ -405,22 +409,25 @@ where
 * each $i_j$ is an _input_ variable of sort $\delta_j$;
 * each $o_j$ is an _output_ variable of sort $\tau_j$;
 * each $s_j$ is a _local_ variable of sort $\sigma_j$;
+* all variables abo
 * each $i_j$, $o_j$, $s_j$ denote _current-state_ values
 * _next-state variables_ are not provided explicitly but are denoted
   by convention by appending $'$ to the names of the current-state variables 
   $i_j$, $o_j$, and $s_j$;
-* $I$ is a one-state formula over the unprimed system's variables 
-  (input, output and local state variables)
+* $I$, _the initial condition_, is a one-state formula
+  over the unprimed system's variables (input, output and local state variables)
   that expresses a constraint on the initial states of $S$;
-* $T$ is a two-state formula over all of the system's variables (primed and unprimed)
+* $T$, _the transition condition,_ is a two-state formula
+  over all of the system's variables (primed and unprimed)
   that expresses a constraint on the state transitions of $S$;
-* $P$ is a one state formula over all of the _unprimed_ system's variables
+* $P$, _the invariance condition_, is a one state formula
+  over all of the _unprimed_ system's variables
   that expresses a constraint on all reachable states of $S$;
 * all attributes are optional and their order is immaterial except that
   <tt>:input</tt>, <tt>:output</tt>, and <tt>:local</tt> must occur before
   <tt>:init</tt>, <tt>:trans</tt>, and <tt>:inv</tt>;
 * the default value for a missing attribute is the empty list <tt>()</tt>
-  for <tt>:input</tt>, <tt>:output</tt>, and <tt>:local</tt>, 
+  for <tt>:input</tt>, <tt>:output</tt>, and <tt>:local</tt>;
   and <tt>true</tt> for <tt>:init</tt>, <tt>:trans</tt>, and <tt>:inv</tt>.
   
 Syntactically, the system identifier, the input, output and local variables are 
@@ -467,6 +474,10 @@ $I_S[\boldsymbol{v}] = I[\boldsymbol{v}] \land P[\boldsymbol{v}]$
 and
 &nbsp;&nbsp;
 $T_S[\boldsymbol{v},\boldsymbol{v'}] = T[\boldsymbol{v},\boldsymbol{v'}] \land P[\boldsymbol{v'}]$ .
+
+We call $I_S$ _the initial state predicate_ of $S$ and
+call $T_S$ _the transition predicate_ of $S$.
+
 
 > **Note:**
 The relation expressed by the formula $T$ is not required to be functional
@@ -1005,8 +1016,7 @@ the system can move to another state (_and so_ also produce output).
 In general, checking the two sufficient conditions above automatically can be
 impossible or very expensive because of the quantifier alternations in the conditions.
 
-### System verification command
-
+### System checking command
 
 <tt>(check-system $S$</tt> <br>
 <tt>&nbsp; :input ( ( $i_1$ $\delta_1$ ) $\cdots$ ( $i_m$ $\delta_m$ ) ) </tt><br>
@@ -1028,11 +1038,12 @@ where
   before the other attributes [may not need this restriction];
 * all attributes except <tt>:input</tt>, <tt>:output</tt>, <tt>:local</tt>
   are repeatable.
-* $\boldsymbol{i} = (i_1, \ldots, i_m)$ is a (possible) renaming of the corresponding
+* $\boldsymbol{i} = (i_1, \ldots, i_m)$ is a _renaming_[^1]
+  of the corresponding
   input variables of $S$ of sort $\boldsymbol{\delta} = (\delta_1, \ldots, \delta_m)$;
-* $\boldsymbol{o} = (o_1, \ldots, o_n)$ is a (possible) renaming of the corresponding
+* $\boldsymbol{o} = (o_1, \ldots, o_n)$ is a renaming of the corresponding
   output variables of $S$ of sort $\boldsymbol{\tau} = (\tau_1, \ldots, \tau_n)$;
-* $\boldsymbol{s} = (s_1, \ldots, s_p)$ is a (possible) renaming of the corresponding
+* $\boldsymbol{s} = (s_1, \ldots, s_p)$ is a renaming of the corresponding
   local variables of $S$ of sort $\boldsymbol{\sigma} = (\sigma_1, \ldots, \sigma_n)$;
 * $a$, $r$, $f$, $c$, and $q$ are identifiers;
   each $g_i$ ranges over such identifiers;
@@ -1048,18 +1059,102 @@ where
   expressing a state _initiality condition_;
 
 > **Note:**
-The list of identifiers for a query $a$ contains all the elements of the query.
 When the command contains more than one instance of the attributes
 <tt>:assumption</tt>, <tt>:reachable</tt>, <tt>:fairness</tt> and <tt>:current</tt>,
 the list of elements of a query $q$ can refer to any of the identifiers
 in those attributes.
 
-
 #### Semantics
 
 Each query in the <tt>check-system</tt> command asks for the existence of a trace.
-Specifically, given such a command for a system $S$
-let $I_S$ and $T_S$ be the initial state and transition predicate of $S$ 
-_modulo_ the variable renamings in the command.
+The trace must satisfy the infinite-state semantics if the query includes at least
+one fairness condition.
+In contrast, it must satisfy the finite-state semantics if the query includes
+no fairness conditions.
 
-[to be continued]
+Given a check command like the above for a system $S$,
+let $I_S$ and $T_S$ be the initial state and transition predicates of $S$
+_modulo_ the variable renamings in the command.
+The meaning of the query depends on its components.
+
+Specifically:
+
+1. A $q$ query of the form
+   <tt>( $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$  )</tt>,
+   with each $a_j$ naming an assumption $A_j$ and
+   each $r_j$ naming a reachability condition $R_j$,
+   is _satisfiable_ iff the formula
+
+   $$\begin{array}{l@{}l}
+      I_S
+      & \land & \mathbf{always}\ T_S \\
+      & \land & \mathbf{always}\ (A_1 \land \cdots \land A_n) \\
+      & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
+    \end{array}
+   $$
+
+   is **$n$-satisfiable** in LTL for some $n > 0$.
+
+2. A $q$ query of the form
+   <tt>( $c$ $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$  )</tt>,
+   with $c$ naming an initiality condition $C$,
+   each $a_j$ naming an assumption $A_j$, and
+   each $r_j$ naming a reachability condition $R_j$,
+   is _satisfiable_ iff the formula
+
+   $$\begin{array}{l@{}l}
+      C
+      & \land & \mathbf{always}\ T_S \\
+      & \land & \mathbf{always}\ (A_1 \land \cdots \land A_n) \\
+      & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
+     \end{array}
+   $$
+
+   is **$n$-satisfiable** in LTL for some $n > 0$.
+
+3. A $q$ query of the form
+   <tt>( $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$ $f_1$ $\cdots$ $r_v$  )</tt>,
+   with each $a_j$ naming an assumption $A_j$,
+   each $r_j$ naming a reachability condition $R_j$, and
+   each $f_j$ naming a fairness condition $F_j$,
+   _satisfiable_ iff the formula
+
+    $$\begin{array}{l@{}l}
+       I_S
+       & \land & \mathbf{always}\ T_S \\
+       & \land & \mathbf{always}\ (A_1 \land \cdots \land A_n) \\
+       & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u \\
+       & \land & \mathbf{always}\ \mathbf{eventually}\ (F_1 \land \cdots \land F_v)
+      \end{array}
+    $$
+   is **satisfiable** in LTL.
+
+For each successful query in a <tt>check-system</tt>  command,
+the model checker is expected to produce
+
+* a $\mathcal T$-interpretation $\mathcal I$ of the (global) free symbols
+  in the formulas in the query and
+* a witnessing trace in $\mathcal I$.
+
+The interpretation $\mathcal I$ _must be the same for each query in the command_.
+In contrast, the witnessing trace may be specific to each query.
+To allow different interpretations for two different queries one must
+include them each in a separate <tt>check-system</tt> command.
+
+> **Note**:
+To enforce the infinite state semantics for an query it is enough for it
+to contain any fairness condition, including the valid formula <tt>true</tt>.
+>
+> **Note**:
+For queries with no fairness conditions, the witnessing trace may not be
+a trace of the system. [Elaborate]
+>
+> **Note**:
+The witnessing trace for a query may satisfy each reachability condition
+in the query in a different state.
+
+
+
+
+[^1]: A sequence of elements is a renaming of another sequence
+      if there is a bijection between their elements.
