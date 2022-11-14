@@ -327,7 +327,7 @@ IL adopts the following SMT-LIB commands:
   Declares $s$ to be a sort symbol (i.e., type constructor) of arity $n$.
   Examples:
 
-  ```scheme
+  ```smt
   (declare-sort A 0)
   (declare-sort Set 1)
   ; possible sorts: A, (Set A), (Set (Set A)), (Array Int Real), ...
@@ -338,7 +338,7 @@ IL adopts the following SMT-LIB commands:
   Defines $S$ as synonym of a parametric type $\tau$ with parameters $u_1 \cdots u_n$.
   Examples:
 
-  ```scheme
+  ```smt
   (declare-sort NestedSet (X) (Set (Set X)))
   ; possible sorts: (NestedSet A), ...
   (declare-sort Array2 (X Y) (Array X (Array X Y)))
@@ -350,7 +350,7 @@ IL adopts the following SMT-LIB commands:
   Declares a constant $c$ of sort $\sigma$.
   Examples:
   
-  ```scheme
+  ```smt
   (declare-const a A)
   (declare-const n Int)
   ```
@@ -361,7 +361,7 @@ IL adopts the following SMT-LIB commands:
   (of respective sort $\sigma_1, \ldots, \sigma_n$), output sort $\sigma$, and body $t$.
   Examples:
 
-  ```scheme
+  ```smt
   (declare-fun sq ((n Int)) Int (* n n))
   (declare-fun isSqRoot ((m Int) (n Int)) Bool (= n (sq m)))
   (declare-fun max ((m Int) (n Int)) Int (ite (> m n) m n))
@@ -375,7 +375,7 @@ IL adopts the following SMT-LIB commands:
   as well as the language of allowed logical constraints
   (e.g., quantifier-free, linear, etc.).
 
-  ```scheme
+  ```smt
   (set-logic QF_BV)
   ```
 
@@ -533,7 +533,7 @@ The output of system <tt>Delay</tt> below is initially <tt>0</tt> and
 then is the previous input.
 No local variables are needed.
 
-```scheme
+```smt
 (define-system Delay :input ( (i Int) ) :output ( (o Int) )
  :init (= o 0)
  :trans (= o' i) ; the new output is the old input
@@ -542,7 +542,7 @@ No local variables are needed.
 
 A variant of <tt>Delay</tt> where the output is initially any number in [0,10].
 
-```scheme
+```smt
 (define-system Delay :input ( (i Int) ) :output ( (o Int) )
  :init (<= 0 o 10) ; more than one possible initial output
  :trans (= o' i)
@@ -552,7 +552,7 @@ A variant of <tt>Delay</tt> where the output is initially any number in [0,10].
 A clocked lossless channel, stuttering when the clock is not ticking.
 The clock is represented by a Boolean input variable <tt>clock</tt>.
 
-```scheme
+```smt
 (define-system StutteringClockedCopy
  :input ((clock Bool) (i Int))
  :output ((o Int))
@@ -565,7 +565,7 @@ Events carrying data can be modeled as instances
 of the polymorphic algebraic datatype <tt>(Event X)</tt>
 where <tt>X</tt> is the type of the data carried by the event.
 
-```scheme
+```smt
 (declare-datatype Event (par (X)
   (absent)
   (present (val X))
@@ -574,7 +574,7 @@ where <tt>X</tt> is the type of the data carried by the event.
 
 An event-triggered channel that arbitrarily loses its input data.
 
-```scheme
+```smt
 (define-system LossyIntChannel
  :input ((i (Event Int)))
  :output ((o (Event Int)))
@@ -584,7 +584,7 @@ An event-triggered channel that arbitrarily loses its input data.
 
 Equivalent formulation using unconstrained local state.
 
-```scheme
+```smt
 (define-system LossyIntChannel
  :input ((i (Event Int))) 
  :output ((o (Event Int)))
@@ -600,7 +600,7 @@ on for at most 10 steps unless it is switched off before.
 The input Boolean is interpreted as an on/off toggle.
 The transition predicate is formulated as a set of transitions.
 
-```scheme
+```smt
 (define-enum-sort LightStatus (on off))
 
 (define-system TimedSwitch1
@@ -627,7 +627,7 @@ The transition predicate is formulated as a set of transitions.
 A variant of the system above where the transition predicate is formulated
 guarded-transitions style.
 
-```scheme
+```smt
 (define-system TimedSwitch2
  :input ( (press Bool) )
  :output ( (sig Bool) )
@@ -652,7 +652,7 @@ guarded-transitions style.
 
 Another variant but in equational style.
 
-```scheme
+```smt
 (define-fun flip ((s LightStatus)) LightStatus
   (ite (= s off) on off)
 )
@@ -684,7 +684,7 @@ if it is the only request.
 When both inputs contain a request, one of the two request is granted,
 with a non-deterministic  choice.
 
-```scheme
+```smt
 (define-system NonDetArbiter
  :input ( (r1 Bool) (r2 Bool) )
  :output ( (g1 Bool) (g2 Bool) )
@@ -708,7 +708,7 @@ with a non-deterministic  choice.
 The next arbiter is similar to <tt>NonDetArbiter</tt> but grants requests
 a cycle later and does not use a local variable for the non-deterministic choice.
 
-```scheme
+```smt
 (define-system DelayedArbiter
  :input ( (r1 Bool) (r2 Bool) )
  :output ( (g1 Bool) (g2 Bool) )
@@ -729,7 +729,7 @@ a cycle later and does not use a local variable for the non-deterministic choice
 
 Similar to <tt>NonDetArbiter</tt> but for requests expressed as integer events.
 
-```scheme
+```smt
 (define-system IntNonDetArbiter
   :input ( (r1 (Event Int)) (r2 (Event Int)) )
   :output ( (g1 (Event Int)) (g2 (Event Int)) )
@@ -829,7 +829,7 @@ and
 
 #### Examples, composite systems
 
-```scheme
+```smt
 ;----------------
 ; Two-step delay
 ;----------------
@@ -901,7 +901,7 @@ In that case, the choice between the two requests is resolved arbitrarily using
 the value of the unconstrained local variable <tt>b</tt>.
 In the absence of either a set or a reset, the value of <tt>out</tt> is unchanged.
 
-````scheme
+````smt
 (define-system Latch  :input ( (set Bool) (reset Bool) )  :output ( (out Bool)) 
  :local ( (s Bool) (b Bool) )
  :init (and
@@ -922,7 +922,7 @@ the increment signal <tt>inc</tt> is true.
 It is reset to 0 (<tt>false</tt>) when the start signal is true.
 The initial value of the counter is arbitrary.
 
-````scheme
+````smt
 ;        +------------------------------------------------------------+
 ;        |                                                            |
 ;        | +--------------------------------------------------------+ |
@@ -957,7 +957,7 @@ three 1-bit counters.
 The output is three Boolean values standing for the three bits,
 with <tt>out0</tt> being the least significant one.
 
-````scheme
+````smt
 (define-system ThreeBitCounter  :input ( (inc Bool) (start Bool) )
  :output ( (out0 Bool) (out1 Bool) (out2 Bool) ) 
  :local ( (car0 Bool) (car1 Bool) (car2 Bool) ) 
@@ -1170,7 +1170,7 @@ in the query in a different state.
 
 [Non-deterministic arbiter.]
 
-````scheme
+````smt
 (check-system NonDetArbiter
  :input ( (req1 Bool) (req2 Bool) )
  :output ( (gr1 Bool) (gr2 Bool) )
@@ -1234,7 +1234,7 @@ in the query in a different state.
 ````
 
 <!--
-````scheme
+````smt
 (response
  :query (q1 :result sat :model m :trace t)
  :query (q2 :result unsat :certificate c)
