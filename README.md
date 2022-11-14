@@ -1,16 +1,10 @@
 ---
-title: Model Checking Intermediate Language
+title: Model Checking Intermediate Language (Draft)
 author: Cesare Tinelli
-date: 2022-06-27
+date: 2022-11-13
 ---
 
 --------------------------------------------------------------------------------
-
-[TOC]
-
---------------------------------------------------------------------------------
-
-# Model Checking Intermediate Language (Draft)
 
 The Model Checking Intermediate Language (IL, for short) is an intermediate
 language meant to be a common input and output standard for model checker
@@ -399,12 +393,12 @@ Declares $s$ to be an enumerative type with (distinct) values $c_1, \ldots, c_n$
 An atomic transition system is defined by a command of the form:
 
 <tt>(define-system $S$</tt><br>
-<tt>&nbsp; :input ( ( $i_1$ $\delta_1$ ) $\cdots$ ( $i_m$ $\delta_m $) ) </tt><br>
-<tt>&nbsp; :output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) ) </tt><br>
-<tt>&nbsp; :local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) ) </tt><br>
-<tt>&nbsp; :init $I$</tt><br>
-<tt>&nbsp; :trans $T$</tt><br>
-<tt>&nbsp; :inv $P$</tt><br>
+<tt>&nbsp;:input ( ( $i_1$ $\delta_1$ ) $\cdots$ ( $i_m$ $\delta_m $) ) </tt><br>
+<tt>&nbsp;:output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) ) </tt><br>
+<tt>&nbsp;:local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) ) </tt><br>
+<tt>&nbsp;:init $I$</tt><br>
+<tt>&nbsp;:trans $T$</tt><br>
+<tt>&nbsp;:inv $P$</tt><br>
 </tt>)</tt>
 
 where
@@ -493,20 +487,20 @@ The <tt>:inv</tt> attribute is not strictly necessary since a system
 with a  declaration of the form
 > 
 >  <tt>(define-system $S$ :input ( ( $i_1$ $\sigma_1$ ) $\cdots$ ( $i_m$ $\sigma_m$ ) )</tt><br>
->  <tt>&nbsp; :output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) )</tt><br>
->  <tt>&nbsp; :local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) )</tt><br>
->  <tt>&nbsp; :init $I$</tt><br>
->  <tt>&nbsp; :trans $T$</tt><br>
->  <tt>&nbsp; :inv $P$</tt><br>
+>  <tt>&nbsp;:output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) )</tt><br>
+>  <tt>&nbsp;:local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) )</tt><br>
+>  <tt>&nbsp;:init $I$</tt><br>
+>  <tt>&nbsp;:trans $T$</tt><br>
+>  <tt>&nbsp;:inv $P$</tt><br>
 >  <tt>)</tt>
 >
 > can be equivalently expressed with a declaration of the form
 >
 >  <tt>(define-system $S$ :input ( ( $i_1$ $\sigma_1$ ) $\cdots$ ( $i_m$ $\sigma_m$ ) )</tt><br>
->  <tt>&nbsp; :output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) )</tt><br>
->  <tt>&nbsp; :local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) )</tt><br>
->  <tt>&nbsp; :init (and $I$ $P$)</tt><br>
->  <tt>&nbsp; :trans (and $T$ $P'$)</tt><br>
+>  <tt>&nbsp;:output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) )</tt><br>
+>  <tt>&nbsp;:local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) )</tt><br>
+>  <tt>&nbsp;:init (and $I$ $P$)</tt><br>
+>  <tt>&nbsp;:trans (and $T$ $P'$)</tt><br>
 >  <tt>)</tt>
 >
 >where $P'$ is the formula obtained from $P$ by priming all the system variables in $P$.
@@ -777,15 +771,15 @@ A transition systems can be defined as the synchronous composition
 of other systems by a command of the form:
 
 <tt>(define-system $S$</tt><br>
-<tt>&nbsp; :input ( ( $i_1$ $\sigma_1$ ) $\cdots$ ( $i_m$ $\sigma_m$ ) )</tt><br>
-<tt>&nbsp; :output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) ) </tt><br>
-<tt>&nbsp; :local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) ) </tt><br>
-<tt>&nbsp; :subsys ( $N_1$ ( $S_1$ $\boldsymbol x_1$ $\boldsymbol y_1$ ) ) </tt><br>
+<tt>&nbsp;:input ( ( $i_1$ $\sigma_1$ ) $\cdots$ ( $i_m$ $\sigma_m$ ) )</tt><br>
+<tt>&nbsp;:output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) ) </tt><br>
+<tt>&nbsp;:local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) ) </tt><br>
+<tt>&nbsp;:subsys ( $N_1$ ( $S_1$ $\boldsymbol x_1$ $\boldsymbol y_1$ ) ) </tt><br>
 <tt>&nbsp;&nbsp; $\cdots$</tt><br>
-<tt>&nbsp; :subsys ( $N_q$ ( $S_q$ $\boldsymbol x_q$ $\boldsymbol y_q$ ) ) </tt><br>
-<tt>&nbsp; :init $I$</tt><br>
-<tt>&nbsp; :trans $T$</tt><br>
-<tt>&nbsp; :inv $P$</tt><br>
+<tt>&nbsp;:subsys ( $N_q$ ( $S_q$ $\boldsymbol x_q$ $\boldsymbol y_q$ ) ) </tt><br>
+<tt>&nbsp;:init $I$</tt><br>
+<tt>&nbsp;:trans $T$</tt><br>
+<tt>&nbsp;:inv $P$</tt><br>
 <tt>)</tt>
 
 where
@@ -1023,15 +1017,15 @@ impossible or very expensive because of the quantifier alternations in the condi
 ### System checking command
 
 <tt>(check-system $S$</tt> <br>
-<tt>&nbsp; :input ( ( $i_1$ $\delta_1$ ) $\cdots$ ( $i_m$ $\delta_m$ ) ) </tt><br>
-<tt>&nbsp; :output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) ) </tt><br>
-<tt>&nbsp; :local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) ) </tt><br>
-<tt>&nbsp; :assumption ( $a$ A ) </tt><br>
-<tt>&nbsp; :fairness ( $f$ $F$ ) </tt><br>
-<tt>&nbsp; :reachable ( $r$ $R$ ) </tt><br>
-<tt>&nbsp; :current ( $c$ $C$ ) </tt><br>
-<tt>&nbsp; :query ( $q$ ( $g_1$ $\cdots$ $g_q$ ) )</tt><br>
-<tt>&nbsp; :queries ( ( $q_1$ ( $g_{1,1}$ $\cdots$ $g_{1,n_1}$ ) ) $\cdots$ ( $q_t$ ( $g_{t,1}$ $\cdots$ $g_{t,n_t}$ ) ) )</tt><br>
+<tt>&nbsp;:input ( ( $i_1$ $\delta_1$ ) $\cdots$ ( $i_m$ $\delta_m$ ) ) </tt><br>
+<tt>&nbsp;:output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) ) </tt><br>
+<tt>&nbsp;:local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) ) </tt><br>
+<tt>&nbsp;:assumption ( $a$ A ) </tt><br>
+<tt>&nbsp;:fairness ( $f$ $F$ ) </tt><br>
+<tt>&nbsp;:reachable ( $r$ $R$ ) </tt><br>
+<tt>&nbsp;:current ( $c$ $C$ ) </tt><br>
+<tt>&nbsp;:query ( $q$ ( $g_1$ $\cdots$ $g_q$ ) )</tt><br>
+<tt>&nbsp;:queries ( ( $q_1$ ( $g_{1,1}$ $\cdots$ $g_{1,n_1}$ ) ) $\cdots$ ( $q_t$ ( $g_{t,1}$ $\cdots$ $g_{t,n_t}$ ) ) )</tt><br>
 <tt>)</tt>
 
 where
@@ -1132,13 +1126,26 @@ Specifically:
        I_S
        & \land & \mathbf{always}\ T_S \\
        & \land & \mathbf{always}\ (A_1 \land \cdots \land A_n) \\
-       & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u \\
-       & \land & \mathbf{always}\ \mathbf{eventually}\ F_1 \land \cdots 
-         \land   \mathbf{always}\ \mathbf{eventually}\ F_v
+       & \land & \mathbf{always}\ \mathbf{eventually}\ F_1 \land \cdots
+         \land   \mathbf{always}\ \mathbf{eventually}\ F_v \\
+       & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
       \end{array}
     $$
 
     is **satisfiable** in LTL.
+
+<!--
+    $$\begin{array}{rcl}
+       I_S
+       & \land & \mathbf{always}\ T_S \\
+       & \land & \mathbf{always}\ (A_1 \land \cdots \land A_n) \\
+       & \land & \mathbf{always}\ \mathbf{eventually}\ F_1 \land \cdots
+         \land   \mathbf{always}\ \mathbf{eventually}\ F_v \\
+       & \models & \lnot\mathbf{eventually}\ R_1 \lor \cdots \lor \lnot\mathbf{eventually}\ R_u \\
+       & \models & \mathbf{always}\ \lnot R_1 \lor \cdots \lor \mathbf{always}\ \lnot R_u
+      \end{array}
+    $$
+-->
 
 Let $\mathcal T$ be the background theory specified for an IL script.
 For each satisfiable query in a <tt>check-system</tt> command,
@@ -1233,21 +1240,26 @@ in the query in a different state.
 )
 ````
 
-<!--
-````smt
-(response
+#### Check-system response
+
+[to do]
+
+````scheme
+(check-system-response
  :query (q1 :result sat :model m :trace t)
  :query (q2 :result unsat :certificate c)
- :query (q3 :result unknown)
- :model (m (...))
- :trail (p (...))
- :trail (l (...))
- :trace (t :prefix p :lasso l)
- :invariant (f F)
- :certificate (c :inv f :k n)
+ :query (q3 :result unknown)                            ; for timeouts and other cases
+ :trace (t :prefix p :lasso l)                          ; t = pl^ω
+ :model (m M)                                           ; M is model in SMT-LIB format
+ :trail (p ( ((i i_0) (o o_0) (s s_0) (r r_0) (f f_0))  ; state/valuation
+              ...
+             ((i i_k) (o o_k) (s s_k) (r r_k) (f f_k))
+           )
+        ) 
+ :trail (l ( ( ... ) ... ( ... ) ))
+ :certificate (c :inv F :k n)
 )
 ````
--->
 
 
 [^1]: A sequence of elements is a renaming of another sequence
