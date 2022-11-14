@@ -1031,6 +1031,7 @@ impossible or very expensive because of the quantifier alternations in the condi
 <tt>&nbsp; :reachable ( $r$ $R$ ) </tt><br>
 <tt>&nbsp; :current ( $c$ $C$ ) </tt><br>
 <tt>&nbsp; :query ( $q$ ( $g_1$ $\cdots$ $g_q$ ) )</tt><br>
+<tt>&nbsp; :queries ( ( $q_1$ ( $g_{1,1}$ $\cdots$ $g_{1,n_1}$ ) ) $\cdots$ ( $q_t$ ( $g_{t,1}$ $\cdots$ $g_{t,n_t}$ ) ) )</tt><br>
 <tt>)</tt>
 
 where
@@ -1040,7 +1041,7 @@ where
 * all attributes are optional and their order is immaterial except that
   <tt>:input</tt>, <tt>:output</tt>, <tt>:local</tt>, have to come
   before the other attributes [may not need this restriction];
-* all attributes except <tt>:input</tt>, <tt>:output</tt>, <tt>:local</tt>
+* all attributes except for <tt>:input</tt>, <tt>:output</tt> and <tt>:local</tt>
   are repeatable.
 * $\boldsymbol{i} = (i_1, \ldots, i_m)$ is a _renaming_[^1]
   of the corresponding
@@ -1049,8 +1050,7 @@ where
   output variables of $S$ of sort $\boldsymbol{\tau} = (\tau_1, \ldots, \tau_n)$;
 * $\boldsymbol{s} = (s_1, \ldots, s_p)$ is a renaming of the corresponding
   local variables of $S$ of sort $\boldsymbol{\sigma} = (\sigma_1, \ldots, \sigma_n)$;
-* $a$, $r$, $f$, $c$, and $q$ are identifiers;
-  each $g_i$ ranges over such identifiers;
+* $a$, $r$, $f$, $c$, $q$, $q_1, \ldots, q_k$ are identifiers;
 * $A$ is (non-temporal) formula over the system variables
   $\boldsymbol{i}$, $\boldsymbol{o}$, $\boldsymbol{s}$, and $\boldsymbol{i'}$
   expressing an _environmental assumption_ on $\boldsymbol{i'}$;
@@ -1061,6 +1061,12 @@ where
   expressing a state _reachability condition_;
 * $C$ is (non-temporal) formula over all the unprimed system variables
   expressing a state _initiality condition_;
+* each $g_j$ and $g_{j,k}$ ranges over the $a$, $r$, $f$, $c$ identifiers;
+* $(q\ (g_1 \cdots g_q))$ defines a query $q$ as consisting of the formulas named
+  by $g_1, \dots, g_q$;
+  the same holds for each $(q_j\ (g_{j,1} \cdots g_{j,n_j}))$;
+* a query can contain more than one assumption, fairness condition and reachability
+  condition but at most one initiality condition.
 
 > **Note:**
 When the command contains more than one instance of the attributes
@@ -1070,11 +1076,10 @@ in those attributes.
 
 #### Semantics
 
-Each query in the <tt>check-system</tt> command asks for the existence of a trace.
-The trace must satisfy the infinite-state semantics if the query includes at least
-one fairness condition.
-In contrast, it must satisfy the finite-state semantics if the query includes
-no fairness conditions.
+Each query $q$ ($q_j$) in the <tt>check-system</tt> command asks for the existence
+of a trace.
+The query is to be evaluated with infinite-state semantics if it includes at least
+one fairness condition, and the finite-state semantics otherwise.
 
 Given a check command like the above for a system $S$,
 let $I_S$ and $T_S$ be the initial state and transition predicates of $S$
@@ -1135,18 +1140,19 @@ Specifically:
 
     is **satisfiable** in LTL.
 
-For each successful query in a <tt>check-system</tt>  command,
+Let $\mathcal T$ be the background theory specified for an IL script.
+For each satisfiable query in a <tt>check-system</tt> command,
 the model checker is expected to produce
 
-* a $\mathcal T$-interpretation $\mathcal I$ of the (global) free symbols
-  in the formulas in the query and
-* a witnessing trace in $\mathcal I$.
+1. a $\mathcal T$-interpretation $\mathcal I$ of the (global) free symbols
+   in the script;
+2. a witnessing trace in $\mathcal I$.
 
-[revise]
-The interpretation $\mathcal I$ _must be the same for each query in the command_.
-In contrast, the witnessing trace may be specific to each query.
-To allow different interpretations for two different queries one must
-include them each in a separate <tt>check-system</tt> command.
+The interpretation $\mathcal I$ _must be the same_ for all queries in
+the same <tt>:queries</tt> attribute.
+In contrast, queries in different attributes may each have their own
+interpretation of the free symbols.
+Regardless of where it occurs, each query may have its own witnessing trace.
 
 > **Note**:
 To enforce the infinite state semantics for an query it is enough for it
@@ -1162,7 +1168,7 @@ in the query in a different state.
 
 #### Check-system examples
 
-Non-deterministic arbiter.
+[Non-deterministic arbiter.]
 
 ````scheme
 (check-system NonDetArbiter
@@ -1179,9 +1185,9 @@ Non-deterministic arbiter.
 )
 ````
 
-Temporal queries.
+[Temporal queries.]
 
-````scheme
+````smt
 (define-system Historically :input ((b Bool)) :output ((hb Bool)) 
  :init (= hb b) 
  :trans (= hb’ (and b’ hb))
@@ -1227,7 +1233,21 @@ Temporal queries.
 )
 ````
 
-
+<!--
+````scheme
+(response
+ :query (q1 :result sat :model m :trace t)
+ :query (q2 :result unsat :certificate c)
+ :query (q3 :result unknown)
+ :model (m (...))
+ :trail (p (...))
+ :trail (l (...))
+ :trace (t :prefix p :lasso l)
+ :invariant (f F)
+ :certificate (c :inv f :k n)
+)
+````
+-->
 
 
 [^1]: A sequence of elements is a renaming of another sequence
