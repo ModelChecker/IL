@@ -783,9 +783,9 @@ where
 \item $q > 0$ and each $S_i$ is the name of a system other than $S$
 \item $S_1, \ldots, S_q$ need not be all distinct
 \item each $N_i$ is a local synonym for $S_i$, with $N_1$, \ldots $N_q$ distinct
-\item each $\vec x_i$ consist of $S$'s variables of the same type as $S_i$'s input
-\item each $\vec y_i$ consist of $S$'s local/output variables of the same type as $S_i$'s output
-\item the subsystem directed graph rooted at $S$ is acyclic 
+\item each $\vec x_i$ consists of $S$'s variables of the same type as $S_i$'s input
+\item each $\vec y_i$ consists of $S$'s local/output variables of the same type as $S_i$'s output
+\item the directed subsystem graph rooted at $S$ is acyclic 
 \end{enumerate}
 }
 
@@ -1518,7 +1518,7 @@ the model checker is expected to produce
 ~~\inita (= hb b)  \transa (= hb' (and b' hb))) 
 \\[1.4ex]
 (\definesys Before \inputa ((b Bool)) \outputa ((bb Bool)) \\
-~~\inita false \transa (= bb' b)) 
+~~\inita (= bb' false) \transa (= bb' b)) 
 \\[1.4ex]
 (\definesys Count \inputa ((b Bool)) \outputa ((c Int)) \\
 ~~\inita (= c (ite b 1 0)) \transa (= c' (+ c (ite b 0 1)))) 
