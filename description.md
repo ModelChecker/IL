@@ -22,7 +22,7 @@ on SAT/SMT technology.
 For being an intermediate language, models expressed in IL are meant
 to be produced and processed by tools, hence it was designed to have
 
-* simple, easily parsable syntax;
+* simple, easily (machine) parsable syntax;
 * a rich set of data types;
 * minimal syntactic sugar, at least initially;
 * well-understood formal semantics;
@@ -1242,6 +1242,10 @@ in the query in a different state.
 
 #### Check-system response
 
+We define a trail each to be a finite sequence of states. A trace consists of two trails: a prefix trail and a lasso trail. 
+A trace repesents an infinite counterexample and consists of a finite prefix of type trail followed by a lasso of type trail representing an infinite loop: there is a transition from last state of the lasso to its first state. 
+Oppositely from a trace, a certificate represents a proof of correctness. 
+We return one trail or certificate in response to each query.
 [to do]
 
 ````scheme
