@@ -1248,16 +1248,19 @@ Oppositely from a trace, a certificate represents a proof of correctness.
 We return one trail or certificate in response to each query.
 [to do]
 
+**Verbose** response with input var `i`, output var `o`, local var `s`,
+reachability pred `r`, and fairness condition `f`.
+
 ````scheme
 (check-system-response
  :query (q1 :result sat :model m :trace t)
  :query (q2 :result unsat :certificate c)
- :query (q3 :result unknown)                            ; for timeouts and other cases
- :trace (t :prefix p :lasso l)                          ; t = pl^ω
- :model (m M)                                           ; M is model in SMT-LIB format
- :trail (p ( ((i i_0) (o o_0) (s s_0) (r r_0) (f f_0))  ; state/valuation
+ :query (q3 :result unknown)                         ; for timeouts and other cases
+ :trace (t :prefix p :lasso l)                       ; t = pl^ω
+ :model (m M)                                        ; M is model in SMT-LIB format
+ :trail (p ( (0 (i i₀) (o o₀) (s s₀) (r r₀) (f f₀))  ; numbered state/valuation
               ...
-             ((i i_k) (o o_k) (s s_k) (r r_k) (f f_k))
+             (j (i iⱼ) (o oⱼ) (s sⱼ) (r rⱼ) (f fⱼ))
            )
         ) 
  :trail (l ( ( ... ) ... ( ... ) ))
@@ -1265,6 +1268,9 @@ We return one trail or certificate in response to each query.
 )
 ````
 
+The **compact** response format is identical to the verbose one except that
+each trail starts with a fully specified state and continues with states
+that list only the variables whose value differs from their value
+in the previous state.
 
-[^1]: A sequence of elements is a renaming of another sequence
-      if there is a bijection between their elements.
+[add examples]
