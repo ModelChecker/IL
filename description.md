@@ -1242,17 +1242,23 @@ in the query in a different state.
 
 #### Check-system response
 
-We define a trail each to be a finite sequence of states. A trace consists of two trails: a prefix trail and a lasso trail. 
-A trace repesents an infinite counterexample and consists of a finite prefix of type trail followed by a lasso of type trail representing an infinite loop: there is a transition from last state of the lasso to its first state. 
-Oppositely from a trace, a certificate represents a proof of correctness. 
+We define a trail each to be a finite sequence of states. A trace consists of two trails:
+
+* a prefix trail and
+* a lasso trail.
+
+A trace represents an infinite counterexample and consists of a finite prefix of type trail
+followed by a lasso of type trail representing an infinite loop: there is a transition
+from last state of the lasso to its first state.
+Oppositely from a trace, a certificate represents a proof of correctness.
 We return one trail or certificate in response to each query.
-[to do]
 
 **Verbose** response with input var `i`, output var `o`, local var `s`,
 reachability pred `r`, and fairness condition `f`.
 
 ````scheme
 (check-system-response
+ :verbosity full
  :query (q1 :result sat :model m :trace t)
  :query (q2 :result unsat :certificate c)
  :query (q3 :result unknown)                         ; for timeouts and other cases
@@ -1273,4 +1279,11 @@ each trail starts with a fully specified state and continues with states
 that list only the variables whose value differs from their value
 in the previous state.
 
-[add examples]
+[Complete examples]
+
+````scheme
+(check-system-response
+ :verbosity compact
+ ...
+)
+````
