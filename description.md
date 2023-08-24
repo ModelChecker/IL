@@ -728,17 +728,17 @@ Similar to <tt>NonDetArbiter</tt> but for requests expressed as integer events.
   :input ( (r1 (Event Int)) (r2 (Event Int)) )
   :output ( (g1 (Event Int)) (g2 (Event Int)) )
   :local ( (s Bool) )
-  :init ( (= g1 g2 none) )
+  :init ( (= g1 g2 absent) )
   :trans (
-    (=> (= r1' r2' none)
-        (= g1' g2' none))
-    (=> (and (!= r1' none) (= r2' none))
-        (and (= g1' r1) (= g2' none)))
-    (=> (and (= r1' none) (!= r2' none))
-        (and (= g1' none) (= g2' r2')))
-    (=> (and (!= r1' none) (!= r2' none))
-        (or (and (= g1' r1') (= g2' none))
-          (and (= g1' none) (= g2' r2'))))
+    (=> (= r1' r2' absent)
+        (= g1' g2' absent))
+    (=> (and (!= r1' absent) (= r2' absent))
+        (and (= g1' r1) (= g2' absent)))
+    (=> (and (= r1' absent) (!= r2' absent))
+        (and (= g1' absent) (= g2' r2')))
+    (=> (and (!= r1' absent) (!= r2' absent))
+        (or (and (= g1' r1') (= g2' absent))
+          (and (= g1' absent) (= g2' r2'))))
   )
 )
 ```
@@ -751,7 +751,7 @@ Similar to <tt>NonDetArbiter</tt> but for requests expressed as integer events.
   :local ( (s Bool) )
   ; whether the input event is transmitted depends on s
   ; s is unconstrained so can take any value during execution
-  :inv ( (= out (ite s in none)) )   
+  :inv ( (= out (ite s in absent)) )   
 )
 
 ; A system that simply passes along the current input `in` when the `clock` input is true.
