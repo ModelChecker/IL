@@ -751,7 +751,7 @@ Similar to <tt>NonDetArbiter</tt> but for requests expressed as integer events.
   :local ( (s Bool) )
   ; whether the input event is transmitted depends on s
   ; s is unconstrained so can take any value during execution
-  :inv ( (= out (ite s in none)) )   
+  :inv ( (= out (ite s in absent)) )   
 )
 
 ; A system that simply passes along the current input `in` when the `clock` input is true.
