@@ -421,7 +421,8 @@ where
 * $P$, _the invariance condition_, is a one state formula
   over all of the _unprimed_ system's variables
   that expresses a constraint on all reachable states of $S$;
-* all attributes are optional and their order is immaterial except that
+* all attributes are optional but can occur at most once;
+* the order of the attributes is immaterial except that
   <tt>:input</tt>, <tt>:output</tt>, and <tt>:local</tt> must occur before
   <tt>:init</tt>, <tt>:trans</tt>, and <tt>:inv</tt>;
 * the default value for a missing attribute is the empty list <tt>()</tt>
@@ -1068,6 +1069,9 @@ When the command contains more than one instance of the attributes
 the list of elements of a query $q$ can refer to any of the identifiers
 in those attributes.
 
+> **Note:**
+The order of the formula names in a query is immaterial.
+
 #### Semantics
 
 Each query $q$ ($q_j$) in the <tt>check-system</tt> command asks for the existence
@@ -1080,7 +1084,7 @@ let $I_S$ and $T_S$ be the initial state and transition predicates of $S$
 _modulo_ the variable renamings in the command.
 The meaning of the query depends on its components.
 
-Specifically:
+Specifically, let $t, u, v  \geq 0$ :
 
 1. A $q$ query of the form
    <tt>( $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$  )</tt>,
@@ -1091,7 +1095,7 @@ Specifically:
     $$\begin{array}{rcl}
       I_S
       & \land & \mathbf{always}\ T_S \\
-      & \land & \mathbf{always}\ (A_1 \land \cdots \land A_n) \\
+      & \land & \mathbf{always}\ (A_1 \land \cdots \land A_t) \\
       & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
     \end{array}
    $$
@@ -1108,7 +1112,7 @@ Specifically:
     $$\begin{array}{rcl}
       C
       & \land & \mathbf{always}\ T_S \\
-      & \land & \mathbf{always}\ (A_1 \land \cdots \land A_n) \\
+      & \land & \mathbf{always}\ (A_1 \land \cdots \land A_t) \\
       & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
      \end{array}
    $$
@@ -1116,7 +1120,7 @@ Specifically:
    is **$n$-satisfiable** in LTL for some $n > 0$.
 
 3. A $q$ query of the form
-   <tt>( $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$ $f_1$ $\cdots$ $r_v$  )</tt>,
+   <tt>( $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$ $f_1$ $\cdots$ $f_v$  )</tt>,
    with each $a_j$ naming an assumption $A_j$,
    each $r_j$ naming a reachability condition $R_j$, and
    each $f_j$ naming a fairness condition $F_j$,
@@ -1125,7 +1129,7 @@ Specifically:
     $$\begin{array}{rcl}
        I_S
        & \land & \mathbf{always}\ T_S \\
-       & \land & \mathbf{always}\ (A_1 \land \cdots \land A_n) \\
+       & \land & \mathbf{always}\ (A_1 \land \cdots \land A_t) \\
        & \land & \mathbf{always}\ \mathbf{eventually}\ F_1 \land \cdots
          \land   \mathbf{always}\ \mathbf{eventually}\ F_v \\
        & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
@@ -1133,6 +1137,28 @@ Specifically:
     $$
 
     is **satisfiable** in LTL.
+
+4. A $q$ query of the form
+   <tt>( $c$ $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$ $f_1$ $\cdots$ $f_v$  )</tt>,
+   with $c$ naming an initiality condition $C$,
+   each $a_j$ naming an assumption $A_j$,
+   each $r_j$ naming a reachability condition $R_j$, and
+   each $f_j$ naming a fairness condition $F_j$,
+   _satisfiable_ iff the formula
+
+    $$\begin{array}{rcl}
+       C
+       & \land & \mathbf{always}\ T_S \\
+       & \land & \mathbf{always}\ (A_1 \land \cdots \land A_t) \\
+       & \land & \mathbf{always}\ \mathbf{eventually}\ F_1 \land \cdots
+         \land   \mathbf{always}\ \mathbf{eventually}\ F_v \\
+       & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
+      \end{array}
+    $$
+
+    is **satisfiable** in LTL.
+
+
 
 <!--
     $$\begin{array}{rcl}
