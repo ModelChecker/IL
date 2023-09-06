@@ -1038,13 +1038,12 @@ where
   before the other attributes [may not need this restriction];
 * all attributes except for <tt>:input</tt>, <tt>:output</tt> and <tt>:local</tt>
   are repeatable.
-* $\boldsymbol{i} = (i_1, \ldots, i_m)$ is a _renaming_[^1]
-  of the corresponding
+* $\boldsymbol{i} = (i_1, \ldots, i_m)$ is a renaming of the corresponding
   input variables of $S$ of sort $\boldsymbol{\delta} = (\delta_1, \ldots, \delta_m)$;
 * $\boldsymbol{o} = (o_1, \ldots, o_n)$ is a renaming of the corresponding
   output variables of $S$ of sort $\boldsymbol{\tau} = (\tau_1, \ldots, \tau_n)$;
 * $\boldsymbol{s} = (s_1, \ldots, s_p)$ is a renaming of the corresponding
-  local variables of $S$ of sort $\boldsymbol{\sigma} = (\sigma_1, \ldots, \sigma_n)$;
+  local variables of $S$ of sort $\boldsymbol{\sigma} = (\sigma_1, \ldots, \sigma_p)$;
 * $a$, $r$, $f$, $c$, $q$, $q_1, \ldots, q_k$ are identifiers;
 * $A$ is (non-temporal) formula over the system variables
   $\boldsymbol{i}$, $\boldsymbol{o}$, $\boldsymbol{s}$, and $\boldsymbol{i'}$
