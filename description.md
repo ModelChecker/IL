@@ -946,6 +946,21 @@ The output is three Boolean values standing for the three bits,
 with <tt>out0</tt> being the least significant one.
 
 ```smt
+;        +---------------------------------------------------------+
+;        |                                                         |
+;        |           +-----------------------------------------------> out0
+;        |           |                +------------------------------> out1
+;        |           |                |                +-------------> out2
+;        |           |                |                |           |   
+;        |      +---------+      +---------+      +---------+      |    
+;        |      |         | car0 |         | car1 |         | car2 |
+;   inc ------->| OneBit  |----->| OneBit  |----->| OneBit  |----> |
+;        |      | Counter |      | Counter |      | Counter |      |
+; start ----+-->|         |  +-->|         |  +-->|         |      |
+;        |  |   +---------+  |   +---------+  |   +---------+      |
+;        |  +----------------+----------------+                    |
+;        +---------------------------------------------------------+
+;
 (define-system ThreeBitCounter  :input ( (inc Bool) (start Bool) )
  :output ( (out0 Bool) (out1 Bool) (out2 Bool) ) 
  :local ( (car0 Bool) (car1 Bool) (car2 Bool) ) 
@@ -1149,8 +1164,6 @@ Specifically, let $t, u, v  \geq 0$ :
     $$
 
     is **satisfiable** in LTL.
-
-
 
 <!--
     $$\begin{array}{rcl}
