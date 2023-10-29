@@ -1,0 +1,1819 @@
+
+%\documentclass[10pt,aspectratio=149,handout]{beamer}
+\documentclass[10pt,aspectratio=149]{beamer}
+
+\usepackage[T1]{fontenc}
+\usepackage[semibold]{sourcesanspro} % good font
+\usepackage[scaled=0.9]{beramono}
+
+\usepackage{pgfpages}
+\usepackage{bm}
+\usepackage{fancyvrb}
+\usepackage{tikz}
+%\usepackage{pgfplots}
+\usepackage{xspace}
+
+\usepackage{alltt}
+\usepackage{latexcolors}
+%\usepackage{version}
+%\usepackage{etoolbox}
+%\usepackage{tcolorbox}
+%\usepackage{boxproof}
+%\usepackage{mathpartir}
+
+\usepackage[framemethod=tikz,roundcorner=4pt]{mdframed}
+%\usepackage[absolute,overlay]{textpos}
+
+\usetikzlibrary{arrows,backgrounds,shadows,shapes}
+\tikzstyle{every picture}+=[remember picture]
+
+\input{beamerstyle}
+\input{macros}
+
+\title{
+{\LARGE A Model Checking Intermediate Language}
+\\[1ex]
+}
+\subtitle{\Large An Overview}
+%
+\author{\large The NSF:CCRI Team}
+
+\date{FMCAD 2023}
+
+%\institute{}
+
+\begin{document}
+%\maketitle
+
+%---------------------------------------------------------------------
+
+\begin{frame}
+\titlepage
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Model Checking Intermediate Language (IL)  goals}
+\large 
+
+The IL has been designed to
+\bigskip
+
+\begin{itemize}
+\item
+be a \alert{general enough} intermediate \alert{target language} for MC
+\medskip
+
+\item
+support a \alert{variety} of user-facing \alert{modeling languages}
+\medskip
+
+\item
+be \alert{directly supported} by tools or \alert{compiled} to lower level languages
+\medskip
+
+\item
+leverage SAT/SMT technology
+\end{itemize}
+
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{General design principles}
+\large
+
+IL models are meant to be \alert{produced and processed} mostly \\
+\alert{by tools}
+\bigskip
+\medskip
+\pause
+
+So the IL was designed to have
+\medskip
+
+\setbeamercovered{transparent=12}
+
+\begin{itemize}
+\item<2,8> \alert{simple}, easily parsable \alert{syntax}
+\item<3,8> a \alert{rich set} of \alert{data types}
+\item<4,8> little syntactic sugar, at least initially
+\item<5,8> \alert{well-understood semantics}
+\item<6,8> a \alert{small} but comprehensive \alert{set of commands}
+\item<7-> \alert{simple translations to lower level} languages \\
+      such as Btor2 and Aiger
+\end{itemize}
+
+\setbeamercovered{transparent=4}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Design principles --- implications }
+\large
+
+\begin{enumerate}
+\item
+\alert{Little direct support} for many of the \alert{features} offered by 
+\medskip
+
+\begin{itemize}\normalsize
+\item
+hardware modeling languages such as VHDL and Verilog or
+\medskip
+
+\item
+system modeling languages such as SMV, TLA+, PROMELA, \\
+UNITY, Lustre
+\end{itemize}
+\bigskip
+\bigskip
+\pause
+
+\item
+However, enough \alert{capability to support} the \alert{reduction} of problems
+in those languages \alert{to} problems in the \alert{IL}
+\end{enumerate}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{IL in a Nutshell}
+
+\alert{Extension} the \alert{SMT-LIB} language with \alert{new commands} to define and check systems
+
+\bigskip
+\smallskip
+\pause
+
+Each \alert{system definition}
+\medskip
+
+\setbeamercovered{transparent=12}
+\begin{itemize}
+\item<2,8>
+defines a \alert{transition system} via the use of SMT formulas
+\medskip
+
+\item<3,8>
+generally imposes \alert{minimal syntactic restrictions} on those formulas
+\medskip
+
+\item<4,8>
+is \empha{parametrized} by a \df{state signature}, a sequence of typed variables
+\medskip
+
+\item<5,8>
+partitions state variables into \alert{input}, \alert{output} and \alert{local} variables
+\medskip
+
+\item<6,8>
+is \alert{hierarchical}, i.e., may include (instances of) previously defined systems as subsystems 
+\medskip
+
+\item<7,8>
+can \alert{encode} \alert{synchronous} \alert{and} (later) \alert{asynchronous} system composition
+\end{itemize}
+\setbeamercovered{transparent=4}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{IL in a Nutshell}
+
+\alert{Extension} the \alert{SMT-LIB} language with \alert{new commands} to define and check systems
+
+\bigskip
+\smallskip
+\pause
+
+Each \alert{verification command}
+\medskip
+
+\setbeamercovered{transparent=12}
+\begin{itemize}
+\item<2,8>
+refers to a \alert{previously defined system}
+\medskip
+
+\item<3,8>
+queries the \emph{reachability} of a one-state formula
+\medskip
+
+\item<4,8>
+can impose environmental assumptions on input
+\medskip
+
+\item<5,8>
+can specifie fairness condition on queries
+\medskip
+
+\item<6,8>
+is \alert{hierarchical}, i.e., may include (instances of) previously defined systems as subsystems 
+\medskip
+
+\item<7,8>
+can \alert{encode} \alert{synchronous} \alert{and} (later) \alert{asynchronous} system composition
+\end{itemize}
+\setbeamercovered{transparent=4}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Current focus}
+\Large
+\centering
+
+\alert{Finite-state} systems
+\bigskip
+\bigskip
+\pause
+
+but with an eye to \alert{infinite-state} systems too
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+%\begin{frame}{Preliminaries}
+%
+%Formally, a transition system is a pair $S$ of predicates of the form
+%{\large
+%\[
+% S \ = \ (\,
+% \lambda\vec i{:}\vec\delta\, \lambda\vec o{:}\vec\tau\: 
+%    \alert{I_S}[\vec i,\vec o,\vec s],\;
+% \lambda\vec i{:}\vec\delta\, \lambda\vec o{:}\vec\tau\,
+% \lambda\vec{i'}{:}\vec\delta\, \lambda\vec{o'}{:}\vec\tau\:
+%   \alert{T_S}[\vec i,\vec o,\vec s, \vec{i'},\vec{o'},\vec{s'}]\,
+% )
+%\]
+%}
+%where 
+%\begin{itemize}
+%\item 
+%$\vec i$ and $\vec{i'}$ are two tuples of \df{input variables}, both of type $\vec\delta$
+%\item 
+%$\vec s$ and $\vec{s'}$ are two tuples of \df{local variables}, both of type $\vec\sigma$
+%\item 
+%$\vec o$ and $\vec{o'}$ are two tuples of \df{output variables}, both of type $\vec\tau$
+%\item 
+%$\alert{I_S}$, the \df{initial state condition} is an SMT-LIB formula with free vars from $[\vec i,\vec o,\vec s]$ 
+%\item
+%$\alert{T_S}$, the \df{transition condition} is an SMT-LIB formula with free vars from $[\vec i,\vec o,\vec s, \vec{i'},\vec{o'},\vec{s'}]$
+%\end{itemize}
+%
+%\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Technical preliminaries}
+
+Formally, a transition system is a pair $S$ of predicates of the form
+{\large
+\[
+ S \ = \ (\,
+ \alert{I_S}[\vec i,\vec o,\vec s],\;
+ \alert{T_S}[\vec i,\vec o,\vec s, \vec{i'},\vec{o'},\vec{s'}]\,
+ )
+\]
+}
+\pause
+
+where 
+\begin{itemize}
+\item 
+$\vec i$ and $\vec{i'}$ are two tuples of \df{input variables} with the same length and type
+\item 
+$\vec o$ and $\vec{o'}$ are two tuples of \df{output variables} with the same length and type
+\item 
+$\vec s$ and $\vec{s'}$ are two tuples of \df{local variables} with the same length and type
+\item 
+$\alert{I_S}$, the \df{initial state condition} is a formula with free vars from $[\vec i,\vec o,\vec s]$ 
+\item
+$\alert{T_S}$, the \df{transition condition} is a formula with free vars from $[\vec i,\vec o,\vec s, \vec{i'},\vec{o'},\vec{s'}]$
+\end{itemize}
+\bigskip
+
+\pause
+\textbf{Note:}
+A (full) state of $S$ is a valuation of $(\vec i,\vec o,\vec s)$
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}[t]{SMT-LIB commands}
+\vspace{5ex}
+
+\only<1>{%
+\textbf{\large As in SMT-LIB}
+\bigskip
+
+\expr{(\kw{set-logic} $L$)}
+\medskip
+
+\expr{(\kw{declare-sort} $s$ $n$)}
+\medskip
+
+\expr{(\kw{define-sort} $s$ ($u_1$ $\,\cdots$ $u_n$) $\tau$)}
+\medskip
+
+\expr{(\kw{declare-fun} $f$ (($x_1$ $\sigma_1$) $\,\cdots$ ($x_n$ $\sigma_n$)) $\sigma$)}
+\medskip
+
+\expr{(\kw{define-fun} $f$ (($x_1$ $\sigma_1$) $\,\cdots$ ($x_n$ $\sigma_n$)) $\sigma$ $t$)}
+\medskip
+
+\expr{(\kw{declare-datatype} $d$ ($\,\cdots$))}
+\medskip
+
+\expr{(\kw{assert} $F$)}
+\medskip
+
+{\small (perhaps a few more)}
+}
+
+\only<2->{%
+\textbf{\large New}
+\bigskip
+
+\expr{(\definesys $S$ $\,\cdots$)}
+\medskip
+
+\expr{(\checksys $S$ $\,\cdots$)}
+\vspace{4ex}
+
+\expr{(\kw{declare-enum-sort} $S$ ($c_1$ $\,\cdots$ $c_n$))}
+\medskip
+
+\expr{(\kw{declare-range-sort} $S$ ($m$ $n$))}
+}
+\vspace{5ex}
+
+\only<3->{%
+\textbf{Note:}
+IL inherits SMT-LIB's concrete syntax, based on s-expressions
+\\
+\phantom{\textbf{Note:}}
+(only prefix operators)
+
+}
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Logical semantics}
+
+A \expr{\definesys} command implicitly defines 
+a \alert{\emph{model}} (i.e., a Kripke structure) 
+of \alert{First-Order} Linear Temporal Logic (FO-LTL)
+\bigskip
+\pause
+
+An FO-LTL formula $F[\vec f, \vec x, \vec x']$ with 
+\smallskip
+
+\begin{itemize}
+\item free (immutable) constants/functions (aka, uninterpreted symbols) from $\vec f$ 
+\item free (mutable) variables from $\vec x, \vec x'$ 
+\end{itemize}
+\smallskip
+
+is \df{satisfiable} in an SMT theory $\T$ if there is
+\smallskip
+\pause
+
+\begin{enumerate}
+\item a $\T$-interpretation $\str I$ of $\vec f$ and 
+\item an infinite trace $\pi$ over $\vec x$ in $\str I$
+\end{enumerate}
+\smallskip
+
+that \alert{satisfy} $F$
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{\only<3->{\alert{Finite-}}Trace semantics}
+\small
+
+Fix
+\begin{itemize}
+\item an FOL-LTL formula $F[\vec f, \vec x, \vec x']$ over a theory $\T$
+\item a $\T$-interpretation $\str I$ of $\vec f$
+\item an infinite trace $\pi = s_0, s_1, \ldots$ \ 
+where $s_i$ is an assignment of $\vec x$ into $\str I$ \ for all $i \geq 0$   
+\end{itemize}
+\bigskip
+
+Let $\pi^i = s_i, s_{i+1}, \ldots$ for all $i \geq 0$
+\bigskip
+\pause
+
+$(\str I, \pi)$ \ \df{\only<3->{$n$-}satisfies $F$} \ \only<3->{for some $n > 0$},
+written $(\str I, \pi) \models\only<3->{_n} F$, iff
+\medskip
+
+\begin{tabular}{lll}
+1. & ${\str I}[\vec x \mapsto s_0(\vec x),\, \vec x' \mapsto s_1(\vec x)]$
+     \ satisfies $F$ 
+   & when $F$ is atomic
+\\[.5ex]
+2. & $({\str I}, \pi) \not\models\only<3->{_n} G$
+   & when $F$ is $\lnot G$
+\\[.5ex]
+3. & $({\str I}, \pi) \models\only<3->{_n} G_j$ \ for $j=1,2$
+   & when $F$ is $G_1 \land G_2$
+\\[.5ex]
+4. & $({\str I}, \pi^1) \models\only<3->{_{n-1}} G$ \only<3->{and $n - 1 > 0$}
+   & when $F$ is $\textbf{next}\ G$
+\\[.5ex]
+5. & $({\str I}, \pi^i) \models\only<3->{_{n-i}} G$ \ for all $i = 0, \ldots, \only<3->{n-1}$
+   & when $F$ is $\textbf{always}\ G$
+\\[.5ex]
+6. & $({\str I}, \pi^i) \models\only<3->{_{n-i}} G$ \ for some $i = 0, \ldots, \only<3->{n-1}$
+  & when $F$ is $\textbf{eventually}\ G$
+\\[.5ex]
+7. & \ldots
+\end{tabular}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\newcommand{\definesystem}{%
+\expr{(\definesys $S$ \\
+\begin{tabular}{l@{~}l@{\;}l}
+ \inputa 
+   & (\,($i_1$ $\mi{\delta}_1$) $\,\cdots$ ($i_m$ $\mi{\delta}_m$)\,)
+   & \comm{; input vars} \\
+ \outputa
+   & (\,($o_1$ $\mi{\tau}_1$) $\,\cdots$ ($o_n$ $\mi{\tau}_n$)\,)
+   & \comm{; output vars} \\
+ \locala 
+   & (\,($s_1$ $\mi{\sigma}_1$) $\,\cdots$ ($s_p$ $\mi{\delta}_p$)\,)
+   & \comm{; local vars} \\
+ \inita 
+   & $I$
+   & \comm{; initial state formula} \\
+ \transa 
+   & $T$
+   & \comm{; transition formula} \\
+ \inva 
+   & $P$
+   & \comm{; invariant formula} \\
+% ~~$\vdots$
+%   & $\vdots$ & \hspace{5em} $\vdots$ \\
+% \inva 
+%   & $P_n$
+%   & \comm{; invariant formula} \\
+\end{tabular} \\
+)
+}}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{}
+\LARGE
+\centering
+\bigskip
+
+\textbf{Model Specification}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}[t]{Atomic system \alert{definition}}
+
+{\large \definesystem}
+\medskip
+
+\only<2>{
+where
+
+\begin{itemize}
+\item
+each var gets a \alert{primed copy}: $i'_1$, \ldots, $o'_1$, \ldots, $s'_1$, \ldots
+
+\item
+$I$ and $P$ are \alert{one-state} formulas (over unprimed vars only)
+
+\item
+$T$ is a \alert{two-state} formula (over unprimed and primed vars)
+
+\item
+all \alert{attributes} are \alert{optional} and
+their \alert{order} is \alert{immaterial}
+
+\begin{itemize}
+\item[${\color{black}\blacktriangleright}$]
+however, \inputa, \outputa, \locala must occur before
+\inita, \transa, \inva 
+\end{itemize}
+\end{itemize}
+}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Default values for missing attributes}
+\centering
+\large
+
+\begin{tabular}{ll}
+ \hline
+ {\bf attribute} & {\bf default} \\
+ \hline
+ \expr{\inputa} & \expr{()} \\
+ \expr{\outputa} & \expr{()} \\
+ \expr{\locala}  & \expr{()} \\
+ \expr{\inita} & \expr{true} \\
+ \expr{\transa}  & \expr{true} \\
+ \expr{\inva}  & \expr{true}
+\end{tabular}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}[t]{Examples}
+
+\expr{\normalsize
+\comm{%
+; The output of Delay is initially in [0,10] and  \\
+; then is the previous input \\
+;} \\
+(\definesys Delay \inputa ((in Int)) \outputa ((out Int)) \\
+~~\inita (<= 0 out 10) \\
+~~\transa (= out' in) \\
+)}
+\bigskip
+
+\only<2->{
+\textbf{Example trace:}
+\medskip
+
+\centering
+
+\begin{tabular}{r|rrrrrrrrr}
+step & 0 & 1 & 2 & 3 & 4 & 5 & 6 & \ldots \\
+\hline
+\expr{in}  & 1 & 2 & 3 & 4 & 3 & 2 & 1 & \ldots \\
+\expr{out} & 9 & 1 & 2 & 3 & 4 & 3 & 2 & \ldots 
+\end{tabular}
+}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}[t]{Examples}
+
+\expr{%
+\comm{%
+; A clocked lossless channel that stutters when clock is false \\
+;} \\
+(\definesys ClockedChannel  \\
+~~\inputa ((clock Bool) (in Int)) \\
+~~\outputa ((out Int)) \\
+~~~~~~~~\comm{; out is unconstrained when clock is false} \\
+~~\inita (=> clock (= out in))  \\
+~~\transa (ite clock' (= out' in') (= out' out)) \\
+)}
+\bigskip
+
+\only<2->{
+\textbf{Example trace:}
+\smallskip
+
+\centering
+
+\begin{tabular}{r|rrrrrrrrr}
+step & 0 & 1 & 2 & 3 & 4 & 5 & 6 & \ldots \\
+\hline
+\expr{clock}  & F & T & T & F & F & T & F & \ldots \\
+\expr{in}     & 1 & 2 & 3 & 4 & 5 & 6 & 7 & \ldots \\
+\expr{out}   & -3 & 2 & 3 & 3 & 3 & 6 & 6 & \ldots 
+\end{tabular}
+}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}[t]{Example: timed light switch}
+
+\only<1>{
+\expr{TimedSwitch} models a timed light switch 
+\smallskip
+
+where, once on,
+the light stays on for 10 steps unless it is switched off before
+\bigskip
+
+A Boolean input is provided as a toggle signal 
+}
+
+\small
+\only<2->{
+\expr{%
+(\kw{define-enum-sort} LightStatus (On Off)) \\[1.5ex]
+}}
+
+%
+\only<2>{
+\expr{%
+\comm{; Guarded-transitions-style definition} \\
+(\definesys TimedSwitch
+  \inputa ((press Bool)) \outputa ((sig Bool)) \\
+~~\locala ((s LightStatus) (n Int)) \\
+~~\inva (= sig (= s On)) \\
+~~\inita (and (= n 0) (ite press (= s On) (= s Off))) \\
+~~\transa (and \\
+~~~~(=> (and (= s~ Off) (not press'))~~~~~~~~~~~\comm{; Off ->} \\
+~~~~~~~~(and (= s' Off) (= n' n)))~~~~~~~~~~~~~~\comm{; Off} \\
+~~~~(=> (and (= s~ Off) press')~~~~~~~~~~~~~~~~~\comm{; Off ->} \\
+~~~~~~~~(and (= s' On)~ (= n' n)))~~~~~~~~~~~~~~\comm{; On} \\
+~~~~(=> (and (= s~ On)~ (not press') (< 10 n))~~\comm{; On ->} \\
+~~~~~~~~(and (= s' On)~ (= n' (+ n 1))))~~~~~~~~\comm{; On} \\
+~~~~(=> (and (= s~ On)~ (or press' (>= n 10))~~~\comm{; On ->} \\
+~~~~~~~~(and (= s' Off) (= n' 0)))~~~~~~~~~~~~~~\comm{; Off} \\
+~~) \\
+)
+}}
+
+\only<3>{
+\expr{%
+\comm{; Set-of-transitions-style definition} \\
+(\definesys TimedSwitch2
+  \inputa ((press Bool)) \outputa ((sig Bool)) \\
+~~\locala ((s LightStatus) (n Int)) \\
+~~\inva (= sig (= s On)) \\
+~~\inita (and (= n 0) (ite press (= s On) (= s Off))) \\
+~~\transa \\
+~~~~(\kw{let} (\comm{; Transitions} \\
+~~~~~~~~~~(stay-off (and (= s Off) (not press') (= s' Off) (= n' n)))  \\
+~~~~~~~~~~(turn-on~ (and (= s Off) press' (= s' On) (= n' n))) \\
+~~~~~~~~~~(stay-on~ (and (= s On) (not press') (< n 10) \\
+~~~~~~~~~~~~~~~~~~~~~~~~~(= s' On) (= n' (+ n 1)))) \\
+~~~~~~~~~~(turn-off (and (= s On) (or press' (>= n 10)) \\
+~~~~~~~~~~~~~~~~~~~~~~~~~(= s' Off) (= n' 0)))  \\
+~~~~~~~~~) \\
+~~~~~~(or stay-off turn-on turn-off stay-on) \\
+~~~~) \\
+)
+}}
+
+
+\only<4>{
+\expr{%
+\comm{; Equational-style definition} \\
+(\definesys TimedSwitch3 
+  \inputa ((press Bool)) \outputa ((sig Bool)) \\
+~~\locala ((s LightStatus) (n Int)) \\
+~~\inva (= sig (= s On)) \\
+~~\inita (and (= n 0) (ite press (= s On) (= s Off))) \\
+~~\transa (and \\
+~~~~(= s' (ite press' (flip s) \\
+~~~~~~~~~~~~(ite (or (= s Off) (>= n 10)) Off \\
+~~~~~~~~~~~~~~On))) \\
+~~~~(= n' (ite (or (= s Off) (s' Off)) 0 \\
+~~~~~~~~~~~~(+ n 1))) \\
+~~) \\
+) \\
+\ \\
+(\kw{define-fun} flip ((s LightStatus)) LightStatus \\
+~~(ite (= s Off) On Off) \\
+) \\
+}}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}[t]{Examples}
+\small
+
+\visible<1->{%
+\expr{%
+(\kw{declare-datatype} Event (par (X) (Abs) (Pres (val X))))
+}
+\medskip
+
+\begin{tabular}{ll}
+Values of sort \expr{(Event Int)}:& \expr{Abs}, \expr{(Pres 12)}, \expr{(Pres -23)}, \ldots
+\\
+Values of sort \expr{(Event Bool)}:& \expr{Abs}, \expr{(Pres true)}, \expr{(Pres false)}
+\end{tabular}
+\bigskip
+
+\visible<2->{
+\expr{%
+\comm{%
+; An event-triggered channel that arbitrarily loses its input data} \\
+(\definesys LossyIntChannel  \\
+~~\inputa ((in (Event Int))) \\
+~~\outputa ((out (Event Int))) \\
+~~\inva (or (= out in) (= out Abs)) \\
+) \\
+}}
+}
+\bigskip
+
+\visible<3->{%
+\expr{%
+\comm{%
+; Equivalent formulation using unconstrained local state} \\
+(\definesys LossyIntChannel  \\
+~~\inputa ((in (Event Int))) \\
+~~\outputa ((out (Event Int))) \\
+~~\locala ((s Bool)) \\
+~~\comm{; input event is relayed or not depending on value of s} \\
+~~\inva (= out (ite s in Abs)) \\
+) \\
+}}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}[t]{Atomic system \alert{definition} --- Semantics}
+
+\definesystem
+%
+\only<2-3>{
+{\large
+\[
+ S = (\alert{I_S}, \alert{T_S})
+   = (I[\vec i,\vec o,\vec s], \ 
+      P[\vec i,\vec o,\vec s] \land
+      T[\vec i,\vec o,\vec s,\vec{i'},\vec{o'},\vec{s'}]
+     )
+\]}
+
+where \ 
+$\vec i = (i_1,\ldots,i_m)$, 
+$\vec o = (o_1,\ldots,o_n)$, 
+$\vec s = (s_1,\ldots,s_n)$
+\bigskip
+}
+
+\visible<3>{\large
+\emph{$S$ denotes the set of all \alert{infinite} traces 
+that satisfy the \alert{FO-LTL} formula}
+\[
+  \alert{I_S}%[\vec i,\vec o,\vec s] 
+  ~\land~
+  \textbf{always}\ \alert{T_S}%[\vec i,\vec o,\vec s,\vec{i'},\vec{o'},\vec{s'}]
+\]}%
+\only<4->{\normalsize
+\textbf{Note:}
+\smallskip
+
+Systems are meant to be \df{progressive}: every reachable state has a successor wrt $T_S$
+\smallskip
+
+However, they may not be because of the generality of $T$ and $P$
+\smallskip
+
+(It is possible to define deadlocking systems)
+}
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}[t]{Composite system \alert{definition}}
+
+\expr{(\definesys $S$ \\
+\begin{tabular}{l@{~}l@{\;}l}
+ \inputa 
+   & (\,($i_1$ $\mi{\delta}_1$) $\,\cdots$ ($i_m$ $\mi{\delta}_m$)\,)
+   & \comm{; input vars} \\
+ \outputa
+   & (\,($o_1$ $\mi{\tau}_1$) $\,\cdots$ ($o_n$ $\mi{\tau}_n$)\,)
+   & \comm{; output vars} \\
+ \locala 
+   & (\,($s_1$ $\mi{\sigma}_1$) $\,\cdots$ ($s_p$ $\mi{\delta}_p$)\,)
+   & \comm{; local vars} \\
+ \subsysa 
+   & (\,$N_1$ ($S_1$ $\vec x_1$ $\vec y_1$)\,)
+   & \comm{; component subsystem} \\
+ $\quad\cdots$ & $\quad\cdots$ & $\quad\cdots$
+ \\
+ \subsysa 
+   & (\,$N_q$ ($S_q$ $\vec x_q$ $\vec y_q$)\,)
+   & \comm{; component subsystem}
+\end{tabular} \\
+)
+}
+
+\small
+\medskip
+
+\only<2->{
+where
+
+\begin{enumerate}
+\item $q > 0$ and each $S_i$ is the name of a system other than $S$
+\item $S_1, \ldots, S_q$ need not be all distinct
+\item each $N_i$ is a local synonym for $S_i$, with $N_1$, \ldots $N_q$ distinct
+\item each $\vec x_i$ consists of $S$'s variables of the same type as $S_i$'s input
+\item each $\vec y_i$ consists of $S$'s local/output variables of the same type as $S_i$'s output
+\item the directed subsystem graph rooted at $S$ is acyclic 
+\end{enumerate}
+}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}[t]{Composite system \alert{definition} extended}
+
+\expr{(\definesys $S$ \\
+\begin{tabular}{l@{~}l@{\;}l}
+ \inputa 
+   & (\,($i_1$ $\mi{\delta}_1$) $\,\cdots$ ($i_m$ $\mi{\delta}_m$)\,)
+   & \comm{; input vars} \\
+ \outputa
+   & (\,($o_1$ $\mi{\tau}_1$) $\,\cdots$ ($o_n$ $\mi{\tau}_n$)\,)
+   & \comm{; output vars} \\
+ \locala 
+   & (\,($s_1$ $\mi{\sigma}_1$) $\,\cdots$ ($s_p$ $\mi{\delta}_p$)\,)
+   & \comm{; local vars} \\
+ \subsysa 
+   & (\,$N_1$ ($S_1$ $\vec x_1$ $\vec y_1$)\,)
+   & \comm{; component subsystem} \\
+ $\quad\cdots$ & $\quad\cdots$ & $\quad\cdots$
+ \\
+ \subsysa 
+   & (\,$N_q$ ($S_q$ $\vec x_q$ $\vec y_q$)\,)
+   & \comm{; component subsystem} \\
+ \inita 
+   & $I$
+   & \comm{; initial state formula} \\
+ \transa 
+   & $T$
+   & \comm{; transition formula} \\
+ \inva 
+   & $P$
+   & \comm{; invariant formula} \\
+\end{tabular} \\
+)
+}
+\vspace{3ex}
+
+\visible<2->{
+\begin{center}
+\large\em Composition is \alert{synchronous} by default
+\end{center}
+}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+%\begin{frame}[t]{Examples}
+%\footnotesize
+%
+%\expr{%
+%;~~~~~~~~+------------------------------------------------------------+ \\
+%;~~~~~~~~|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~| \\
+%;~~~~~~~~|~+--------------------------------------------------------+~| \\
+%;~~~~~~~~|~|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~+-------+~|~| \\
+%;~~~~~~~~+-|-----------------------------------|``-.~~set |~~~~~~~|~|~| \\
+%;~~~~~~~~|~|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~|`-.\_~~~~|~~~~:---->|~~~~|~~|~~| \\
+%;~~~~~~~~| +->|``-.~~~~~~~~~~~~~+--|~~~\_]o--|..-`~~~~~~| Latch~|~|~| \\
+%;~~~~~~~~|~~~~|~~~~:--+----\``-.~~~|~~|.-`~~~~~~~~~~reset |~~~~~~~|-+-+--> out \\
+%;~~~inc -+----|..-`~~~|~~~~~)~~~:--+--------------------->|~~~~~~~|~~~| \\
+%;~~~~~~~~|~~~~~~~~~~~~| +--/..-`~~~~~~~~~~~~~~~~~~~~~~~~~~+-------+~~~| \\
+%;~~~~~~~~|~~~~~~~~~~~~|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~| \\
+%;~start~----------------+~~~~~~~~~~~~~~~~OneBitCounter~~~~~~~~~~~~~~~~| \\
+%;~~~~~~~~|~~~~~~~~~~~~|~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~| \\
+%;~~~~~~~~+------------+-----------------------------------------------+ \\
+%;~~~~~~~~~~~~~~~~~~~~~|     \\
+%;~~~~~~~~~~~~~~~~~~~~~v carry
+%}
+%
+%\end{frame}
+
+%---------------------------------------------------------------------
+\begin{frame}[t]{Examples}
+
+\expr{%
+\comm{; One-step delay} \\
+(\definesys Delay \inputa ((i Int)) \outputa ((o Int)) \\
+~~\locala ((s Int)) \\
+~~\inva (= s i) 
+~~\inita (= o 0)
+~~\transa (= o' s) \\
+)\\
+\comm{; Two-step delay} \\
+(\definesys Delay2 \inputa ((in Int)) \outputa ((out Int)) \\
+~~\locala ((temp Int)) \\
+~~\subsysa (D1 (\alert{Delay} in temp)) \\
+~~\subsysa (D2 (\alert{Delay} temp out)) \\
+)}
+\medskip
+
+\only<2->{
+\textbf{Example trace:}
+\smallskip
+
+\centering
+
+\begin{tabular}{r|rrrrrrrrr}
+step        & 0 & 1 & 2 & 3 & 4 & 5 & 6 & 7 & \ldots \\
+\hline
+\expr{in}   & 2 & 3 & 4 & 5 & 6 & 7 & 8 & 9 & \ldots \\
+\expr{temp} & 0 & 2 & 3 & 4 & 5 & 6 & 7 & 8 &\ldots \\
+\expr{out}  & 0 & 0 & 2 & 3 & 4 & 5 & 6 & 7 & \ldots 
+\end{tabular}
+}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}[t]{Examples}
+\footnotesize
+
+\expr{%
+(\definesys Latch
+  \inputa ((s Bool) (r Bool))
+  \outputa ((o Bool)) \\
+~~\locala ((b Bool)) \\
+~~\transa (= o' (or (and s (or (not r) b)) \\
+~~~~~~~~~~~~~~~~~~~(and (not s) (not r) o))) \\
+)
+\\[1.3ex]
+(\definesys OneBitCounter
+  \inputa ((inc Bool) (start Bool)) \\
+~~\outputa ((out Bool) (carry Bool)) \\
+~~\locala ((set Bool) (reset Bool)) \\
+~~\subsysa (L (\alert{Latch} set reset out)) \\
+~~\inva (and (= set (and inc (not reset))) \\
+~~~~~~~~~~~~(= reset (or carry start)) \\
+~~~~~~~~~~~~(= carry (and inc out))) \\
+)
+\\[1.3ex]
+(\definesys ThreeBitCounter \\
+~~\inputa ((inc Bool) (start Bool)) \\
+~~\outputa ((out0 Bool) (out1 Bool) (out2 Bool)) \\
+~~\locala ((car0 Bool) (car1 Bool) (car2 Bool)) \\
+~~\subsysa (C1 (\alert{OneBitCounter} inc start out0 car0)) \\
+~~\subsysa (C2 (\alert{OneBitCounter} car0 start out1 car1)) \\
+~~\subsysa (C3 (\alert{OneBitCounter} car1 start out2 car2)) \\
+)
+}
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}[t]{Composite system \alert{definition} --- Semantics}
+
+\expr{(\definesys $S$ \\
+\begin{tabular}{l@{~}l@{\;}l}
+ \inputa 
+   & (\,($i_1$ $\mi{\delta}_1$) $\,\cdots$ ($i_m$ $\mi{\delta}_m$)\,)
+   & \comm{; input vars} \\
+ \outputa
+   & (\,($o_1$ $\mi{\tau}_1$) $\,\cdots$ ($o_n$ $\mi{\tau}_n$)\,)
+   & \comm{; output vars} \\
+ \locala 
+   & (\,($s_1$ $\mi{\sigma}_1$) $\,\cdots$ ($s_p$ $\mi{\delta}_p$)\,)
+   & \comm{; local vars} \\
+ \subsysa 
+   & (\,$N_1$ ($S_1$ $\vec x_1$ $\vec y_1$)\,)
+   & \comm{; component subsystem} \\
+ $\quad\cdots$ & $\quad\cdots$ & $\quad\cdots$
+ \\
+ \subsysa 
+   & (\,$N_q$ ($S_q$ $\vec x_q$ $\vec y_q$)\,)
+   & \comm{; component subsystem}
+\end{tabular} \\
+)
+}
+\bigskip
+
+\small
+
+\only<2>{
+Let \ 
+\(
+ S_k = (\,
+   \alert{I_k}[\vec i_k,\vec o_k,\vec s_k],\;
+   \alert{T_k}[\vec i_k,\vec o_k,\vec s_k,\vec{i'}_k,\vec{o'}_k,\vec{s'}_k]
+   \,)
+\)
+for $k = 1, \ldots, q$,
+with $\vec s_1, \ldots, \vec s_q$ all distinct
+\smallskip
+
+Let \ 
+$\vec i = (i_1, \ldots, i_m)$, \ 
+$\vec o = (o_1, \ldots, o_n)$, \ 
+$\vec s = s_1, \ldots, s_q, \vec s_1, \ldots, \vec s_q$
+
+{\normalsize
+\[
+S = (\alert{I_S}[\vec i,\vec o,\vec s], 
+     \alert{T_S}[\vec i,\vec o,\vec s,\vec{i'},\vec{o'},\vec{s'}])
+\]
+
+\begin{tabular}{l@{\qquad}l@{\qquad\quad}l}
+ with
+ &
+ $\alert{I_S} ~=~ 
+ \bigwedge_{k=1}^q \alert{I_k}[\vec x_k,\vec y_k,\vec s_k]$
+ &
+ $\alert{T_S} ~=~ 
+ \bigwedge_{k=1}^q \alert{T_k}[\vec x_k,\vec y_k,\vec s_k,\vec{x'}_k,\vec{y'}_k,\vec{s'}_k]$
+\end{tabular}
+}}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}[t]{Composite system \alert{definition} extended --- Semantics}
+
+\expr{(\definesys $S$ \\
+\begin{tabular}{l@{~}l@{\;}l}
+ \inputa 
+   & (\,($i_1$ $\mi{\delta}_1$) $\,\cdots$ ($i_m$ $\mi{\delta}_m$)\,)
+   & \comm{; input vars} \\
+ \outputa
+   & (\,($o_1$ $\mi{\tau}_1$) $\,\cdots$ ($o_n$ $\mi{\tau}_n$)\,)
+   & \comm{; output vars} \\
+ \locala 
+   & (\,($s_1$ $\mi{\sigma}_1$) $\,\cdots$ ($s_p$ $\mi{\delta}_p$)\,)
+   & \comm{; local vars} \\
+ \subsysa 
+   & (\,$N_1$ ($S_1$ $\vec x_1$ $\vec y_1$)\,)
+   & \comm{; component subsystem} \\
+ $\quad\cdots$ & $\quad\cdots$ & $\quad\cdots$
+ \\
+ \subsysa 
+   & (\,$N_q$ ($S_q$ $\vec x_q$ $\vec y_q$)\,)
+   & \comm{; component subsystem} \\
+ \inita 
+   & $I$
+   & \comm{; initial state formula} \\
+ \transa 
+   & $T$
+   & \comm{; transition formula} \\
+ \inva 
+   & $P$
+   & \comm{; invariant formula} \\
+\end{tabular} \\
+)
+}
+
+\[
+S = (\alert{I_S}[\vec i,\vec o,\vec s], 
+     \alert{T_S}[\vec i,\vec o,\vec s,\vec{i'},\vec{o'},\vec{s'}])
+\]
+
+\begin{tabular}{l@{\qquad}l@{\qquad}l}
+ with
+ &
+ $\alert{I_S} ~=~ 
+ \alert{I} \land 
+ \bigwedge_{k=1}^q \alert{I_k}[\vec x_k,\vec y_k,\vec s_k]$
+ &
+ $\alert{T_S} ~=~ 
+ \alert{P} \land \alert{T} \land 
+ \bigwedge_{k=1}^q \alert{T_k}[\vec x_k,\vec y_k,\vec s_k,\vec{x'}_k,\vec{y'}_k,\vec{s'}_k]$
+\end{tabular}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}[t]{Expressiveness}
+
+\alert{\definesys + SMT-LIB commands and types} appear sufficient
+
+to allow faithful reductions from (full or large fragment of)
+\medskip
+
+\begin{itemize}
+\item Moore and Mealy machines
+\item I/O automata
+\item SMV and nuXMV
+\item UNITY
+\item TLA+
+\item Reactive Modules
+\item Lustre
+\item SAL
+\end{itemize}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{}
+\LARGE
+\centering
+\bigskip
+
+\textbf{Model Checking}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}[t]{System \alert{checking} command \only<4->{--- Semantics}}
+
+\expr{%
+(\checksys $S$ \\
+\begin{tabular}{l@{~}l@{\;}l}
+ \inputa 
+   & (\,($i_1$ $\mi{\delta}_1$) $\,\cdots$ ($i_m$ $\mi{\delta}_m$)\,)
+   & \comm{; renaming of S's input vars} \\
+ \outputa
+   & (\,($o_1$ $\mi{\tau}_1$) $\,\cdots$ ($o_n$ $\mi{\tau}_n$)\,)
+   & \comm{; renaming of S's output vars} \\
+ \locala 
+   & (\,($s_1$ $\mi{\sigma}_1$) $\,\cdots$ ($s_p$ $\mi{\delta}_p$)\,)
+   & \comm{; renaming of S's local vars} \\
+ \assumptiona
+   & ($a$ $A$)
+   & \comm{; environmental assumption} \\
+ \reachablea 
+   & ($r$ $R$)
+   & \comm{; reachability condition} \\
+ \fairnessa 
+   & ($f$ $F$)
+   & \comm{; fairness condition} \\
+ \currenta 
+   & ($c$ $C$)
+   & \comm{; initiality condition } \\
+ \only<1-3,7->{%
+ \querya 
+   & ($q$ ($g_1$ $\,\cdots$ $g_q$))
+   & \comm{; trace query to be checked }
+ }%
+ \only<4>{%
+   \alert{\querya} & ($q$ ($a$ $r$))
+ }%
+ \only<5>{%
+   \alert{\querya} & ($q$ ($a$ $f$ $r$))
+ }%
+ \only<6>{%
+   \alert{\querya} & ($q$ ($a$ $c$ $r$))
+ }%
+% \\
+% \only<7>{%
+%   \alert{\queriesa} & (($q_1$ ($g_{1,1}$ $\,\cdots$ $g_{1,q_1}$)) $\cdots$ ($q_k$ ($g_{k,1}$ $\,\cdots$ $g_{k,q_k}$)))
+% }%
+\end{tabular} \\
+)
+}
+\medskip
+
+
+\only<2>{\small
+where
+\begin{itemize}
+\item $a$, $r$, $f$, $c$, $q$\: are \alert{identifiers}; 
+ each $g_i$ ranges over $\{a,\,r,\,f,\,c\}$
+\item $C$\: is a \alert{one-state (non-temporal) formula} over the given vars
+\item $A$, $R$, $F$\: are \alert{one- or two-state (non-temporal) formulas} over the given vars
+\item
+all \alert{attributes} are \alert{optional} and their \alert{order} is \alert{immaterial}
+\item
+all attributes but the first three are \alert{repeatable}
+\end{itemize}
+}
+
+
+%\only<4>{
+%\medskip
+%\textbf{Notation}
+%\medskip
+%
+%\(\begin{array}{r}
+% \textbf{always}_n\ P \\[.6ex]
+% \textbf{eventually}_n\ P
+%\end{array}
+%\)
+%are satisfiable if they are $n$-satisfied by some 
+%}
+
+\only<4-6>{
+\smallskip
+Query $q$ \alert{succeeds} iff the formula below is \alert{\only<4,6>{$\alert{n}$-}satisfiable} in LTL%
+\only<4,6>{ \alert{for some} $n > 0$}
+\[
+ \only<6>{C} 
+ \only<1-5>{I_S}
+ \only<1-6>{\land \textbf{always}\ T_S}
+ \land \textbf{always}\ A
+ \land \textbf{eventually}\ R
+ \uncover<5>{\land \textbf{always}\ \textbf{eventually}\ F}
+\]
+\small
+where
+$I_S$ and $T_S$ are the initial state and transition predicates of $S$
+\alert{modulo} the renamings above 
+}
+\only<7->{
+\medskip
+
+For each successful query, 
+%\smallskip
+%
+%\quad 
+the model checker is expected to produce
+\begin{itemize}
+\item a \alert{$\T$-interpretation} $\str I$ (of the free immutable symbols) and
+\item a \df{witnessing} trace in $\str I$
+\end{itemize}
+\medskip
+}
+
+\only<8->{
+\centering
+\em Different queries may be given different interpretations and traces
+}
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Example --- Non-deterministic arbiter}
+
+\expr{%
+(\definesys NonDetArbiter \\
+~~\inputa~~((r1 Bool) (r2 Bool)) \\
+~~\outputa ((g1 Bool) (g2 Bool)) \\
+~~\locala ((s Bool)) \\
+~~\inva (and \\
+~~~~(=> (and (not r1) (not r2)) \\
+~~~~~~~~(and (not g1) (not g2))) \\
+~~~~(=> (and r1 (not r2)) \\
+~~~~~~~~(and g1 (not g2))) \\
+~~~~(=> (and (not r1) r2) \\
+~~~~~~~~(and (not g1) g2)) \\
+~~~~(=> (and r1 r2) \\
+~~~~\comm{; unconstrained value of s used as non-deterministic choice} \\
+~~~~~~~~(ite s (and g1~~~~~~~(not g2)) \\
+~~~~~~~~~~~~~~~(and (not g1) g2~~~~~))) \\
+~~) \\
+)
+}
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Example --- Non-deterministic arbiter}
+
+\expr{%
+(\checksys NonDetArbiter \\
+~~\inputa ((req1 Bool) (req2 Bool)) \\
+~~\outputa ((gr1 Bool) (gr2 Bool)) \\[1ex]
+~~\comm{; There are never concurrent requests} \\
+~~\assumptiona (a1 
+      (not (and req1 req2))) \\[1ex]
+~~\comm{; The same request is never issued twice in a row} \\
+~~\assumptiona (a2 (and (=> req1 (not req1')) \\
+~~~~~~~~~~~~~~~~~~~~~~~(=> req2 (not req2')))) \\[1ex]
+~~\comm{; Neg of:~Every request is immediately granted} \\
+~~\reachablea (r (not (and (=> req1 gr1) (=> req2 gr2)))) \\[1ex]
+~~\comm{; check the reachability of r under assumptions a1 and a2} \\
+~~\querya (q (a1 a2 r)) \\
+)
+}
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Example --- Temporal queries}
+
+\scriptsize
+\expr{%
+(\definesys Historically \inputa ((b Bool)) \outputa ((hb Bool)) \\
+~~\inita (= hb b)  \transa (= hb' (and b' hb))) 
+\\[1.4ex]
+(\definesys Before \inputa ((b Bool)) \outputa ((bb Bool)) \\
+~~\inita (= bb false) \transa (= bb' b)) 
+\\[1.4ex]
+(\definesys Count \inputa ((b Bool)) \outputa ((c Int)) \\
+~~\inita (= c (ite b 1 0)) \transa (= c' (+ c (ite b' 0 1)))) 
+\\[1.4ex]
+(\definesys Monitor \inputa ((r1 Bool) (r2 Bool))
+  \outputa ((g1 Bool) (g2 Bool)) \\
+~~\locala ((a1 Bool) (a2 Bool) (b0 Bool) (b1 Bool) (b2 Bool) \\
+~~~~~~~~~  (h1 Bool) (h2 Bool) (c Int) (bf Bool)) \\
+~~\subsysa (NDA (NonDetArbiter r1 r2 g1 g2)) \\
+~~\subsysa (His1 (Historically a1 h1)) \\
+~~\subsysa (His2 (Historically a2 h2)) \\
+~~\subsysa (Cnt (Count g1 c)) \\
+~~\subsysa (Bf (Before b0 bf)) \\
+~~\inva (and \\
+~~~~~\comm{; a1 = no concurrent requests~~~~~~~a2 = no concurrent grants} \\
+~~~~(= a1 (and (not r1) (not r2))) ~~ (= a2 (and (not g1) (not g2))) ~~ (= b0 (= c 4)) \\
+~~~~(= b1 (=> h1 h2)) \comm{; b1 = if there have been no requests, there have been no grants}\\
+~~~~(= b2 (=> bf (not g1))))) \comm{; b2 = a request is granted at most 4 times}
+\\[1.4ex]
+(\checksys Monitor
+  \inputa ((r1 Bool) (r2 Bool)) \\
+~~\outputa ((g1 Bool) (g2 Bool)) \\
+~~\locala (\_ \_ \_ (b1 Bool) (b2 Bool) \_ \_ \_ \_) \\
+~~\assumptiona (A (not (and r1 r2)))
+  \reachablea (R (not (and b1 b2))) 
+  \querya (Q1 (A R)) \\
+)
+}
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Example --- Multiple queries}
+
+{\footnotesize
+\expr{%
+(\checksys NonDetArbiter
+  \inputa ((r1 Bool) (r2 Bool)) \\[.8ex]
+~~\outputa ((g1 Bool) (g2 Bool)) \\[.8ex]
+~~\assumptiona (a (not (and r1 r2))) \\[.8ex]
+~~\comm{; Neg of:~Every request is (immediately) granted} \\
+~~\reachablea (p1 (not (and (=> r1 g1) (=> r2 g2)))) \\[.8ex]
+~~\comm{; Neg of:~In the absence of other requests, every request is granted} \\
+~~\reachablea (p2
+      (not (=> (!= r1 r2) 
+          (and (=> r1 g1) (=> r2 g2))))) \\[.8ex]
+~~\comm{; Neg of:~A request is granted only if present} \\
+~~\reachablea (p3 
+      (not (and (=> g1 r1) (=> g2 r2)))) \\[.8ex]
+~~\comm{; Neg of:~At most one request is granted at any one time} \\
+~~\reachablea (p4 
+      (not (not (and g1 g2)))) \\[.8ex]
+~~\comm{; Neg of:~In case of concurrent requests, one of them is always granted} \\
+~~\reachablea (p5 
+      (not (=> (and r1 r2) (or g1 g2)))) \\[.8ex]
+~~\querya (q1 (a p1))
+  \querya (q2 (a p2))
+  \querya (q3 (a p3)) \\
+~~\querya (q4 (a p4))
+  \querya (q5 (a p5)) \\
+)
+}
+}
+{\small
+\medskip
+
+Each query can be witnessed 
+by a \alert{different} $\T$-interpretation and trace in it
+}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{\alert{Output format} for \checksys}
+\smallskip
+\footnotesize
+
+\expr{%
+(\definesys $A$
+  \inputa  (($i$ $\sigma_A$))
+  \outputa (($o$ $\tau_A$)) 
+  \locala (($s$ $\theta_A$))
+  $\ldots$
+)
+\ \\[1.3ex]
+(\definesys $B$
+  \inputa  (($i$ $\sigma_B$))
+  \outputa (($o$ $\tau_B$))
+  \locala (($s$ $\theta_B$)) \\
+~\subsysa ( $\cdots$ (S (A $\cdots$)) $\cdots$) $\ldots$
+)
+\ \\[1.2ex]
+(\checksys $B$ ~$\cdots$~
+ \fairnessa ($f$ $\cdots$)~
+ \reachablea ($r$ $\cdots$)~
+ $\cdots$~ \\
+~\querya ($q$ ($r$ $f$ $\cdots$)) $\cdots$  )\\ %\querya ($q_n$ ($r_{n,1}$ $\cdots$)))\\
+}
+\bigskip
+Output:
+\medskip
+
+\expr{%
+(\checkres \\
+~\querya (q :result sat :model m :trace t) \\
+~\modela ($\:\cdots$) ~~~~~~~~\;\comm{; SMT-LIB interpretation of free symbols} \\
+~\traila ($p$ (\comm{; state sequence} \\
+~~~~~~~~~~~~(($i$ $i_0$) ($o$ $o_0$) ($s$ $s_0$)
+                  ($S$::$i$ $i_{S,0}$) ($S$::$o$ $o_{S,0}$) ($S$::$s$ $s_{S,0}$) ($r$ $r_0$) ($f$ $f_0$)$\cdots$) \\
+~~~~~~~~~~~~~~~~$\cdots$ \\
+~~~~~~~~~~~~(($i$ $i_k$) ($o$ $o_k$) ($s$ $s_k$)
+                  ($S$::$i$ $i_{S,k}$) ($S$::$o$ $o_{S,k}$) ($S$::$s$ $s_{S,k}$) ($r$ $r_k$) ($f$ $f_k$) $\cdots$) \\
+~~~~~~~~~~~)\\
+~~~~~~~~) \\
+~\traila ($l$ ( $\cdots$ )) \\
+%~:\traila ($l$ ((($i$ $i_{n}$) ($o$ $o_{n}$) ($s$ $s_{n}$)
+%                  ($S$::$i$ $i_{S,n}$) ($S$::$o$ $o_{S,n}$) ($S$::$s$ $s_{S,n}$) ($r$ $r_n$) $\cdots$)\\
+%~~~~~~~~~~~~~~~~$\cdots$ \\
+%~~~~~~~~) \\
+~~~~~~$\cdots$ \\
+~\tracea ($q$ \prefixa $p$ \lassoa $l$) \comm{; witness trace for query $q$ is $pl^\omega$} \\
+~$\cdots$ \\
+)
+}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Additional features}
+\large
+
+\begin{itemize}\setlength{\itemsep}{3ex}
+
+\item Special predicate for \alert{frame conditions}
+ 
+\item Special predicate for \alert{deadlock states}
+ 
+\item \alert{Aggregate} queries 
+\end{itemize}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Planned extensions}
+\large
+
+\begin{itemize}\setlength{\itemsep}{3ex}
+
+\item \alert{Executable} system definitions 
+ 
+\item \alert{Parametric} models
+ 
+ \end{itemize}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Resources}
+
+Available at \url{https://github.com/ModelChecker/FMCAD23-Tutorial}
+\smallskip
+
+\begin{itemize}
+\item These slides
+\item Examples of systems and queries
+\item Syntax highlighting for VS Code 
+\item Executables of an experimental version of Kind 2 model checker with MCIL front-end
+\end{itemize}
+\vspace{3ex}
+
+Available at \url{https://github.com/ModelChecker/IL}
+\smallskip
+
+\begin{itemize}
+\item Detailed document of IL definition
+\end{itemize}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{What's intentionally missing (and why)}
+\smallskip
+
+\begin{itemize}
+\item
+Restrictions to just bit vector types \\[.5ex]
+\uncover<2,8>{\empha{Other types are useful!}}
+\smallskip
+
+\item
+Stronger syntactic restrictions for \inita and \transa formulas \\[.5ex]
+\uncover<3,8>{\empha{Should be enforced in the user-facing language}}
+\smallskip
+
+\item
+Direct support for LTL, or your favorite temporal logic, in \checksys \\[.5ex]
+\uncover<4,8>{\empha{Generality, mostly}}
+\smallskip
+
+\item
+Global (mutable) variables \emph{a la} SAL \\[.5ex]
+\uncover<5,8>{\empha{Tricky to get right}}
+\smallskip
+
+\item
+Parametric components as in SMV or SAL \\[.5ex] 
+\uncover<6,8>{\empha{Some support. The rest is better provided in the user-facing language }}
+\smallskip
+
+\item
+Compositional reasoning features
+(i.e., assume-guarantee contracts) \\[.5ex]
+\uncover<7,8>{\empha{Too many different approaches out there}}
+\smallskip
+
+%\item
+%Commands for getting the results of the analysis \\[.5ex]
+%\uncover<8->{\empha{Currently working on them!}}
+\end{itemize}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{}
+\LARGE
+\centering
+\bigskip
+
+\textbf{Additional Features}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Special predicate:\, \expr{Deadlock}}
+
+For every system 
+$S = (\,
+  I_S[\vec i, \vec o, \vec s],\: 
+  T_S[\vec i, \vec o, \vec s, \vec{i'}, \vec{o'}, \vec{s'}]
+ \,)
+$
+\medskip
+
+\expr{Deadlock} is a predicate (implicitly) over $\vec i, \vec o, \vec s$
+\bigskip
+\medskip
+\pause
+
+\begin{center}
+A state
+$\{
+ \vec i \mapsto \vec i_0,\, 
+ \vec o \mapsto \vec o_0,\,
+ \vec s \mapsto \vec s_0 
+\}$ 
+satisfies \expr{Deadlock}, or
+
+\df{is deadlocked},
+\smallskip
+
+iff
+\smallskip
+
+it satisfies the formula \ 
+$\exists \vec{i'}\, \forall \vec{o'}\, \forall \vec{s'}\, 
+ \lnot T_S[\vec i,\vec o,\vec s,\vec{i'},\vec{o'},\vec{s'}]
+$
+\end{center}
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Uses of \ \expr{Deadlock}}
+
+\textbf{\large Examples}
+\bigskip
+
+\begin{itemize}
+\item
+\expr{%
+(\checksys $S$ $\,\cdots$ \\
+\quad \assumptiona ($a$ $A$) \;\currenta ($d$ Deadlock) \;\querya ($a$ $d$))
+} \\[.7ex]
+checks the \alert{existence} of deadlocked states under assumption $A$
+\bigskip
+\pause
+
+\item
+\expr{%
+(\checksys $S$ $\,\cdots$ \\
+\quad \assumptiona ($a$ $A$) \;\reachablea ($d$ Deadlock) \;\querya ($a$ $d$))
+} \\[.7ex]
+checks the \alert{reachability} of deadlocked states under assumption $A$
+\bigskip
+\pause
+
+\item
+\expr{%
+(\checksys $S$ $\,\cdots$ \\
+\quad \fairnessa ($f$ true) \;\reachablea ($r$ $R$) \;\querya ($f$ $r$))
+} \\[.7ex]
+checks the \alert{reachability} of $R$ on \alert{infinite} 
+(hence deadlock-free) traces
+\end{itemize}
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Special predicate:\, \expr{OnlyChange}}
+
+For every system 
+$S = (\,
+  I_S[\vec i, \vec o, \vec s],\: 
+  T_S[\vec i, \vec o, \vec s, \vec{i'}, \vec{o'}, \vec{s'}]
+ \,)
+$
+\bigskip
+
+\expr{OnlyChange} is a \emph{multi-arity} predicate over $\vec o, \vec s, \vec{o'}, \vec{s'}$:
+
+\begin{eqnarray*}
+ \expr{OnlyChange}(x_1, \ldots, x_n) & \equiv &
+ \bigwedge 
+ \{ y' = y \mid 
+    y \in (\vec o \cup \vec s \cup \vec{o'} \cup \vec{s'}) \setminus 
+    \{ x_1, \ldots, x_n \}
+ \}
+\end{eqnarray*}
+
+
+\alert{Fixes} the value of all \alert{output and local} variables 
+\alert{not in} $(x_1, \ldots, x_n)$
+\bigskip
+\bigskip
+\pause
+
+It is a useful \alert{abbreviation} in transition conditions to express 
+transitions \\
+that leave many state variables unchanged 
+
+\bigskip
+\pause
+
+\textbf{Note:}
+$\expr{OnlyChange}(x_1, \ldots, x_n)$ does not actually constrain the $x_i$'s
+in any way
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{Example}
+\small
+
+\expr{%
+\comm{; increment $n_i$ iff $n = i$; $n_i$ is 0 initially if not incremented} \\[.7ex]
+(\definesys Increment 
+  \inputa ((i Int)) \\
+~~\outputa ((inc Bool) (n1 Int) (n2 Int) $\,\cdots$ (n5 Int)) \\
+~~\inva (= inc (<= 1 i 5)) \\
+~~\inita (and \\
+~~~~(=> (= n 1) (and (= n1 1) (= n2 n3 n4 n5 0))) \\
+~~~~~$\vdots$ \\
+~~~~(=> (= n 5) (and (= n5 1) (= n1 n2 n3 n4 0))) \\
+~~~~(=> (not (<= 1 n 5)) (= n1 n2 n3 n4 n5 0)) \\
+~~) \\
+~~\transa (and \\
+~~~~(=> (= n' 1) (and (= n1' (+ n1 1)) (OnlyChange inc n1))) \\
+~~~~~$\vdots$ \\
+~~~~(=> (= n' 5) (and (= n5' (+ n5 1)) (OnlyChange inc n5))) \\
+~~~~(=> (not (<= 1 n' 5)) (OnlyChange inc)) \\
+~~) \\
+)
+}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}[t]{\alert{Aggregate} queries}
+
+\expr{%
+(\checksys $S$ \\
+\begin{tabular}{ll}
+ \inputa 
+   & (\,($i_1$ $\mi{\delta}_1$) $\,\cdots$ ($i_m$ $\mi{\delta}_m$)\,) \\
+ \outputa
+   & (\,($o_1$ $\mi{\tau}_1$) $\,\cdots$ ($o_n$ $\mi{\tau}_n$)\,) \\
+ $\vdots$ \\  
+   \alert{\queriesa} & (($q_1$ ($g_{1,1}$ $\,\cdots$ $g_{1,n_1}$)) $\cdots$ ($q_k$ ($g_{k,1}$ $\,\cdots$ $g_{k,n_k}$)))
+% }%
+\end{tabular} \\
+)
+}
+\bigskip
+
+
+\begin{itemize}
+\item Each query $q_i$ can be witnessed by a \alert{different trace}
+\item However, each free immutable symbol has the \alert{same interpretation} \\
+      across all queries
+\end{itemize}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{}
+\LARGE
+\centering
+\bigskip
+
+\textbf{Possible Extensions}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{\alert{Executable} system definitions}
+
+%\textbf{Example}
+%\medskip
+
+Local and output variables are defined exclusively equationally
+\medskip
+
+{\footnotesize
+
+\expr{%
+(\definesys TimedSwitch 
+  \inputa ((press Bool)) \outputa ((sig Bool)) \\
+~~\locala ((s LightStatus) (n Int)) \\
+~~\attr{inv-def} ( \\
+~~~~(sig (= s On)) \\
+~~) \\
+~~\attr{init-def} ( \\
+~~~~(n 0) \\
+~~~~(s (ite press On Off)) \\
+~~) \\
+~~\attr{next-def} ( \\
+~~~~(s' (ite press' (ite (= s Off) On Off)) \\
+~~~~~~~~~~(ite (= s Off) Off (ite (< n 10) On Off)))) \\
+~~~~(n' (ite (or (= s Off) (s' Off)) 0 (+ n 1))) \\
+~~))
+}
+}
+\medskip
+
+\small
+\textbf{Restrictions:} (guaranteeing progressiveness and executability)
+\begin{itemize}
+\item Each local or output variable must be listed in \expr{\attr{inv-def}} or \\
+      in both \expr{\attr{init-def}} and \expr{\attr{next-def}}
+\item No definitional cycles
+\item No uninterpreted symbols
+\end{itemize}
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\begin{frame}{\alert{Parametric} definitions}
+%\textbf{Example}
+%\medskip
+%
+\footnotesize
+
+\expr{%
+(\definesys Delay
+  \alert{\parama} ((\alert{V} Sort) (\alert{d} \alert{V}) (\alert{n} Int))
+  \inputa ((in \alert{V})) \\
+~~\outputa ((out \alert{V})) \\
+~~\locala ((a (Array Int \alert{V}))) \\
+~~\inva (and \\
+~~~~(= in (select a 0)) \\
+~~~~(= out (select a \alert{n})) \\
+~~) \\
+~~\inita (forall ((i Int)) (=> (<= 1 i \alert{n}) \\
+~~~~~~~~~~~(= (select a i) \alert{d})) \\
+~~~~~~~~) \\
+~~\transa (forall ((i Int)) (=> (<= 1 i \alert{n})) \\
+~~~~~~~~~~~~(= (select a' i) (select a (- i 1)))) \\
+~~~~~~~~~) \\
+) \\
+\ \\
+(\checksys Delay
+  \alert{\parama} ((\alert{V} String) (\alert{d} "") (\alert{n} 4))
+  \inputa ((in String)) \\
+~~\outputa ((out String)) \\
+~~\locala ((a (Array Int String))) \\
+~~\ldots \\
+)
+}
+\medskip
+
+\small
+\textbf{Restrictions:}
+parameters are immutable (rigid)
+
+\end{frame}
+
+%---------------------------------------------------------------------
+
+\end{document}
