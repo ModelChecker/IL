@@ -1,7 +1,7 @@
 ---
 title: Model Checking Intermediate Language (Draft)
 author: Cesare Tinelli
-date: 2022-11-13
+date: 2022-10-18
 ---
 
 --------------------------------------------------------------------------------
@@ -463,19 +463,11 @@ is a transition system whose behavior consists of all the (infinite) executions
 $(\mathcal I, \pi)$ over $\boldsymbol{v}$ such that
 
 $$(\mathcal I, \pi) \models
-  I_S[\boldsymbol{v}] \land \mathbf{always}\ T_S[\boldsymbol{v},\boldsymbol{v'}]
+  I[\boldsymbol{v}] \land \mathbf{always}\ (P[\boldsymbol{v}] \land T[\boldsymbol{v},\boldsymbol{v'}]) \ .
 $$
 
-where
-&nbsp;&nbsp;
-$I_S[\boldsymbol{v}] = I[\boldsymbol{v}] \land P[\boldsymbol{v}]$
-&nbsp;&nbsp;
-and
-&nbsp;&nbsp;
-$T_S[\boldsymbol{v},\boldsymbol{v'}] = T[\boldsymbol{v},\boldsymbol{v'}] \land P[\boldsymbol{v'}]$ .
-
-We call $I_S$ _the initial state predicate_ of $S$ and
-call $T_S$ _the transition predicate_ of $S$.
+We call $I_S = I[\boldsymbol{v}]$ _the initial state predicate_ of $S$ and
+$T_S = P[\boldsymbol{v}] \land T[\boldsymbol{v},\boldsymbol{v'}]$ _the transition predicate_ of $S$.
 
 
 > **Note:**
@@ -500,12 +492,12 @@ with a  declaration of the form
 >  <tt>(define-system $S$ :input ( ( $i_1$ $\sigma_1$ ) $\cdots$ ( $i_m$ $\sigma_m$ ) )</tt><br>
 >  <tt>&nbsp;:output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) )</tt><br>
 >  <tt>&nbsp;:local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) )</tt><br>
->  <tt>&nbsp;:init (and $I$ $P$)</tt><br>
->  <tt>&nbsp;:trans (and $T$ $P'$)</tt><br>
+>  <tt>&nbsp;:init $I$</tt><br>
+>  <tt>&nbsp;:trans (and $P$ $T$)</tt><br>
 >  <tt>)</tt>
 >
->where $P'$ is the formula obtained from $P$ by priming all the system variables in $P$.
->
+
+
 > **Note:**
 Systems are meant to be progressive: every reachable state has a successor
 with respect $T_S$.
@@ -533,7 +525,7 @@ No local variables are needed.
  :init (= o 0)
  :trans (= o' i) ; the new output is the old input
 )
-````
+```
 
 A variant of <tt>Delay</tt> where the output is initially any number in [0,10].
 
@@ -542,7 +534,7 @@ A variant of <tt>Delay</tt> where the output is initially any number in [0,10].
  :init (<= 0 o 10) ; more than one possible initial output
  :trans (= o' i)
 )
-````
+```
 
 A clocked lossless channel, stuttering when the clock is not ticking.
 The clock is represented by a Boolean input variable <tt>clock</tt>.
@@ -565,7 +557,7 @@ where <tt>X</tt> is the type of the data carried by the event.
   (absent)
   (present (val X))
 )))
-````
+```
 
 An event-triggered channel that arbitrarily loses its input data.
 
@@ -575,7 +567,7 @@ An event-triggered channel that arbitrarily loses its input data.
  :output ((o (Event Int)))
  :inv (or (= o i) (= o absent))
 )
-````
+```
 
 Equivalent formulation using unconstrained local state.
 
@@ -588,7 +580,7 @@ Equivalent formulation using unconstrained local state.
  ; or not depends on value of s
  :inv (= o (ite s i absent))
 )
-````
+```
 
 <tt>TimedSwitch</tt> models a timed light switch where the light stays
 on for at most 10 steps unless it is switched off before.
@@ -673,29 +665,30 @@ Another variant but in equational style.
 
 The non-deterministic arbiter below grants input requests expressed
 by the Boolean inputs <tt>r1</tt> and <tt>r2</tt>.
-Initially, no requests are granted. Afterwards, a request is always granted,
+A request is always granted,
 expressed by the Boolean outputs <tt>g1</tt> or <tt>grant2</tt>,
 if it is the only request.
 When both inputs contain a request, one of the two request is granted,
 with a non-deterministic  choice.
+Since the output depends only on the current values of input and
+local variables, the systems can be specified simply by an invariant.
 
 ```smt
 (define-system NonDetArbiter
  :input ( (r1 Bool) (r2 Bool) )
  :output ( (g1 Bool) (g2 Bool) )
  :local ( (s Bool) )
- :init ( and (not g1) (not g2) )  ; nothing is granted initially
- :trans (and
-  (=> (and (not r1') (not r2'))
-      (and (not g1') (not g2')))
-  (=> (and r1' (not r2'))
-      (and g1' (not g2')))
-  (=> (and (not r1') r2')
-      (and (not g1') g2'))
-  (=> (and r1' r2')
+ :inv (and
+  (=> (and (not r1) (not r2))
+      (and (not g1) (not g2)))
+  (=> (and r1 (not r2))
+      (and g1 (not g2)))
+  (=> (and (not r1) r2)
+      (and (not g1) g2))
+  (=> (and r1 r2)
       ; the unconstrained value of `s` is used as non-deterministic choice
-      (ite s' (and g1' (not g2'))
-        (and (not g1') g2')))
+      (ite s (and g1 (not g2))
+        (and (not g1) g2)))
   )
 )
 ```
@@ -722,7 +715,7 @@ a cycle later and does not use a local variable for the non-deterministic choice
 )
 ```
 
-Similar to <tt>NonDetArbiter</tt> but for requests expressed as integer events.
+Similar to <tt>DelayedArbiter</tt> but for requests expressed as integer events.
 
 ```smt
 (define-system IntNonDetArbiter
@@ -881,7 +874,7 @@ and
 ; temp = 0, 1, 2, 3, 4, 5, 6, ...
 ;   s2 = 0, 1, 2, 3, 4, 5, 6, ...
 ;  out = 0, 0, 1, 2, 3, 4, 5, ...
-````
+```
 
 The next example defines a three-bit counter in terms of three identical
 one-bit counters.
@@ -896,7 +889,7 @@ In that case, the choice between the two requests is resolved arbitrarily using
 the value of the unconstrained local variable <tt>b</tt>.
 In the absence of either a set or a reset, the value of <tt>out</tt> is unchanged.
 
-````smt
+```smt
 (define-system Latch  :input ( (set Bool) (reset Bool) )  :output ( (out Bool)) 
  :local ( (s Bool) (b Bool) )
  :init (and
@@ -908,7 +901,7 @@ In the absence of either a set or a reset, the value of <tt>out</tt> is unchange
              (and (not set) (not reset) out)))
  )
 )
-````
+```
 
 The one-bit counter is implemented using the latch component modeled by `Latch`.
 The counter goes from 0 (represented as <tt>false</tt>) to 1 (<tt>true</tt>)
@@ -917,23 +910,23 @@ the increment signal <tt>inc</tt> is true.
 It is reset to 0 (<tt>false</tt>) when the start signal is true.
 The initial value of the counter is arbitrary.
 
-````smt
-;        +------------------------------------------------------------+
-;        |                                                            |
-;        | +--------------------------------------------------------+ |
-;        | |                                              +-------+ | |
-;        +-|-----------------------------------|``-.  set |       | | |
-;        | |                          |`-._    |    :---->|       | | |
-;        | +->|``-.                +--|   _]o--|..-`      | Latch | | |
-;        |    |    :--+----\``-.   |  |.-`          reset |       |-+-+--> out
-;   inc -+----|..-`   |     )   :--+--------------------->|       |   |
-;        |            | +--/..-`                          +-------+   |
-;        |            | |                                             |
-; start ----------------+                OneBitCounter                |
-;        |            |                                               |
-;        +------------+-----------------------------------------------+
-;                     |    
-;                     v carry
+```smt
+;        +--------------------------------------------------------------+
+;        |                                                              |
+;        |   +--------------------------------------------------------+ |
+;        |   |                                              +-------+ | |
+;        | +-|-----------------------------------|``-.  set |       | | |
+;        | | |                          |`-._    |    :---->|       | | |
+;        | | +--|``-.                +--|   _]o--|..-`      | Latch | | |
+;        | |    |    :--+----\``-.   |  |.-`          reset |       |-+----> out
+;   inc ---+----|..-`   |     )   :--+--------------------->|       |   |
+;        |              | +--/..-`                          +-------+   |
+;        |              | |                                             |
+; start ------------------+                OneBitCounter                |
+;        |              |                                               |
+;        +--------------|-----------------------------------------------+
+;                       |    
+;                       v carry
 
 (define-system OneBitCounter :input ( (inc Bool) (start Bool) ) 
  :output ( (out Bool) (carry Bool) )
@@ -945,14 +938,14 @@ The initial value of the counter is arbitrary.
    (= carry (and inc out))
  )
 )
-````
+```
 
 The three-bit counter is a resettable counter obtained by cascading
 three 1-bit counters.
 The output is three Boolean values standing for the three bits,
 with <tt>out0</tt> being the least significant one.
 
-````smt
+```smt
 (define-system ThreeBitCounter  :input ( (inc Bool) (start Bool) )
  :output ( (out0 Bool) (out1 Bool) (out2 Bool) ) 
  :local ( (car0 Bool) (car1 Bool) (car2 Bool) ) 
@@ -960,7 +953,7 @@ with <tt>out0</tt> being the least significant one.
  :subsys (C2 (OneBitCounter car0 start out1 car1)) 
  :subsys (C3 (OneBitCounter car1 start out2 car2))
 )
-````
+```
 
 #### Sanity requirements on $I_S$ and $T_S$
 
@@ -1202,7 +1195,7 @@ in the query in a different state.
 
 [Non-deterministic arbiter.]
 
-````smt
+```smt
 (check-system NonDetArbiter
  :input ( (req1 Bool) (req2 Bool) )
  :output ( (gr1 Bool) (gr2 Bool) )
@@ -1215,11 +1208,11 @@ in the query in a different state.
  ; check the reachability of r under assumptions a1 and a2
  :query (q (a1 a2 r)) 
 )
-````
+```
 
 [Temporal queries.]
 
-````smt
+```smt
 (define-system Historically :input ((b Bool)) :output ((hb Bool)) 
  :init (= hb b) 
  :trans (= hb’ (and b’ hb))
@@ -1263,7 +1256,7 @@ in the query in a different state.
  :query (Q1 (A P1))
  :query (Q2 (A P2))
 )
-````
+```
 
 #### Check-system response
 
@@ -1281,7 +1274,7 @@ We return one trail or certificate in response to each query.
 **Verbose** response with input var `i`, output var `o`, local var `s`,
 reachability pred `r`, and fairness condition `f`.
 
-````scheme
+```scheme
 (check-system-response
  :verbosity full
  :query (q1 :result sat :model m :trace t)
@@ -1297,7 +1290,7 @@ reachability pred `r`, and fairness condition `f`.
  :trail (l ( ( ... ) ... ( ... ) ))
  :certificate (c :inv F :k n)
 )
-````
+```
 
 The **compact** response format is identical to the verbose one except that
 each trail starts with a fully specified state and continues with states
@@ -1306,9 +1299,9 @@ in the previous state.
 
 [Complete examples]
 
-````scheme
+```scheme
 (check-system-response
  :verbosity compact
  ...
 )
-````
+```
