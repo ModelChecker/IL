@@ -1099,7 +1099,8 @@ Specifically, let $t, u, v  \geq 0$ :
    each $r_j$ naming a reachability condition $R_j$,
    is _satisfiable_ iff the formula
 
-    $$\begin{array}{rcl}
+    $$
+    \begin{array}{rcl}
       I_S
       & \land & \mathbf{always}\ T_S \\
       & \land & \mathbf{always}\ (A_1 \land \cdots \land A_t) \\
@@ -1116,13 +1117,14 @@ Specifically, let $t, u, v  \geq 0$ :
    each $r_j$ naming a reachability condition $R_j$,
    is _satisfiable_ iff the formula
 
-    $$\begin{array}{rcl}
+    $$
+    \begin{array}{rcl}
       C
       & \land & \mathbf{always}\ T_S \\
       & \land & \mathbf{always}\ (A_1 \land \cdots \land A_t) \\
       & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
-     \end{array}
-   $$
+    \end{array}
+    $$
 
    is **$n$-satisfiable** in LTL for some $n > 0$.
 
@@ -1133,14 +1135,15 @@ Specifically, let $t, u, v  \geq 0$ :
    each $f_j$ naming a fairness condition $F_j$,
    _satisfiable_ iff the formula
 
-    $$\begin{array}{rcl}
+    $$
+    \begin{array}{rcl}
        I_S
        & \land & \mathbf{always}\ T_S \\
        & \land & \mathbf{always}\ (A_1 \land \cdots \land A_t) \\
        & \land & \mathbf{always}\ \mathbf{eventually}\ F_1 \land \cdots
          \land   \mathbf{always}\ \mathbf{eventually}\ F_v \\
        & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
-      \end{array}
+    \end{array}
     $$
 
     is **satisfiable** in LTL.
@@ -1153,14 +1156,15 @@ Specifically, let $t, u, v  \geq 0$ :
    each $f_j$ naming a fairness condition $F_j$,
    _satisfiable_ iff the formula
 
-    $$\begin{array}{rcl}
+    $$
+    \begin{array}{rcl}
        C
        & \land & \mathbf{always}\ T_S \\
        & \land & \mathbf{always}\ (A_1 \land \cdots \land A_t) \\
        & \land & \mathbf{always}\ \mathbf{eventually}\ F_1 \land \cdots
          \land   \mathbf{always}\ \mathbf{eventually}\ F_v \\
        & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
-      \end{array}
+    \end{array}
     $$
 
     is **satisfiable** in LTL.
