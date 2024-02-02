@@ -7,7 +7,7 @@ date: 2024-02-01
 --------------------------------------------------------------------------------
 
 MoXI, which stands for Model Exchange Interlingua, is an intermediate
-language meant to be a common input and output standard for model checker
+language meant to be a common input and output standard for model checkers
 for finite- and infinite-state systems,
 with an initial focus is on finite-state ones.
 
@@ -46,7 +46,7 @@ It also allows the specification and checking of reachability conditions
 (or, indirectly state and transition invariants) and deadlocks,
 possibly under fairness conditions on input values.
 
-MoXI assumes a discrete and linear notion of time and hence has 
+MoXI assumes a discrete and linear notion of time and hence has
 a standard trace-based semantics.
 
 Each system definition:
