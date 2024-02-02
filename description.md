@@ -1093,81 +1093,81 @@ The meaning of the query depends on its components.
 
 Specifically, let $t, u, v  \geq 0$ :
 
-1. A $q$ query of the form
-   <tt>( $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$  )</tt>,
-   with each $a_j$ naming an assumption $A_j$ and
-   each $r_j$ naming a reachability condition $R_j$,
-   is _satisfiable_ iff the formula
+(1) A $q$ query of the form
+<tt>( $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$  )</tt>,
+with each $a_j$ naming an assumption $A_j$ and
+each $r_j$ naming a reachability condition $R_j$,
+is _satisfiable_ iff the formula
 
-    $$
-    \begin{array}{rcl}
-      I_S
-      & \land & \mathbf{always}\ T_S \\
-      & \land & \mathbf{always}\ (A_1 \land \cdots \land A_t) \\
-      & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
-    \end{array}
-   $$
+$$
+\begin{array}{rcl}
+  I_S
+  & \land & \mathbf{always}\ T_S \\
+  & \land & \mathbf{always}\ (A_1 \land \cdots \land A_t) \\
+  & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
+\end{array}
+$$
 
-   is **$n$-satisfiable** in LTL for some $n > 0$.
+is **$n$-satisfiable** in LTL for some $n > 0$.
 
-2. A $q$ query of the form
-   <tt>( $c$ $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$  )</tt>,
-   with $c$ naming an initiality condition $C$,
-   each $a_j$ naming an assumption $A_j$, and
-   each $r_j$ naming a reachability condition $R_j$,
-   is _satisfiable_ iff the formula
+(2) A $q$ query of the form
+<tt>( $c$ $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$  )</tt>,
+with $c$ naming an initiality condition $C$,
+each $a_j$ naming an assumption $A_j$, and
+each $r_j$ naming a reachability condition $R_j$,
+is _satisfiable_ iff the formula
 
-    $$
-    \begin{array}{rcl}
-      C
-      & \land & \mathbf{always}\ T_S \\
-      & \land & \mathbf{always}\ (A_1 \land \cdots \land A_t) \\
-      & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
-    \end{array}
-    $$
+$$
+\begin{array}{rcl}
+  C
+  & \land & \mathbf{always}\ T_S \\
+  & \land & \mathbf{always}\ (A_1 \land \cdots \land A_t) \\
+  & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
+\end{array}
+$$
 
-   is **$n$-satisfiable** in LTL for some $n > 0$.
+is **$n$-satisfiable** in LTL for some $n > 0$.
 
-3. A $q$ query of the form
-   <tt>( $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$ $f_1$ $\cdots$ $f_v$  )</tt>,
-   with each $a_j$ naming an assumption $A_j$,
-   each $r_j$ naming a reachability condition $R_j$, and
-   each $f_j$ naming a fairness condition $F_j$,
-   _satisfiable_ iff the formula
+(3) A $q$ query of the form
+<tt>( $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$ $f_1$ $\cdots$ $f_v$  )</tt>,
+with each $a_j$ naming an assumption $A_j$,
+each $r_j$ naming a reachability condition $R_j$, and
+each $f_j$ naming a fairness condition $F_j$,
+_satisfiable_ iff the formula
 
-    $$
-    \begin{array}{rcl}
-       I_S
-       & \land & \mathbf{always}\ T_S \\
-       & \land & \mathbf{always}\ (A_1 \land \cdots \land A_t) \\
-       & \land & \mathbf{always}\ \mathbf{eventually}\ F_1 \land \cdots
-         \land   \mathbf{always}\ \mathbf{eventually}\ F_v \\
-       & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
-    \end{array}
-    $$
+$$
+\begin{array}{rcl}
+   I_S
+   & \land & \mathbf{always}\ T_S \\
+   & \land & \mathbf{always}\ (A_1 \land \cdots \land A_t) \\
+   & \land & \mathbf{always}\ \mathbf{eventually}\ F_1 \land \cdots
+ \land   \mathbf{always}\ \mathbf{eventually}\ F_v \\
+   & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
+\end{array}
+$$
 
-    is **satisfiable** in LTL.
+is **satisfiable** in LTL.
 
-4. A $q$ query of the form
-   <tt>( $c$ $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$ $f_1$ $\cdots$ $f_v$  )</tt>,
-   with $c$ naming an initiality condition $C$,
-   each $a_j$ naming an assumption $A_j$,
-   each $r_j$ naming a reachability condition $R_j$, and
-   each $f_j$ naming a fairness condition $F_j$,
-   _satisfiable_ iff the formula
+(4) A $q$ query of the form
+<tt>( $c$ $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$ $f_1$ $\cdots$ $f_v$  )</tt>,
+with $c$ naming an initiality condition $C$,
+each $a_j$ naming an assumption $A_j$,
+each $r_j$ naming a reachability condition $R_j$, and
+each $f_j$ naming a fairness condition $F_j$,
+_satisfiable_ iff the formula
 
-    $$
-    \begin{array}{rcl}
-       C
-       & \land & \mathbf{always}\ T_S \\
-       & \land & \mathbf{always}\ (A_1 \land \cdots \land A_t) \\
-       & \land & \mathbf{always}\ \mathbf{eventually}\ F_1 \land \cdots
-         \land   \mathbf{always}\ \mathbf{eventually}\ F_v \\
-       & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
-    \end{array}
-    $$
+$$
+\begin{array}{rcl}
+   C
+   & \land & \mathbf{always}\ T_S \\
+   & \land & \mathbf{always}\ (A_1 \land \cdots \land A_t) \\
+   & \land & \mathbf{always}\ \mathbf{eventually}\ F_1 \land \cdots
+ \land   \mathbf{always}\ \mathbf{eventually}\ F_v \\
+   & \land & \mathbf{eventually}\ R_1 \land \cdots \land \mathbf{eventually}\ R_u
+\end{array}
+$$
 
-    is **satisfiable** in LTL.
+is **satisfiable** in LTL.
 
 <!--
     $$\begin{array}{rcl}
