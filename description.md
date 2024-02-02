@@ -1,5 +1,5 @@
 ---
-title: MoXI: a Model Checking Intermediate Language. (Draft)
+title: MoXI — A Model Checking Intermediate Language. (Draft)
 author: Cesare Tinelli
 date: 2024-02-01
 ---
