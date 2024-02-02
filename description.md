@@ -1,25 +1,25 @@
 ---
-title: Model Checking Intermediate Language (Draft)
+title: MoXI: a Model Checking Intermediate Language. (Draft)
 author: Cesare Tinelli
-date: 2022-10-18
+date: 2024-02-01
 ---
 
 --------------------------------------------------------------------------------
 
-The Model Checking Intermediate Language (IL, for short) is an intermediate
+MoXI, which stands for Model Exchange Interlingua, is an intermediate
 language meant to be a common input and output standard for model checker
 for finite- and infinite-state systems,
 with an initial focus is on finite-state ones.
 
 ## General Design Philosophy
 
-IL has been designed to be general enough to be an intermediate target language
+MoXI has been designed to be general enough to be an intermediate target language
 for a variety of user-facing specification languages for model checking.
-At the same time, IL is meant to be simple enough to be easily compilable
+At the same time, MoXI is meant to be simple enough to be easily compilable
 to lower level languages or be directly supported by model checking tools based
 on SAT/SMT technology.
 
-For being an intermediate language, models expressed in IL are meant
+For being an intermediate language, models expressed in MoXI are meant
 to be produced and processed by tools, hence it was designed to have
 
 * simple, easily (machine) parsable syntax;
@@ -30,14 +30,14 @@ to be produced and processed by tools, hence it was designed to have
 * simple translations to lower level modeling languages such as
   [Btor2](https://link.springer.com/chapter/10.1007/978-3-319-96145-3_32).
 
-Based on these principles, IL provides no direct support for many of the features
+Based on these principles, MoXI provides no direct support for many of the features
 offered by current hardware modeling languages such as VHDL and Verilog
 or more general purpose system modeling languages
 such as SMV, TLA+, PROMELA, Simulink, SCADE, Lustre.
 However, it strives to offer enough capability so that problems expressed
-in those languages can be reduced to problems in IL.
+in those languages can be reduced to problems in MoXI.
 
-IL is an extension the 
+MoXI is an extension the 
 [SMT-LIB language](https://smtlib.cs.uiowa.edu/language.shtml)
 with new commands to define and verify systems.
 It allows the definition of multi-component synchronous or
@@ -46,7 +46,7 @@ It also allows the specification and checking of reachability conditions
 (or, indirectly state and transition invariants) and deadlocks,
 possibly under fairness conditions on input values.
 
-IL assumes a discrete and linear notion of time and hence has 
+MoXI assumes a discrete and linear notion of time and hence has 
 a standard trace-based semantics.
 
 Each system definition:
@@ -66,7 +66,7 @@ of infinite-state system as well.
 
 ## Technical Preliminaries
 
-The base logic of IL is the same as that of SMT-LIB:
+The base logic of MoXI is the same as that of SMT-LIB:
 many-sorted first-order logic with equality and let binders.
 We refer to this logic simply as FOL.
 When we say _formula_, with no further qualifications, we refer
@@ -314,7 +314,7 @@ See Section [todo](#add_link) for more details.
 SMT-LIB is a command-based language with LISP-like syntax ([s-expressions](https://en.wikipedia.org/wiki/S-expression), in prefix notation) designed
 to be a common input/output language for SMT solvers.
 
-IL adopts the following SMT-LIB commands:
+MoXI adopts the following SMT-LIB commands:
 
 * <tt>(declare-sort $s$ $n$)</tt>
 
@@ -378,7 +378,7 @@ For each term <tt>s</tt> and <tt>t</tt> of the same sort,
 <tt>(!= s t)</tt> has the same meaning as <tt>(not (= s t))</tt> 
 or, equivalently, <tt>(distinct s t)</tt>.
 
-## IL-specific commands
+## MoXI-specific commands
 
 ### Enumeration declaration
 
@@ -972,7 +972,7 @@ with <tt>out0</tt> being the least significant one.
 
 #### Sanity requirements on $I_S$ and $T_S$
 
-Because of the infinite trace semantics every system defined in IL is expected
+Because of the infinite trace semantics every system defined in MoXI is expected
 to execute forever.
 This is not a limitation in practice because systems that are meant to reach
 a final state can be always modeled with states that cycle back to themselves and
@@ -1178,7 +1178,7 @@ Specifically, let $t, u, v  \geq 0$ :
     $$
 -->
 
-Let $\mathcal T$ be the background theory specified for an IL script.
+Let $\mathcal T$ be the background theory specified for an MoXI script.
 For each satisfiable query in a <tt>check-system</tt> command,
 the model checker is expected to produce
 
