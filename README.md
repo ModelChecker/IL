@@ -1,5 +1,5 @@
 
-# MoXI Intermediate language
+# MoXI intermediate language
 
 MoXI, which stands for Model Exchange Interlingua, is an intermediate
 language meant to be a common input and output standard for model checkers
