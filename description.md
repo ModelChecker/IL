@@ -1,7 +1,9 @@
 ---
 title: MoXI — A Model Checking Intermediate Language. (Draft)
 author: Cesare Tinelli
-date: 2024-02-01
+contributors: Rohit Dureja, Ahmed Irfan, Christopher Johannsen, Shankar Natarajan,
+              Karthik Nukala, Kristin Rozier, Moshe Vardi
+date: 2024-03-16
 ---
 
 --------------------------------------------------------------------------------
@@ -37,13 +39,13 @@ such as SMV, TLA+, PROMELA, Simulink, SCADE, Lustre.
 However, it strives to offer enough capability so that problems expressed
 in those languages can be reduced to problems in MoXI.
 
-MoXI is an extension the 
+MoXI is an extension of the
 [SMT-LIB language](https://smtlib.cs.uiowa.edu/language.shtml)
 with new commands to define and verify systems.
 It allows the definition of multi-component synchronous or
 asynchronous reactive systems.
 It also allows the specification and checking of reachability conditions
-(or, indirectly state and transition invariants) and deadlocks,
+(or, indirectly, state and transition invariants) and deadlocks,
 possibly under fairness conditions on input values.
 
 MoXI assumes a discrete and linear notion of time and hence has
@@ -54,11 +56,8 @@ Each system definition:
 * defines a _transition system_ via the use of SMT formulas,
   imposing minimal syntactic restrictions on those formulas;
 * is parametrized by a _state signature_, a sequence of typed variables;
-* partitions state variables into input, output and local variables;
-* can be expressed as the synchronous or asynchronous composition of other systems
-* is _hierarchical_, i.e., may include (instances of) previously defined systems
-  as subsystems;
-* can encode both synchronous and asynchronous system composition.
+* partitions _state_ variables into _input_, _output_ and _local_ variables;
+* can be expressed as the synchronous or asynchronous composition of other systems.
 
 The current focus on _finite-state_ systems.
 However, the language has been designed to support the specification
@@ -71,6 +70,8 @@ many-sorted first-order logic with equality and let binders.
 We refer to this logic simply as FOL.
 When we say _formula_, with no further qualifications, we refer
 to an arbitrary formula of FOL (possibly with quantifiers and let binders).
+When we say _variable_ we mean a _sorted_ variable, that is, one associated 
+with sort (or a _type_, in type theory terminology).
 
 We say that a formula is _quantifier-free_ if it contains no occurrences
 of the quantifiers $\forall$ and
@@ -79,7 +80,10 @@ We say that it is _binder-free_ if it is quantifier-free and also contains
 no occurrences of the let binder.
 
 The _scope_ of binders and the notion of _free_ and _bound_ (occurrences of)
-variables in a formula are defined as usual.
+variables in a formula are defined as usual, that is, the scope is lexical.
+Following SMT-LIB's convention, local variables in an expression shadow
+global variables with the same name, but not function symbols defined
+in the background theory.
 
 ### Notation
 
@@ -88,7 +92,7 @@ $\boldsymbol{x} = (x_1, \ldots, x_n)$ a tuple of distinct variables,
 we write $F[\boldsymbol{x}]$ or $F[x_1, \ldots, x_n]$ to express the fact
 that every variable in $\boldsymbol{x}$ is free in $F$
 (although $F$ may have additional free variables).
-We write $\boldsymbol{x} \circ \boldsymbol{y}$ to denote the concatenation
+We write $\boldsymbol{x}, \boldsymbol{y}$ to denote the concatenation
 of tuple $\boldsymbol{x}$ with tuple $\boldsymbol{y}$.
 When it is clear from the context, given a formula $F[\boldsymbol{x}]$ and
 a tuple $\boldsymbol{t} = (t_1, \ldots, t_n)$ of terms of the same type
@@ -99,17 +103,17 @@ by $t_i$ for all $i=1,\ldots,n$.
 
 A formula may contain _uninterpreted_ constant and function symbols,
 that is, symbols with no constraints on their interpretation.
-For most purposes, we treat uninterpreted constants as free variables and
-treat uninterpreted function symbols as _second-order_ free variables.
+For most purposes, we treat uninterpreted constant and function symbols
+as free (rigid) variables, respectively of first and second order.
 
 ### Transition systems
 
 Formally, a transition system $S$ is a pair of predicates of the form
 
 $$S = (
-   I_S [\boldsymbol i, \boldsymbol o,  \boldsymbol s],~
-   T_S [\boldsymbol i, \boldsymbol o, \boldsymbol s,
-        \boldsymbol{i'}, \boldsymbol{o'}, \boldsymbol{s'}]
+   I_S [\boldsymbol i, \boldsymbol o,  \boldsymbol l],~
+   T_S [\boldsymbol i, \boldsymbol o, \boldsymbol l,
+        \boldsymbol{i'}, \boldsymbol{o'}, \boldsymbol{l'}]
 )$$
 
 where
@@ -118,37 +122,47 @@ where
   with the same length and type;
 * $\boldsymbol o$ and $\boldsymbol{o'}$ are two tuples of _output variables_
   with the same length and type;
-* $\boldsymbol s$ and $\boldsymbol{s'}$ are two tuples of _local variables_
+* $\boldsymbol l$ and $\boldsymbol{l'}$ are two tuples of _local variables_
   with the same length and type;
 * $I_S$ is the system's _initial state condition_, expressed as a formula
-  with no (free) variables from $\boldsymbol{i'}$, $\boldsymbol{o'}$, and 
-  $\boldsymbol{s'}$;
+  with no (free) variables from $\boldsymbol{i'}$, $\boldsymbol{o'}$, and
+  $\boldsymbol{l'}$;
 * $T_S$ is the system's _transition condition_, expressed as a formula
-  over the variables $\boldsymbol{i}$, $\boldsymbol{o}$, $\boldsymbol{s}$,
-  $\boldsymbol{i'}$, $\boldsymbol{o'}$, and $\boldsymbol{s'}$.
+  over the variables $\boldsymbol{i}$, $\boldsymbol{o}$, $\boldsymbol{l}$,
+  $\boldsymbol{i'}$, $\boldsymbol{o'}$, and $\boldsymbol{l'}$.
 
 >**Note:**
 For convenience, but differently from other formalizations, a (full) state
 of system $S$ is expressed by a valuation of the variables
-$\boldsymbol{i},\boldsymbol{o},\boldsymbol{s}$.
+$\boldsymbol{i},\boldsymbol{o},\boldsymbol{l}$.
 In other words, input and output variables are automatically _stateful_
 since the transition relation formula can access old values of inputs and outputs
 in addition to the old values of the local state.
-This means that, technically, $S$ is a closed system.
+This means that, technically, $S$ is a (non-deterministic) closed system.
 The designation of some state variables as input or output is, however, important
 when combining systems together, to capture which of the state values are shared
 between two systems being combined, and how.
 >
 > **Note:**
-Similarly to Mealy machines, the initial state condition is also meant to specify
+Similarly to Mealy machines, the initial state condition is also supposed to specify
 the initial system's output, based on the initial state and input.
-Correspondingly, the transition relation is also meant to specify the system's output
+Correspondingly, the transition relation is also supposed to specify the system's output
 in every later state of the computation.
 >
->**Note:** The input and output values corresponding to the transition to the _new_ state are
-those in the variables $\boldsymbol{i'}$ and
+>**Note:** The input and output values corresponding to the transition 
+to the _new_ state are those in the variables $\boldsymbol{i'}$ and
 $\boldsymbol{o'}$.
 The values of $\boldsymbol{i}, \boldsymbol{o}$ are the _old_ input and output values.
+>
+
+MoXI focuses on _reactive_ transition systems, that is, transition systems
+where every state as a successor.
+This is not a limitation in practice for modeling purposes because systems
+that have final states can be modeled using states that cycle back to themselves and
+produce stuttering outputs.
+In fact, as discussed later, the language has syntax for checking an even stronger requirement:
+_progressiveness_.
+
 
 ### Trace Semantics
 
@@ -162,7 +176,7 @@ $\mathbf{eventually},$
 $\mathbf{next},$
 $\mathbf{until},$
 $\mathbf{release}$.
-For our purposes of defining the semantics of transition systems
+For our purposes of defining the semantics of transition systems,
 it is enough to consider just the $\mathbf{always}$ and
 $\mathbf{eventually}$ operators.
 
@@ -174,14 +188,15 @@ The meaning of theory symbols (such as arithmetic operators) and theory sorts
 $\mathsf{Real},$
 $\mathsf{Array(Int, Real)},$
 $\mathsf{BitVec(3)}$, $\ldots$)
-is fixed by the theory $\mathcal T$ in question.
+is fixed by the _background_ theory $\mathcal T$ in question.
 Once a theory $\mathcal T$ has been fixed then, the meaning of a FO-LTL formula $F$
 is provided by an interpretation of the uninterpreted (constant and function) symbols
 of $F$, if any,
 as well as an infinite sequence of valuations for the free variables of $F$.
 
 More precisely, let us fix a tuple $\boldsymbol x = (x_1,\ldots,x_n)$
-of distinct _state_ variables, meant to represent the state of a computation system.
+of distinct _state_ variables, 
+which are intended to represent the state of a computation system.
 We will denote by $\boldsymbol{x'}$
 the tuple $(x_1',\ldots,x_n')$
 and write formulas of the form $F[\boldsymbol f, \boldsymbol x, \boldsymbol x']$
@@ -190,13 +205,12 @@ If $F$ has free occurrences of variables from $\boldsymbol x$
 but not from $\boldsymbol{x'}$ we call it a _one-state_ formula;
 otherwise, we call it a _two-state_ formula.
 
-A _valuation of_ $\boldsymbol x$,
-or a _state over_ $\boldsymbol x$, is function mapping
-each variable $x$ in $\boldsymbol x$
-to a value of $x$'s type.
-Let $\kappa$ be a positive ordinal smaller than
-$\omega$, the cardinality of the natural numbers.
-A _trace (of length_ $\kappa$_)_ is
+A _valuation of_ $\boldsymbol x$, or a _state over_ $\boldsymbol x$, is a function
+mapping each variable $x$ in $\boldsymbol x$ to a value of $x$'s sort.
+If $s$ is such a state, we denote by $s(\boldsymbol x)$ the value tuple
+$(s(x_1),\ldots, s(x_n))$.
+Let $\kappa$ be a positive ordinal up to $\omega$, the cardinality of the natural numbers.
+A _trace (of length $\kappa$ over $\boldsymbol x$)_ is
 any state sequence $\pi = (s_j  \mid 0 \leq j < \kappa)$.
 Note that $\pi$ is the finite sequence $s_0, \ldots, s_{\kappa-1}$
 when $\kappa < \omega$ and
@@ -206,6 +220,15 @@ we denote by $\pi[i]$ the state $s_i$ and
 by $\pi^i$ the subsequence
 $(s_j \mid i \leq j < \kappa)$.
 
+Let $\mathcal T$ be a theory and let $\mathcal I$ be an interpretation of the symbols
+of $\mathcal T$ and of some set $X$ of variables.
+If $x$ is a variable in $X$ with sort $\sigma$ and $v$ is a value from the domain of $\sigma$,
+we denote by $\mathcal I[x \mapsto v]$ the interpretation
+that maps $x$ to $v$ and is otherwise identical to $\mathcal I$.
+We extend this notation to $\mathcal I[\boldsymbol x \mapsto \boldsymbol v]$
+in the obvious way when $\boldsymbol x$ and $\boldsymbol v$ are tuples
+of variables and values, respectively, of the same type.
+
 ### Infinite-Trace Semantics
 
 Let $F[\boldsymbol f, \boldsymbol x, \boldsymbol{x'}]$ be a formula as above.
@@ -214,17 +237,17 @@ of $\boldsymbol{f}$
 in the theory $\mathcal T$ and
 $\pi$ is an infinite trace,
 then $(\mathcal I, \pi)$ _satisfies_ $F$,
-written $(\mathcal I, \pi) \models F$, iff
+written $(\mathcal I, \pi) \models F$, iff one of the following holds:
 
 * $F$ is atomic and
-  $\mathcal{I}[\boldsymbol x \mapsto \pi[0](\boldsymbol x),\boldsymbol{x'} \mapsto \pi[1](\boldsymbol x)]$
+  $\mathcal{I}[\boldsymbol x \mapsto \pi[0](\boldsymbol x)][\boldsymbol{x'} \mapsto \pi[1](\boldsymbol x)]$
   satisfies $F$ as in FOL;
 * $F = \lnot G~$ and
   $~(\mathcal I, \pi) \not\models G$;
 * $F = G_1 \land G_2~$ and
   $~(\mathcal I, \pi) \models G_i$ for $i=1,2$;
-* $F = \exists x\, G$ and
-  $(\mathcal I[z \mapsto v], \pi) \models G$ for some value $v$ for $x$;
+* $F = \exists z\, G$ and
+  $(\mathcal I[z \mapsto v], \pi) \models G$ for some value $v$ for $z$;
 * $F = \mathbf{eventually}~G$ and
   $(\mathcal I, \pi^i) \models G$ for some $i \geq 0$;
 * $F = \mathbf{always}~G$ and
@@ -236,7 +259,7 @@ and the quantifier $\forall$
 can be defined by reduction to the connectives above
 (e.g., by defining $G_1 \lor G_2$ as
 $\lnot(\lnot G_1 \land \lnot G_2)$ and so on).
-Note that $\exists$ is a _static_, or _rigid_, quantifier:
+Note that $∃ z$ is a _static_, or _rigid_, quantifier:
 the meaning of the variable it quantifies does not change over time,
 that is, from state to state in $\pi$.
 The same is true for uninterpreted symbols.
@@ -247,11 +270,11 @@ whereas quantified variables, theory symbols and uninterpreted symbols are all i
 
 Now let
 
-$$S = (I_S [\boldsymbol i, \boldsymbol o,  \boldsymbol s],~
-       T_S [\boldsymbol i, \boldsymbol o, \boldsymbol s, \boldsymbol{i'}, \boldsymbol{o'}, \boldsymbol{s'}]
+$$S = (I_S [\boldsymbol i, \boldsymbol o,  \boldsymbol l],~
+       T_S [\boldsymbol i, \boldsymbol o, \boldsymbol l, \boldsymbol{i'}, \boldsymbol{o'}, \boldsymbol{l'}]
 )$$
 
-be a transition system with state variables $\boldsymbol i, \boldsymbol o,  \boldsymbol s$.
+be a transition system with state variables $\boldsymbol i, \boldsymbol o,  \boldsymbol l$.
 
 The _infinite trace semantics_ of $S$ is the set of all pairs $(\mathcal I, \pi)$
 of interpretations $\mathcal I$ in $\mathcal T$ and infinite traces $\pi$ such that
@@ -262,40 +285,39 @@ $$
 
 We call any such pair an _execution_ of $S$.
 
-> **Note:**
-[We focus on reactive systems]
-
 ### Finite-Trace Semantics
 
 Let $F[\boldsymbol f, \boldsymbol x, \boldsymbol{x'}]$, $\mathcal I$, $\mathcal T$ and $\pi$
 be defined is in the subsection above.
 For every $n \geq 0$, $(\mathcal I, \pi)$ $n$_-satisfies_ $F$,
-written $(\mathcal I, \pi) \models_n F$, iff
+written $(\mathcal I, \pi) \models_n F$, iff one of the following holds:
 
 * $F$ is atomic and
   $\mathcal I[\boldsymbol x \mapsto \pi[0](\boldsymbol x), \boldsymbol{x'} \mapsto \pi[1](\boldsymbol x)]$
   satisfies $F$ as in FOL;
 
-* $F = \lnot G$ and $(\mathcal I, \pi) \not\models_n G$
+* $F = \lnot G$ and $(\mathcal I, \pi) \not\models_n G$;
 
 * $F = G_1 \land G_2$ and $(\mathcal I, \pi) \models_n G_i$ for $i=1,2$;
 
-* $F = \exists x\, G$ and $(\mathcal I[z \mapsto v], \pi) \models_n G$ for some value $v$ for $x$;
+* $F = \exists z\, G$ and $(\mathcal I[z \mapsto v], \pi) \models_n G$ for some value $v$ for $z$;
 
 * $F = \mathbf{eventually}~G$ and $(\mathcal I, \pi^i) \models_{n-i} G$ for some $i = 0, \ldots, n$;
 
-* $F = \mathbf{always}~G$ and $(\mathcal I, \pi^i) \models_{n-i} G$ for all $i = 0, \ldots, n$;
+* $F = \mathbf{always}~G$ and $(\mathcal I, \pi^i) \models_{n-i} G$ for all $i = 0, \ldots, n$.
 
 The semantics of the propositional connectives $\lor, \rightarrow, \leftrightarrow$
 and the quantifier $\forall$
 is again defined by reduction to the connectives above.
-
 Intuitively, $n$-satisfiability specifies when a formula is true over
 the first $n$ states of a trace.
-Note that this notion is well defined even when $n=0$ regardless of whether $F$
-has free occurrences of variables from $\boldsymbol{x'}$ or not.
+
+> **Note:**
+This notion is well defined even when $n=0$ regardless of whether $F$
+is a two-state formula (having free occurrences of variables from
+$\boldsymbol{x'}$) or not.
 In the atomic case, this is true because $\pi$, for being an _infinite_ trace,
-does contain the state $\pi[1]$.
+does contain the state $\pi[1]$, providing values for $\boldsymbol{x'}$.
 In the general case, the claim can be shown by a simple inductive argument.
 
 The notion of $n$-satisfiability is useful when one is interested, as we are,
@@ -309,10 +331,21 @@ That is, it is possible for $R$ to be reachable in a system $S$
 without being $n$-satisfied by an execution of $S$.
 See Section [todo](#add_link) for more details.
 
-## Supported SMT-LIB commands
+## The MoXI Intermediate Language
 
-SMT-LIB is a command-based language with LISP-like syntax ([s-expressions](https://en.wikipedia.org/wiki/S-expression), in prefix notation) designed
-to be a common input/output language for SMT solvers.
+MoXI assumes a discrete and linear notion of time and adopts
+the trace-based semantics defined in the previous section.
+As mentioned earlier, it builds on the SMT-LIB language,
+extending it with commands to represent transition systems and
+to specify properties or queries.
+It also standardizes a format for witnesses generated by tool
+for checking MoXI models.
+
+### Supported SMT-LIB commands
+
+SMT-LIB is a command-based language with LISP-like syntax
+([s-expressions](https://en.wikipedia.org/wiki/S-expression), in prefix notation)
+designed to be a common input/output language for SMT solvers.
 
 MoXI adopts the following SMT-LIB commands:
 
@@ -327,7 +360,7 @@ MoXI adopts the following SMT-LIB commands:
   ; possible sorts: A, (Set A), (Set (Set A)), (Array Int Real), ...
   ```
 
-* <tt>(define-sort $s$ ( $u_1$ $\cdots$ $u_n$ ) $\tau$)</tt>
+* <tt>(define-sort $s$ ( $u_1$ $\cdots$ $u_n$) $\tau$)</tt>
 
   Defines $S$ as synonym of a parametric type $\tau$ with parameters $u_1 \cdots u_n$.
   Examples:
@@ -349,7 +382,7 @@ MoXI adopts the following SMT-LIB commands:
   (declare-const n Int)
   ```
 
-* <tt>(define-fun $f$ ( ( $x_1$ $\sigma_1$ ) $\cdots$ ( $x_1$ $\sigma_1$ ) ) $\sigma$ $t$)</tt>
+* <tt>(define-fun $f$ ( ($x_1$ $\sigma_1$) $\cdots$ ( $x_1$ $\sigma_1$ )) $\sigma$ $t$)</tt>
 
   Defines a (non-recursive) function $f$ with inputs $x_1, \ldots, x_n$
   (of respective sort $\sigma_1, \ldots, \sigma_n$), output sort $\sigma$, and body $t$.
@@ -378,24 +411,29 @@ For each term <tt>s</tt> and <tt>t</tt> of the same sort,
 <tt>(!= s t)</tt> has the same meaning as <tt>(not (= s t))</tt> 
 or, equivalently, <tt>(distinct s t)</tt>.
 
-## MoXI-specific commands
+### MoXI-specific commands
 
-### Enumeration declaration
+#### Enumeration declaration
 
-<tt>(declare-enum-sort $s$ ( $c_1$ $\cdots$ $c_n$ ) )</tt>
+<tt>(declare-enum-sort $s$ ( $c_1$ $\cdots$ $c_n$) )</tt>
 
 Declares $s$ to be an enumerative type with (distinct) values $c_1, \ldots, c_n$.
 
-### System definition command
+#### System definition command
 
-#### Atomic systems
+MoXI allows the definition of a model as the composition of one or more systems.
+MoXI ’s system definition commands follow the SMT-LIB syntax
+for attribute-value pairs.
 
-An atomic transition system is defined by a command of the form:
+##### Atomic systems
+
+An atomic transition system with $m$ inputs, $n$ outputs, and $p$ local variables
+is defined by a command of the form:
 
 <tt>(define-system $S$</tt><br>
-<tt>&nbsp;:input ( ( $i_1$ $\delta_1$ ) $\cdots$ ( $i_m$ $\delta_m $) ) </tt><br>
-<tt>&nbsp;:output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) ) </tt><br>
-<tt>&nbsp;:local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) ) </tt><br>
+<tt>&nbsp;:input ( ($i_1$ $\delta_1$) $\cdots$ ($i_m$ $\delta_m $) ) </tt><br>
+<tt>&nbsp;:output ( ($o_1$ $\tau_1$) $\cdots$ ( $o_n$ $\tau_n$) ) </tt><br>
+<tt>&nbsp;:local ( ($l_1$ $\sigma_1$) $\cdots$ ( $l_p$ $\sigma_p$) ) </tt><br>
 <tt>&nbsp;:init $I$</tt><br>
 <tt>&nbsp;:trans $T$</tt><br>
 <tt>&nbsp;:inv $P$</tt><br>
@@ -406,12 +444,12 @@ where
 * $S$ is the system's identifier;
 * each $i_j$ is an _input_ variable of sort $\delta_j$;
 * each $o_j$ is an _output_ variable of sort $\tau_j$;
-* each $s_j$ is a _local_ variable of sort $\sigma_j$;
-* all variables abo
-* each $i_j$, $o_j$, $s_j$ denote _current-state_ values
+* each $l_j$ is a _local_ variable of sort $\sigma_j$;
+* all variables above are distinct;
+* each $i_j$, $o_j$, $l_j$ denote _current-state_ values;
 * _next-state variables_ are not provided explicitly but are denoted
-  by convention by appending $'$ to the names of the current-state variables 
-  $i_j$, $o_j$, and $s_j$;
+  by convention by appending $'$ to the names of the current-state variables
+  $i_j$, $o_j$, and $l_j$;
 * $I$, _the initial condition_, is a one-state formula
   over the unprimed system's variables (input, output and local state variables)
   that expresses a constraint on the initial states of $S$;
@@ -429,7 +467,7 @@ where
   for <tt>:input</tt>, <tt>:output</tt>, and <tt>:local</tt>;
   and <tt>true</tt> for <tt>:init</tt>, <tt>:trans</tt>, and <tt>:inv</tt>.
   
-Syntactically, the system identifier, the input, output and local variables are 
+Syntactically, the system's identifier, input, output and local variables are
 SMT-LIB symbols.
 In contrast, the sorts $\delta_j$, $\tau_j$, $\sigma_j$ are SMT-LIB sorts,
 while the formulas $I$, $T$ and $P$ are SMT-LIB terms of type <tt>Bool</tt>.
@@ -449,39 +487,39 @@ semantics?
 The rationale would be to facilitate the recognition of systems defined
 by alternative sets of transitions.
 
-#### Atomic System Semantics
+##### Atomic System Semantics
 
 Let
 $\boldsymbol{i} = (i_1, \ldots, i_m)$,
 $\boldsymbol{o} = (o_1, \ldots, o_n)$,
-$\boldsymbol{s} = (s_1, \ldots, s_p)$,
+$\boldsymbol{l} = (l_1, \ldots, l_p)$,
 and
-$\boldsymbol{v}$ = $\boldsymbol{i},\boldsymbol{o},\boldsymbol{s}$.
+$\boldsymbol{x}$ = $\boldsymbol{i},\boldsymbol{o},\boldsymbol{l}$.
 
 Formally, an atomic system $S$ introduced by the <tt>define-system</tt> command above
 is a transition system whose behavior consists of all the (infinite) executions 
-$(\mathcal I, \pi)$ over $\boldsymbol{v}$ such that
+$(\mathcal I, \pi)$ over $\boldsymbol{x}$ such that
 
 $$(\mathcal I, \pi) \models
-  I[\boldsymbol{v}] \land \mathbf{always}\ (P[\boldsymbol{v}] \land T[\boldsymbol{v},\boldsymbol{v'}]) \ .
+  I[\boldsymbol{x}] \land \mathbf{always}\ (P[\boldsymbol{x}] \land T[\boldsymbol{x},\boldsymbol{x'}]) \ .
 $$
 
-We call $I_S = I[\boldsymbol{v}]$ _the initial state predicate_ of $S$ and
-$T_S = P[\boldsymbol{v}] \land T[\boldsymbol{v},\boldsymbol{v'}]$ _the transition predicate_ of $S$.
+We call $I_S = I[\boldsymbol{x}]$ _the initial state predicate_ of $S$ and
+$T_S = P[\boldsymbol{x}] \land T[\boldsymbol{x},\boldsymbol{x'}]$ _the transition predicate_ of $S$.
 
 
 > **Note:**
 The relation expressed by the formula $T$ is not required to be functional
-over $\boldsymbol{i},\boldsymbol{o},\boldsymbol{s},\boldsymbol{i'}$,
+over $\boldsymbol{i},\boldsymbol{o},\boldsymbol{l},\boldsymbol{i'}$,
 thus allowing the modeling of non-deterministic systems.
 >
 > **Note:**
 The <tt>:inv</tt> attribute is not strictly necessary since a system
 with a  declaration of the form
-> 
->  <tt>(define-system $S$ :input ( ( $i_1$ $\sigma_1$ ) $\cdots$ ( $i_m$ $\sigma_m$ ) )</tt><br>
->  <tt>&nbsp;:output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) )</tt><br>
->  <tt>&nbsp;:local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) )</tt><br>
+>
+>  <tt>(define-system $S$ :input ( ($i_1$ $\sigma_1$) $\cdots$ ( $i_m$ $\sigma_m$) )</tt><br>
+>  <tt>&nbsp;:output ( ($o_1$ $\tau_1$) $\cdots$ ( $o_n$ $\tau_n$) )</tt><br>
+>  <tt>&nbsp;:local ( ($l_1$ $\sigma_1$) $\cdots$ ( $l_p$ $\sigma_p$) )</tt><br>
 >  <tt>&nbsp;:init $I$</tt><br>
 >  <tt>&nbsp;:trans $T$</tt><br>
 >  <tt>&nbsp;:inv $P$</tt><br>
@@ -489,9 +527,9 @@ with a  declaration of the form
 >
 > can be equivalently expressed with a declaration of the form
 >
->  <tt>(define-system $S$ :input ( ( $i_1$ $\sigma_1$ ) $\cdots$ ( $i_m$ $\sigma_m$ ) )</tt><br>
->  <tt>&nbsp;:output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) )</tt><br>
->  <tt>&nbsp;:local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) )</tt><br>
+>  <tt>(define-system $S$ :input ( ($i_1$ $\sigma_1$) $\cdots$ ( $i_m$ $\sigma_m$) )</tt><br>
+>  <tt>&nbsp;:output ( ($o_1$ $\tau_1$) $\cdots$ ( $o_n$ $\tau_n$) )</tt><br>
+>  <tt>&nbsp;:local ( ($l_1$ $\sigma_1$) $\cdots$ ( $l_p$ $\sigma_p$) )</tt><br>
 >  <tt>&nbsp;:init $I$</tt><br>
 >  <tt>&nbsp;:trans (and $P$ $T$)</tt><br>
 >  <tt>)</tt>
@@ -500,21 +538,22 @@ with a  declaration of the form
 
 > **Note:**
 Systems are meant to be progressive: every reachable state has a successor
-with respect $T_S$.
+with respect $T_S$ for every possible next-state input.
 However, they may not be because of the generality of $T$ and $P$.
 In other words, it is possible to define deadlocking systems.
 (See later for more details on deadlocked states.)
 
-#### Examples
+##### Examples — Atomic systems
 
 (Adapted from "Principles of Cyber-Physical Systems" by R. Alur, 2015)
 
 When reading these examples, it is helpful to keep in mind that, intuitively,
-in the <tt>:init</tt> formulas the input values are given and the local and output
-values are to be defined with respect to them.
-In contrast, in the <tt>:trans</tt> formulas the new input values, and old input,
-output and local values are given, and the new local and output values are
-to be defined.
+_in the initial conditions, the input values are given_ and the local and output
+values are to be defined, or more generally, constrained with respect to the given ones.
+In contrast,
+_in the transition conditions, the new input values, and old input,
+output and local values are given_, and the new local and output values are
+to be constrained with respect to the given ones.
 
 The output of system <tt>Delay</tt> below is initially <tt>0</tt> and
 then is the previous input.
@@ -759,63 +798,62 @@ Similar to <tt>DelayedArbiter</tt> but for requests expressed as integer events.
 )
 -->
 
-#### Composite Systems  - synchronous composition
+##### Composite Systems — synchronous composition
 
-A transition systems can be defined as the synchronous composition
+Transition systems can also be defined as the synchronous[^1] composition
 of other systems by a command of the form:
 
 <tt>(define-system $S$</tt><br>
-<tt>&nbsp;:input ( ( $i_1$ $\sigma_1$ ) $\cdots$ ( $i_m$ $\sigma_m$ ) )</tt><br>
-<tt>&nbsp;:output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) ) </tt><br>
-<tt>&nbsp;:local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) ) </tt><br>
-<tt>&nbsp;:subsys ( $N_1$ ( $S_1$ $\boldsymbol x_1$ $\boldsymbol y_1$ ) ) </tt><br>
+<tt>&nbsp;:input ( ($i_1$ $\sigma_1$) $\cdots$ ( $i_m$ $\sigma_m$) )</tt><br>
+<tt>&nbsp;:output ( ($o_1$ $\tau_1$) $\cdots$ ( $o_n$ $\tau_n$) ) </tt><br>
+<tt>&nbsp;:local ( ($l_1$ $\sigma_1$) $\cdots$ ( $l_p$ $\sigma_p$) ) </tt><br>
+<tt>&nbsp;:subsys ( $N_1$ ( $S_1$ $\boldsymbol x_1$ $\boldsymbol y_1$) ) </tt><br>
 <tt>&nbsp;&nbsp; $\cdots$</tt><br>
-<tt>&nbsp;:subsys ( $N_q$ ( $S_q$ $\boldsymbol x_q$ $\boldsymbol y_q$ ) ) </tt><br>
+<tt>&nbsp;:subsys ( $N_q$ ( $S_q$ $\boldsymbol x_q$ $\boldsymbol y_q$) ) </tt><br>
 <tt>&nbsp;:init $I$</tt><br>
 <tt>&nbsp;:trans $T$</tt><br>
 <tt>&nbsp;:inv $P$</tt><br>
 <tt>)</tt>
 
 where
-
 * <tt>:input</tt>, <tt>:output</tt>, <tt>:local</tt> <tt>:init</tt>, <tt>:trans</tt>, and <tt>:inv</tt> 
   are as in atomic system definitions;
 * $q > 0$ and each $S_i$ is the name of a system other than $S$;
 * the names $S_1 \ldots,S_q$ need not be all distinct;
 * each $N_i$ is a local synonym for $S_i$, with $N_1,\ldots,N_q$ distinct;
-* each $\boldsymbol x_i$ consists of $S$'s variables of the same type as $S_i$'s input;
-* each $\boldsymbol y_i$ consists of $S$'s local/output variables of the same type
-  as $S_i$' ’'s output;
+* each $\boldsymbol x_i$ consists of $S$'s variables of the same sort as $S_i$'s input;
+* each $\boldsymbol y_i$ consists of $S$'s local/output variables of the same sort
+  as $S_i$'s output;
 * the directed subsystem graph rooted at $S$ is acyclic.
 
-#### Composite System Semantics
+##### Composite System Semantics
 
 For $k=1,\ldots, q$, let
-$S_k = (I_k[\boldsymbol{i}_k,\boldsymbol{o}_k,\boldsymbol{s}_k], T_k[\boldsymbol{i}_k,\boldsymbol{o}_k,\boldsymbol{s}_k,\boldsymbol{i'}_k,\boldsymbol{o'}_k,\boldsymbol{s'}_k])$,
-with the elements of $\boldsymbol{s}_1,\ldots, \boldsymbol{s}_q$ all mutually distinct.
+$S_k = (I_k[\boldsymbol{i}_k,\boldsymbol{o}_k,\boldsymbol{l}_k], T_k[\boldsymbol{i}_k,\boldsymbol{o}_k,\boldsymbol{l}_k,\boldsymbol{i'}_k,\boldsymbol{o'}_k,\boldsymbol{l'}_k])$,
+with the elements of $\boldsymbol{l}_1,\ldots, \boldsymbol{l}_q$ all mutually distinct.
 
 Let
 $\boldsymbol{i} = (i_1, \ldots, i_m)$,
 $\boldsymbol{o} = (o_1, \ldots, o_n)$,
-$\boldsymbol{s} = (s_1, \ldots, s_p) \circ \boldsymbol{s}_1 \circ \cdots \circ \boldsymbol{s}_q$,
+$\boldsymbol{l} = (l_1, \ldots, l_p),  \boldsymbol{l}_1,  \ldots,  \boldsymbol{l}_q$,
 and
-$\boldsymbol{v}$ = $\boldsymbol{i} \circ \boldsymbol{o} \circ \boldsymbol{s}$.
+$\boldsymbol{x}$ = $\boldsymbol{i},  \boldsymbol{o},  \boldsymbol{l}$.
 
 Formally, a composite system $S$ introduced by the <tt>define-system</tt> command
 above is a transition system whose behavior consists of all the (infinite) executions
-$(\mathcal I, \pi)$ over $\boldsymbol{v}$ such that
+$(\mathcal I, \pi)$ over $\boldsymbol{x}$ such that
 
 $$(\mathcal I, \pi) \models
-  I_S[\boldsymbol{v}] \land \mathbf{always}\ T_S[\boldsymbol{v},\boldsymbol{v'}]
+  I_S[\boldsymbol{x}] \land \mathbf{always}\ T_S[\boldsymbol{x},\boldsymbol{x'}]
 $$
 
 where
 
-* $I_S[\boldsymbol{v}] = I[\boldsymbol{v}] \land \bigwedge_{k=1,\ldots,q} I_k[\boldsymbol{x}_k,\boldsymbol{y}_k,\boldsymbol{s}_k]$ <br>
+* $I_S[\boldsymbol{x}] = I[\boldsymbol{x}] \land \bigwedge_{k=1,\ldots,q} I_k[\boldsymbol{x}_k,\boldsymbol{y}_k,\boldsymbol{l}_k]$ <br>
 and
-* $T_S[\boldsymbol{v},\boldsymbol{v'}] = P[\boldsymbol{v}] \land T[\boldsymbol{v},\boldsymbol{v'}] \land \bigwedge_{k=1,\ldots,q} T_k[\boldsymbol{x}_k,\boldsymbol{y}_k,\boldsymbol{s}_k, \boldsymbol{x'}_k,\boldsymbol{y'}_k,\boldsymbol{s'}_k]$
+* $T_S[\boldsymbol{x},\boldsymbol{x'}] = P[\boldsymbol{x}] \land T[\boldsymbol{x},\boldsymbol{x'}] \land \bigwedge_{k=1,\ldots,q} T_k[\boldsymbol{x}_k,\boldsymbol{y}_k,\boldsymbol{l}_k, \boldsymbol{x'}_k,\boldsymbol{y'}_k,\boldsymbol{l'}_k]$
 
-#### Examples, composite systems
+##### Examples — composite systems
 
 ```smt
 ;----------------
@@ -970,71 +1008,79 @@ with <tt>out0</tt> being the least significant one.
 )
 ```
 
-#### Sanity requirements on $I_S$ and $T_S$
+##### Sanity requirements on $I_S$ and $T_S$
 
 Because of the infinite trace semantics every system defined in MoXI is expected
 to execute forever.
-This is not a limitation in practice because systems that are meant to reach
-a final state can be always modeled with states that cycle back to themselves and
-produce stuttering outputs.
 In such semantics, the reachability of a _deadlocked state_
 (i.e., a state with no successors in the transition relation) indicates the presence
 of an error in the system's definition.
+In fact, since these are systems with inputs, the requirements are typically
+even more stringent:
+a state should have a successor _for every possible next-state input_.
 
-Intuitively, for a system definition to define a system with no deadlocks:
+Intuitively, for a system definition to define a deadlock-free system,
+the following must hold for the variables
+$\boldsymbol{x} = \boldsymbol{i}, \boldsymbol{o}, \boldsymbol{l}$ and
+their primed versions.:
 
-1. Any assignment of values to the input variables can be extended
-   to a total assignment (to all the unprimed variables) that satisfies $I_S$.
+1. Every assignment of values to the input variables $\boldsymbol{i}$ can be extended
+   to an assignment to $\boldsymbol{x}$ that satisfies $I_S[\boldsymbol{x}]$.
 
-2. For any reachable state $S$, any assignment $s$ to the primed input variables
-   can be extended to a total assignment $s'$ so that $s,s'$ satisfies $T_S$.
+2. For every reachable state $s$ (i.e., assignment to the variables $\boldsymbol{x}$),
+   every assignment to the primed input variables $\boldsymbol{i'}$
+   can be extended to an assignment $s'$ to $\boldsymbol{x'}$ so that
+   $s,s'$ satisfies $T_S$[$\boldsymbol{x},\boldsymbol{x'}$].
 
 The first restriction above guarantees that the system can start at all.
-The second ensures that from any reachable state and for any new input
+The second ensures that from any reachable state and for any new input,
 the system can move to another state (_and so_ also produce output).
+Given a backgrount theory $\mathcal T$,
 
-* A sufficient condition for (1) is that the following formula is valid
-  in the (previously specified) background theory:
+* a sufficient condition for (1) is that the following formula is valid in $\mathcal T$:
 
-  $$\forall \boldsymbol{i}\, \exists \boldsymbol{o}\, \exists \boldsymbol{s}\, I_S$$
+  $$\forall \boldsymbol{i}\, \exists \boldsymbol{o}\, \exists \boldsymbol{l}\, I_S$$
 
-* A sufficient condition for (2) is that the following formula is valid
-  in the background theory:
+* a sufficient condition for (2) is that the following formula is valid in $\mathcal T$:
 
-  $$\forall \boldsymbol{i}~ \forall \boldsymbol{o}~ \forall \boldsymbol{s}~
+  $$\forall \boldsymbol{i}~ \forall \boldsymbol{o}~ \forall \boldsymbol{l}~
     \forall \boldsymbol{i'}~
-    \exists \boldsymbol{o'}~ \exists \boldsymbol{s'}~ T_S
+    \exists \boldsymbol{o'}~ \exists \boldsymbol{l'}~ T_S
   $$
 
-  This condition is not necessary, however, since it need not apply to unreachable
+  Note that this condition is not a necessary condition as it needs not apply to unreachable
   states.
-  Let $\textrm{Reachable}[\boldsymbol{i}, \boldsymbol{o}, \boldsymbol{s}]$ denote
+  Let $\textrm{Reachable}[\boldsymbol{i}, \boldsymbol{o}, \boldsymbol{l}]$ denote
   the (possibly higher-order) formula satisfied exactly by the reachable states
   of $S$.
-  Then, a more accurate sufficient condition for (2) above would be the validity of the formula:
+  Then, a more accurate sufficient condition for (2) above would be the validity 
+  in $\mathcal T$ of the formula:
 
-  $$\forall \boldsymbol{i}~ \forall \boldsymbol{o}~ \forall \boldsymbol{s}~
+  $$\forall \boldsymbol{i}~ \forall \boldsymbol{o}~ \forall \boldsymbol{l}~
     \forall \boldsymbol{i'}~
-    \exists \boldsymbol{o'}~ \exists \boldsymbol{s'}~
-     \textrm{Reachable} \Rightarrow T_S[\boldsymbol{i}, \boldsymbol{o}, \boldsymbol{s}]
+    \exists \boldsymbol{o'}~ \exists \boldsymbol{l'}~
+     \textrm{Reachable} \Rightarrow T_S[\boldsymbol{i}, \boldsymbol{o}, \boldsymbol{l}]
   $$
 
 > **Note:**
 In general, checking the two sufficient conditions above automatically can be
 impossible or very expensive because of the quantifier alternations in the conditions.
 
-### System checking command
+#### System checking command
+
+The properties to check for a (possibly composite) defined system are specified using 
+the following command for defining _queries_ on the system’s behavior.
 
 <tt>(check-system $S$</tt> <br>
-<tt>&nbsp;:input ( ( $i_1$ $\delta_1$ ) $\cdots$ ( $i_m$ $\delta_m$ ) ) </tt><br>
-<tt>&nbsp;:output ( ( $o_1$ $\tau_1$ ) $\cdots$ ( $o_n$ $\tau_n$ ) ) </tt><br>
-<tt>&nbsp;:local ( ( $s_1$ $\sigma_1$ ) $\cdots$ ( $s_p$ $\sigma_p$ ) ) </tt><br>
+<tt>&nbsp;:input ( ($i_1$ $\delta_1$) $\cdots$ ( $i_m$ $\delta_m$) ) </tt><br>
+<tt>&nbsp;:output ( ($o_1$ $\tau_1$) $\cdots$ ( $o_n$ $\tau_n$) ) </tt><br>
+<tt>&nbsp;:local ( ($l_1$ $\sigma_1$) $\cdots$ ( $l_p$ $\sigma_p$) ) </tt><br>
 <tt>&nbsp;:assumption ( $a$ A ) </tt><br>
 <tt>&nbsp;:fairness ( $f$ $F$ ) </tt><br>
 <tt>&nbsp;:reachable ( $r$ $R$ ) </tt><br>
 <tt>&nbsp;:current ( $c$ $C$ ) </tt><br>
-<tt>&nbsp;:query ( $q$ ( $g_1$ $\cdots$ $g_q$ ) )</tt><br>
-<tt>&nbsp;:queries ( ( $q_1$ ( $g_{1,1}$ $\cdots$ $g_{1,n_1}$ ) ) $\cdots$ ( $q_t$ ( $g_{t,1}$ $\cdots$ $g_{t,n_t}$ ) ) )</tt><br>
+<tt>&nbsp;:query ( $q$ ( $g_1$ $\cdots$ $g_q$) )</tt><br>
+<tt>&nbsp;:queries ( ($q_1$ ( $g_{1,1}$ $\cdots$ $g_{1,n_1}$ )) $\cdots$ ( $q_t$ ( $g_{t,1}$ $\cdots$ $g_{t,n_t}$) ) )</tt><br>
 <tt>)</tt>
 
 where
@@ -1050,18 +1096,19 @@ where
   input variables of $S$ of sort $\boldsymbol{\delta} = (\delta_1, \ldots, \delta_m)$;
 * $\boldsymbol{o} = (o_1, \ldots, o_n)$ is a renaming of the corresponding
   output variables of $S$ of sort $\boldsymbol{\tau} = (\tau_1, \ldots, \tau_n)$;
-* $\boldsymbol{s} = (s_1, \ldots, s_p)$ is a renaming of the corresponding
+* $\boldsymbol{l} = (l_1, \ldots, l_p)$ is a renaming of the corresponding
   local variables of $S$ of sort $\boldsymbol{\sigma} = (\sigma_1, \ldots, \sigma_p)$;
 * $a$, $r$, $f$, $c$, $q$, $q_1, \ldots, q_k$ are identifiers;
 * $A$ is (non-temporal) formula over the system variables
-  $\boldsymbol{i}$, $\boldsymbol{o}$, $\boldsymbol{s}$, and $\boldsymbol{i'}$
+  $\boldsymbol{i}$, $\boldsymbol{o}$, $\boldsymbol{l}$, and $\boldsymbol{i'}$
   expressing an _environmental assumption_ on $\boldsymbol{i'}$;
 * $F$ is (non-temporal) formula over the system variables
-  $\boldsymbol{i}$, $\boldsymbol{o}$, $\boldsymbol{s}$, and $\boldsymbol{i'}$
+  $\boldsymbol{i}$, $\boldsymbol{o}$, $\boldsymbol{l}$, and $\boldsymbol{i'}$
   expressing a _fairness condition_ on $\boldsymbol{i'}$;
 * $R$ is (non-temporal) formula over all the system variables, primed and unprimed,
   expressing a state _reachability condition_;
-* $C$ is (non-temporal) formula over all the unprimed system variables
+* $C$ is (non-temporal) formula over all the system variables
+  $\boldsymbol{i}$, $\boldsymbol{o}$, $\boldsymbol{l}$
   expressing a state _initiality condition_;
 * each $g_j$ and $g_{j,k}$ ranges over the $a$, $r$, $f$, $c$ identifiers;
 * $(q\ (g_1 \cdots g_q))$ defines a query $q$ as consisting of the formulas named
@@ -1081,8 +1128,8 @@ The order of the formula names in a query is immaterial.
 
 #### Semantics
 
-Each query $q$ ($q_j$) in the <tt>check-system</tt> command asks for the existence
-of a trace.
+Each query ($q$ and each $q_j$) in the <tt>check-system</tt> command asks
+for the existence of a trace.
 The query is to be evaluated with infinite-state semantics if it includes at least
 one fairness condition, and the finite-state semantics otherwise.
 
@@ -1091,7 +1138,11 @@ let $I_S$ and $T_S$ be the initial state and transition predicates of $S$
 _modulo_ the variable renamings in the command.
 The meaning of the query depends on its components.
 
-Specifically, let $t, u, v  \geq 0$ :
+Specifically, for a system $S$, let $I_S$ and $T_S$ be the initial state and 
+transition predicates of $S$ modulo the variable renamings in the <tt>check-system</tt>
+command.
+Let $t, u, v  \geq 0$.
+The semantics of queries are defined as follows:
 
 (1) A $q$ query of the form
 <tt>( $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$  )</tt>,
@@ -1108,7 +1159,7 @@ $$
 \end{array}
 $$
 
-is **$n$-satisfiable** in LTL for some $n > 0$.
+is **$n$-satisfiable** in LTL for some $n \geq 0$.
 
 (2) A $q$ query of the form
 <tt>( $c$ $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$  )</tt>,
@@ -1126,7 +1177,7 @@ $$
 \end{array}
 $$
 
-is **$n$-satisfiable** in LTL for some $n > 0$.
+is **$n$-satisfiable** in LTL for some $n \geq 0$.
 
 (3) A $q$ query of the form
 <tt>( $a_1$ $\cdots$ $a_t$ $r_1$ $\cdots$ $r_u$ $f_1$ $\cdots$ $f_v$  )</tt>,
@@ -1182,7 +1233,8 @@ is **satisfiable** in LTL.
     $$
 -->
 
-Let $\mathcal T$ be the background theory specified for an MoXI script.
+Let $\mathcal T$ be the background theory specified for an MoXI model.
+
 For each satisfiable query in a <tt>check-system</tt> command,
 the model checker is expected to produce
 
@@ -1195,6 +1247,8 @@ the same <tt>:queries</tt> attribute.
 In contrast, queries in different attributes may each have their own
 interpretation of the free symbols.
 Regardless of where it occurs, each query may have its own witnessing trace.
+
+For each unsatisfiable query, the model checker may return a proof certificate for that query’s unsatisfiability.
 
 > **Note**:
 To enforce the infinite state semantics for an query it is enough for it
@@ -1275,18 +1329,37 @@ in the query in a different state.
 )
 ```
 
-#### Check-system response
+##### Check-system response
 
-We define a trail each to be a finite sequence of states. A trace consists of two trails:
+MoXI also defines the content and format of possible responses
+(from the model checker) to a <tt>check-system</tt> command.
+Witness traces returned by the model checker are currently limited to _lasso traces_,
+that is, traces of the form $pl^\omega$,
+where $p$ and $l$ are finite sequences of states, or _trails_.
 
-* a prefix trail and
-* a lasso trail.
+Each witness is then represented by two trails:
 
-A trace represents an infinite counterexample and consists of a finite prefix of type trail
-followed by a lasso of type trail representing an infinite loop: there is a transition
-from last state of the lasso to its first state.
-Oppositely from a trace, a certificate represents a proof of correctness.
-We return one trail or certificate in response to each query.
+* a _prefix trail_ $p$  and
+* a _lasso trail_ $l$.
+
+A witness trace is then an infinite trace that starts with a prefix $p$
+and continues with a infinite repetitions of a trail $l$
+(meaning that the last state of $l$ loops back to the first state of $l$).
+In contrast, a proof certificate for a trace represents a proof of the unsatisfiability
+of the query.
+Currently, MoXI does not specify the format of proof certificates except for requiring
+The response to a <tt>check-system</tt> comment is expected to contain one witness trace
+or proof certificate for each query in the command.
+
+Each response is an s-expression starting with <tt>check-system-response</tt>
+and listing several attributes with their values.
+The format of the response can be _verbose_ or _compact_.
+This is indicated by the value <tt>full</tt> or <tt>compact</tt> 
+of the attribute <tt>:verbosity</tt>.
+
+###### Verbose response
+
+[to do]
 
 **Verbose** response with input var `i`, output var `o`, local var `s`,
 reachability pred `r`, and fairness condition `f`.
@@ -1304,10 +1377,12 @@ reachability pred `r`, and fairness condition `f`.
              (j (i iⱼ) (o oⱼ) (s sⱼ) (r rⱼ) (f fⱼ))
            )
         ) 
- :trail (l ( ( ... ) ... ( ... ) ))
+ :trail (l ( (... ) ... ( ...) ))
  :certificate (c :inv F :k n)
 )
 ```
+
+###### Compact response
 
 The **compact** response format is identical to the verbose one except that
 each trail starts with a fully specified state and continues with states
@@ -1322,3 +1397,7 @@ in the previous state.
  ...
 )
 ```
+
+### Footnotes
+
+[^1] The asynchronous composition of systems is planned for a later version of MoXI.
