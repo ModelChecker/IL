@@ -131,7 +131,7 @@ where
   over the variables $\boldsymbol{i}$, $\boldsymbol{o}$, $\boldsymbol{l}$,
   $\boldsymbol{i'}$, $\boldsymbol{o'}$, and $\boldsymbol{l'}$.
 
->**Note:**
+> [!NOTE]
 For convenience, but differently from other formalizations, a (full) state
 of system $S$ is expressed by a valuation of the variables
 $\boldsymbol{i},\boldsymbol{o},\boldsymbol{l}$.
@@ -143,13 +143,13 @@ The designation of some state variables as input or output is, however, importan
 when combining systems together, to capture which of the state values are shared
 between two systems being combined, and how.
 >
-> **Note:**
+> [!NOTE]
 Similarly to Mealy machines, the initial state condition is also supposed to specify
 the initial system's output, based on the initial state and input.
 Correspondingly, the transition relation is also supposed to specify the system's output
 in every later state of the computation.
 >
->**Note:** The input and output values corresponding to the transition 
+> [!NOTE] The input and output values corresponding to the transition 
 to the _new_ state are those in the variables $\boldsymbol{i'}$ and
 $\boldsymbol{o'}$.
 The values of $\boldsymbol{i}, \boldsymbol{o}$ are the _old_ input and output values.
@@ -312,7 +312,7 @@ is again defined by reduction to the connectives above.
 Intuitively, $n$-satisfiability specifies when a formula is true over
 the first $n$ states of a trace.
 
-> **Note:**
+> [!NOTE]
 This notion is well defined even when $n=0$ regardless of whether $F$
 is a two-state formula (having free occurrences of variables from
 $\boldsymbol{x'}$) or not.
@@ -515,12 +515,12 @@ $$
 We call $I_S = I[\boldsymbol{x}]$ _the initial state predicate_ of $S$ and
 $T_S = P[\boldsymbol{x}] \land T[\boldsymbol{x},\boldsymbol{x'}]$ _the transition predicate_ of $S$.
 
-> **Note:**
+> [!NOTE]
 The relation expressed by the formula $T$ is not required to be functional
 over $\boldsymbol{i},\boldsymbol{o},\boldsymbol{l},\boldsymbol{i'}$,
 thus allowing the modeling of non-deterministic systems.
 >
-> **Note:**
+> [!NOTE]
 The <tt>:inv</tt> attribute is not strictly necessary since a system
 with a  declaration of the form
 >
@@ -542,7 +542,7 @@ with a  declaration of the form
 >  <tt>)</tt>
 >
 
-> **Note:**
+> [!NOTE]
 Systems are meant to be progressive: every reachable state has a successor
 with respect $T_S$ for every possible next-state input.
 However, they may not be because of the generality of $T$ and $P$.
@@ -1068,9 +1068,9 @@ Given a backgrount theory $\mathcal T$,
      \textrm{Reachable} \Rightarrow T_S[\boldsymbol{i}, \boldsymbol{o}, \boldsymbol{l}]
   $$
 
-> **Note:**
-In general, checking the two sufficient conditions above automatically can be
-impossible or very expensive because of the quantifier alternations in the conditions.
+> [!NOTE]
+> In general, checking the two sufficient conditions above automatically can be
+> impossible or very expensive because of the quantifier alternations in the conditions.
 
 ### System checking command
 
@@ -1123,13 +1123,13 @@ where
 * a query can contain more than one assumption, fairness condition and reachability
   condition but at most one initiality condition.
 
-> **Note:**
+> [!NOTE]
 When the command contains more than one instance of the attributes
 <tt>:assumption</tt>, <tt>:reachable</tt>, <tt>:fairness</tt> and <tt>:current</tt>,
 the list of elements of a query $q$ can refer to any of the identifiers
 in those attributes.
 
-> **Note:**
+> [!NOTE]
 The order of the formula names in a query is immaterial.
 
 #### Check-system semantics
