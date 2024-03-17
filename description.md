@@ -413,19 +413,27 @@ or, equivalently, <tt>(distinct s t)</tt>.
 
 ### MoXI-specific commands
 
-#### Enumeration declaration
+MoXI adds three commands to SMT-LIB:
+<tt>declare-enum-sort</tt>,
+<tt>define-system</tt>, and
+<tt>check-system</tt>
+
+The first has the form
 
 <tt>(declare-enum-sort $s$ ( $c_1$ $\cdots$ $c_n$) )</tt>
 
-Declares $s$ to be an enumerative type with (distinct) values $c_1, \ldots, c_n$.
+where $s$, and $c_1, \ldots, c_n$ are SMT-LIB symbols.
+It declares an enumeration sort $s$ with (distinct) values $c_1, \ldots, c_n$.
 
-#### System definition command
+The other two commands are discussed in detail in the next two sections.
+
+### System definition command
 
 MoXI allows the definition of a model as the composition of one or more systems.
 MoXI ’s system definition commands follow the SMT-LIB syntax
 for attribute-value pairs.
 
-##### Atomic systems
+#### Atomic systems
 
 An atomic transition system with $m$ inputs, $n$ outputs, and $p$ local variables
 is defined by a command of the form:
@@ -507,7 +515,6 @@ $$
 We call $I_S = I[\boldsymbol{x}]$ _the initial state predicate_ of $S$ and
 $T_S = P[\boldsymbol{x}] \land T[\boldsymbol{x},\boldsymbol{x'}]$ _the transition predicate_ of $S$.
 
-
 > **Note:**
 The relation expressed by the formula $T$ is not required to be functional
 over $\boldsymbol{i},\boldsymbol{o},\boldsymbol{l},\boldsymbol{i'}$,
@@ -534,7 +541,6 @@ with a  declaration of the form
 >  <tt>&nbsp;:trans (and $P$ $T$)</tt><br>
 >  <tt>)</tt>
 >
-
 
 > **Note:**
 Systems are meant to be progressive: every reachable state has a successor
@@ -798,7 +804,7 @@ Similar to <tt>DelayedArbiter</tt> but for requests expressed as integer events.
 )
 -->
 
-##### Composite Systems — synchronous composition
+#### Composite Systems — synchronous composition
 
 Transition systems can also be defined as the synchronous[^1] composition
 of other systems by a command of the form:
@@ -1008,7 +1014,7 @@ with <tt>out0</tt> being the least significant one.
 )
 ```
 
-##### Sanity requirements on $I_S$ and $T_S$
+#### System sanity requirements
 
 Because of the infinite trace semantics every system defined in MoXI is expected
 to execute forever.
@@ -1066,7 +1072,7 @@ Given a backgrount theory $\mathcal T$,
 In general, checking the two sufficient conditions above automatically can be
 impossible or very expensive because of the quantifier alternations in the conditions.
 
-#### System checking command
+### System checking command
 
 The properties to check for a (possibly composite) defined system are specified using 
 the following command for defining _queries_ on the system’s behavior.
@@ -1126,7 +1132,7 @@ in those attributes.
 > **Note:**
 The order of the formula names in a query is immaterial.
 
-#### Semantics
+#### Check-system semantics
 
 Each query ($q$ and each $q_j$) in the <tt>check-system</tt> command asks
 for the existence of a trace.
@@ -1329,7 +1335,7 @@ in the query in a different state.
 )
 ```
 
-##### Check-system response
+#### Check-system response
 
 MoXI also defines the content and format of possible responses
 (from the model checker) to a <tt>check-system</tt> command.
@@ -1357,7 +1363,7 @@ The format of the response can be _verbose_ or _compact_.
 This is indicated by the value <tt>full</tt> or <tt>compact</tt> 
 of the attribute <tt>:verbosity</tt>.
 
-###### Verbose response
+##### Verbose response
 
 [to do]
 
@@ -1382,7 +1388,7 @@ reachability pred `r`, and fairness condition `f`.
 )
 ```
 
-###### Compact response
+##### Compact response
 
 The **compact** response format is identical to the verbose one except that
 each trail starts with a fully specified state and continues with states
@@ -1398,6 +1404,6 @@ in the previous state.
 )
 ```
 
-### Footnotes
+## Footnotes
 
 [^1] The asynchronous composition of systems is planned for a later version of MoXI.
