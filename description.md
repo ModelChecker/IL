@@ -149,7 +149,8 @@ the initial system's output, based on the initial state and input.
 Correspondingly, the transition relation is also supposed to specify the system's output
 in every later state of the computation.
 
-> [!NOTE] The input and output values corresponding to the transition 
+> [!NOTE] 
+The input and output values corresponding to the transition 
 to the _new_ state are those in the variables $\boldsymbol{i'}$ and
 $\boldsymbol{o'}$.
 The values of $\boldsymbol{i}, \boldsymbol{o}$ are the _old_ input and output values.
