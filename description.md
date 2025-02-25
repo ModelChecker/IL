@@ -211,7 +211,7 @@ mapping each variable $x$ in $\boldsymbol x$ to a value of $x$'s sort.
 If $s$ is such a state, we denote by $s(\boldsymbol x)$ the value tuple
 $(s(x_1),\ldots, s(x_n))$.
 Let $\kappa$ be a positive ordinal up to $\omega$, the cardinality of the natural numbers.
-A _trace (of length $\kappa$ over $\boldsymbol x$)_ is
+A _trace_ (of length $\kappa$ over $\boldsymbol x$) is
 any state sequence $\pi = (s_j  \mid 0 \leq j < \kappa)$.
 Note that $\pi$ is the finite sequence $s_0, \ldots, s_{\kappa-1}$
 when $\kappa < \omega$ and
