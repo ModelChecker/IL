@@ -825,6 +825,9 @@ of other systems by a command of the form:
 where
 * <tt>:input</tt>, <tt>:output</tt>, <tt>:local</tt> <tt>:init</tt>, <tt>:trans</tt>, and <tt>:inv</tt> 
   are as in atomic system definitions;
+* every <tt>:subsys</tt> attribute occurs 
+  after the <tt>:input</tt>, <tt>:output</tt>, and <tt>:local</tt> attributes
+  but before the <tt>:init</tt>, <tt>:trans</tt>, and <tt>:inv</tt> attributes;
 * $q > 0$ and each $S_i$ is the name of a system other than $S$;
 * the names $S_1 \ldots,S_q$ need not be all distinct;
 * each $N_i$ is a local synonym for $S_i$, with $N_1,\ldots,N_q$ distinct;
